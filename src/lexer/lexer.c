@@ -174,7 +174,7 @@ Token nextToken(Lexer* lexer) {
             int colStart = lexer->col; \
             while (PEEK(lexer) != quote && !IS_AT_END(lexer)) { \
                 if (PEEK(lexer) == '\n') return errorToken("Unterminated string", lexer, colStart); \
-                advance(lexer); \
+                advance(lexer); /* Consume the quote */ \
             } \
             if (IS_AT_END(lexer)) return errorToken("Unterminated string", lexer, colStart); \
                 advance(lexer); \
