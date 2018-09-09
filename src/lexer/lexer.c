@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
+
 #include "lexer.h"
 
 /* Functions/macros for moving the cursor around */
@@ -17,7 +19,7 @@ static char advance(Lexer* lexer) {
 /* Helpers */
 #define IS_DIGIT(ch) ('0' <= ch && ch <= '9')
 
-const char* tokenTypes[] = { TOKEN_TYPES };
+const char* tokenTypes[] = {TOKEN_TYPES};
 
 Lexer newLexer(char* source) {
     Lexer l = {
@@ -29,6 +31,13 @@ Lexer newLexer(char* source) {
     return l;
 }
 
+static bool match(Lexer* lexer, char expected) {
+    if (IS_AT_END(lexer)) return false;
+    if (*lexer->current != expected) return false;
+
+    lexer->current++;
+    return true;
+}
 
 static void skipWhitespace(Lexer* lexer) {
     for (;;) {
@@ -118,6 +127,31 @@ Token nextToken(Lexer* lexer) {
         case '-': return newSingleCharToken(TOKEN_MINUS, lexer);
         case '*': return newSingleCharToken(TOKEN_STAR, lexer);
         case '/': return newSingleCharToken(TOKEN_SLASH, lexer);
+        case '<': {
+            if (match(lexer, '=')) return newToken(TOKEN_LTE, lexer, lexer->col - 1);
+            else return newSingleCharToken(TOKEN_LT, lexer);
+        }
+        case '>': {
+            if (match(lexer, '=')) return newToken(TOKEN_GTE, lexer, lexer->col - 1);
+            else return newSingleCharToken(TOKEN_GT, lexer);
+        }
+        case '!': {
+            if (match(lexer, '=')) return newToken(TOKEN_BANG_EQ, lexer, lexer->col - 1);
+            else return newSingleCharToken(TOKEN_BANG, lexer);
+        }
+        case '=': {
+            if (match(lexer, '=')) return newToken(TOKEN_EQ_EQ, lexer, lexer->col - 1);
+            else return newSingleCharToken(TOKEN_EQ, lexer);
+        }
+        case '[': return newSingleCharToken(TOKEN_LBRACK, lexer);
+        case ']': return newSingleCharToken(TOKEN_RBRACK, lexer);
+        case '{': return newSingleCharToken(TOKEN_LBRACE, lexer);
+        case '}': return newSingleCharToken(TOKEN_RBRACE, lexer);
+        case '(': return newSingleCharToken(TOKEN_LPAREN, lexer);
+        case ')': return newSingleCharToken(TOKEN_RPAREN, lexer);
+        case '.': return newSingleCharToken(TOKEN_DOT, lexer);
+        case ',': return newSingleCharToken(TOKEN_COMMA, lexer);
+        case ':': return newSingleCharToken(TOKEN_COLON, lexer);
 
         default: {
             char msg[24];

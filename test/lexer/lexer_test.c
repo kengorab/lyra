@@ -47,7 +47,7 @@ TEST(testLinesAndColumns, {
     ASSERT_EQ_INT(token.col, 1, "Token should be on column 1");
 })
 
-TEST(testTokenizingIntegers, {
+TEST(testTokenizeIntegers, {
     Token tokens[3];
     tokenizeStr("1 2 3", tokens);
     Token token;
@@ -79,7 +79,7 @@ TEST(testTokenizingIntegers, {
     ASSERT_EQ_STR(tokenTypes[token.type], "TOKEN_NUMBER", "Token should be of type TOKEN_NUMBER");
 })
 
-TEST(testTokenizingFloats, {
+TEST(testTokenizeFloats, {
     Token tokens[2];
     tokenizeStr("1.2 2.3", tokens);
     Token token;
@@ -103,50 +103,121 @@ TEST(testTokenizingFloats, {
     ASSERT_EQ_STR(tokenTypes[token.type], "TOKEN_NUMBER", "Token should be of type TOKEN_NUMBER");
 })
 
-TEST(testTokenizingOperators, {
-    Token tokens[12];
-    tokenizeStr("1 + 2\n1 - 2\n1 * 2\n1 / 2", tokens);
+TEST(testTokenizeOperators, {
+    Token tokens[10];
+    tokenizeStr("+ - * / ! != < <= > >=", tokens);
+    Token token;
+
+    char contents[3]; // Buffer for reading token contents into
+
+    token = tokens[0];
+    sprintf(contents, "%.*s", token.length, token.start);
+    ASSERT_EQ_STR(contents, "+", "Token should contain \"+\"");
+    ASSERT_EQ_STR(tokenTypes[token.type], "TOKEN_PLUS", "Token should be of type TOKEN_PLUS");
+
+    token = tokens[1];
+    sprintf(contents, "%.*s", token.length, token.start);
+    ASSERT_EQ_STR(contents, "-", "Token should contain \"-\"");
+    ASSERT_EQ_STR(tokenTypes[token.type], "TOKEN_MINUS", "Token should be of type TOKEN_MINUS");
+
+    token = tokens[2];
+    sprintf(contents, "%.*s", token.length, token.start);
+    ASSERT_EQ_STR(contents, "*", "Token should contain \"*\"");
+    ASSERT_EQ_STR(tokenTypes[token.type], "TOKEN_STAR", "Token should be of type TOKEN_STAR");
+
+    token = tokens[3];
+    sprintf(contents, "%.*s", token.length, token.start);
+    ASSERT_EQ_STR(contents, "/", "Token should contain \"/\"");
+    ASSERT_EQ_STR(tokenTypes[token.type], "TOKEN_SLASH", "Token should be of type TOKEN_SLASH");
+
+    token = tokens[4];
+    sprintf(contents, "%.*s", token.length, token.start);
+    ASSERT_EQ_STR(contents, "!", "Token should contain \"!\"");
+    ASSERT_EQ_STR(tokenTypes[token.type], "TOKEN_BANG", "Token should be of type TOKEN_BANG");
+
+    token = tokens[5];
+    sprintf(contents, "%.*s", token.length, token.start);
+    ASSERT_EQ_STR(contents, "!=", "Token should contain \"!=\"");
+    ASSERT_EQ_STR(tokenTypes[token.type], "TOKEN_BANG_EQ", "Token should be of type TOKEN_BANG_EQ");
+
+    token = tokens[6];
+    sprintf(contents, "%.*s", token.length, token.start);
+    ASSERT_EQ_STR(contents, "<", "Token should contain \"<\"");
+    ASSERT_EQ_STR(tokenTypes[token.type], "TOKEN_LT", "Token should be of type TOKEN_LT");
+
+    token = tokens[7];
+    sprintf(contents, "%.*s", token.length, token.start);
+    ASSERT_EQ_STR(contents, "<=", "Token should contain \"<=\"");
+    ASSERT_EQ_STR(tokenTypes[token.type], "TOKEN_LTE", "Token should be of type TOKEN_LTE");
+
+    token = tokens[8];
+    sprintf(contents, "%.*s", token.length, token.start);
+    ASSERT_EQ_STR(contents, ">", "Token should contain \">\"");
+    ASSERT_EQ_STR(tokenTypes[token.type], "TOKEN_GT", "Token should be of type TOKEN_GT");
+
+    token = tokens[9];
+    sprintf(contents, "%.*s", token.length, token.start);
+    ASSERT_EQ_STR(contents, ">=", "Token should contain \">=\"");
+    ASSERT_EQ_STR(tokenTypes[token.type], "TOKEN_GTE", "Token should be of type TOKEN_GTE");
+})
+
+TEST(testTokenizeBrackets, {
+    Token tokens[6];
+    tokenizeStr("[] {} ()", tokens);
 
     char contents[2]; // Buffer for reading token contents into
 
-    // First line
     sprintf(contents, "%.*s", tokens[0].length, tokens[0].start);
-    ASSERT_EQ_STR(contents, "1", "Token should contain \"1\"");
+    ASSERT_EQ_STR(contents, "[", "Token should contain \"[\"");
+    ASSERT_EQ_STR(tokenTypes[tokens[0].type], "TOKEN_LBRACK", "Token should be of type TOKEN_LBRACK");
+
     sprintf(contents, "%.*s", tokens[1].length, tokens[1].start);
-    ASSERT_EQ_STR(contents, "+", "Token should contain \"+\"");
+    ASSERT_EQ_STR(contents, "]", "Token should contain \"]\"");
+    ASSERT_EQ_STR(tokenTypes[tokens[1].type], "TOKEN_RBRACK", "Token should be of type TOKEN_RBRACK");
+
     sprintf(contents, "%.*s", tokens[2].length, tokens[2].start);
-    ASSERT_EQ_STR(contents, "2", "Token should contain \"2\"");
+    ASSERT_EQ_STR(contents, "{", "Token should contain \"{\"");
+    ASSERT_EQ_STR(tokenTypes[tokens[2].type], "TOKEN_LBRACE", "Token should be of type TOKEN_LBRACE");
 
-    // Second line
     sprintf(contents, "%.*s", tokens[3].length, tokens[3].start);
-    ASSERT_EQ_STR(contents, "1", "Token should contain \"1\"");
+    ASSERT_EQ_STR(contents, "}", "Token should contain \"}\"");
+    ASSERT_EQ_STR(tokenTypes[tokens[3].type], "TOKEN_RBRACE", "Token should be of type TOKEN_RBRACE");
+
     sprintf(contents, "%.*s", tokens[4].length, tokens[4].start);
-    ASSERT_EQ_STR(contents, "-", "Token should contain \"-\"");
+    ASSERT_EQ_STR(contents, "(", "Token should contain \"(\"");
+    ASSERT_EQ_STR(tokenTypes[tokens[4].type], "TOKEN_LPAREN", "Token should be of type TOKEN_LPAREN");
+
     sprintf(contents, "%.*s", tokens[5].length, tokens[5].start);
-    ASSERT_EQ_STR(contents, "2", "Token should contain \"2\"");
+    ASSERT_EQ_STR(contents, ")", "Token should contain \")\"");
+    ASSERT_EQ_STR(tokenTypes[tokens[5].type], "TOKEN_RPAREN", "Token should be of type TOKEN_RPAREN");
+})
 
-    // Third line
-    sprintf(contents, "%.*s", tokens[6].length, tokens[6].start);
-    ASSERT_EQ_STR(contents, "1", "Token should contain \"1\"");
-    sprintf(contents, "%.*s", tokens[7].length, tokens[7].start);
-    ASSERT_EQ_STR(contents, "*", "Token should contain \"*\"");
-    sprintf(contents, "%.*s", tokens[8].length, tokens[8].start);
-    ASSERT_EQ_STR(contents, "2", "Token should contain \"2\"");
+TEST(testTokenizePunctuation, {
+    Token tokens[3];
+    tokenizeStr(". , :", tokens);
 
-    // Fourth line
-    sprintf(contents, "%.*s", tokens[9].length, tokens[9].start);
-    ASSERT_EQ_STR(contents, "1", "Token should contain \"1\"");
-    sprintf(contents, "%.*s", tokens[10].length, tokens[10].start);
-    ASSERT_EQ_STR(contents, "/", "Token should contain \"/\"");
-    sprintf(contents, "%.*s", tokens[11].length, tokens[11].start);
-    ASSERT_EQ_STR(contents, "2", "Token should contain \"2\"");
+    char contents[2]; // Buffer for reading token contents into
+
+    sprintf(contents, "%.*s", tokens[0].length, tokens[0].start);
+    ASSERT_EQ_STR(contents, ".", "Token should contain \".\"");
+    ASSERT_EQ_STR(tokenTypes[tokens[0].type], "TOKEN_DOT", "Token should be of type TOKEN_DOT");
+
+    sprintf(contents, "%.*s", tokens[1].length, tokens[1].start);
+    ASSERT_EQ_STR(contents, ",", "Token should contain \",\"");
+    ASSERT_EQ_STR(tokenTypes[tokens[1].type], "TOKEN_COMMA", "Token should be of type TOKEN_COMMA");
+
+    sprintf(contents, "%.*s", tokens[2].length, tokens[2].start);
+    ASSERT_EQ_STR(contents, ":", "Token should contain \":\"");
+    ASSERT_EQ_STR(tokenTypes[tokens[2].type], "TOKEN_COLON", "Token should be of type TOKEN_COLON");
 })
 
 void runLexerTests(Tester* tester) {
     tester->startSuite("Lexer");
     tester->run(testUnknownToken);
     tester->run(testLinesAndColumns);
-    tester->run(testTokenizingIntegers);
-    tester->run(testTokenizingFloats);
-    tester->run(testTokenizingOperators);
+    tester->run(testTokenizeIntegers);
+    tester->run(testTokenizeFloats);
+    tester->run(testTokenizeOperators);
+    tester->run(testTokenizeBrackets);
+    tester->run(testTokenizePunctuation);
 }

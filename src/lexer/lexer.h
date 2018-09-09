@@ -8,6 +8,23 @@
     C(TOKEN_MINUS) \
     C(TOKEN_STAR) \
     C(TOKEN_SLASH) \
+    C(TOKEN_LT) \
+    C(TOKEN_LTE) \
+    C(TOKEN_GT) \
+    C(TOKEN_GTE) \
+    C(TOKEN_EQ) \
+    C(TOKEN_EQ_EQ) \
+    C(TOKEN_BANG) \
+    C(TOKEN_BANG_EQ) \
+    C(TOKEN_LBRACK) \
+    C(TOKEN_RBRACK) \
+    C(TOKEN_LBRACE) \
+    C(TOKEN_RBRACE) \
+    C(TOKEN_LPAREN) \
+    C(TOKEN_RPAREN) \
+    C(TOKEN_DOT) \
+    C(TOKEN_COMMA) \
+    C(TOKEN_COLON) \
     C(TOKEN_ERROR) \
     C(TOKEN_EOF)
 
@@ -18,7 +35,7 @@ typedef enum {
 #undef C
 #define C(ENUM_VAL) #ENUM_VAL,
 
-// Initialized in lexer.c
+// Ignore warning; initialized statically
 const char* tokenTypes[];
 
 typedef struct {
