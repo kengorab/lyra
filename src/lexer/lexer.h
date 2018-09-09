@@ -1,15 +1,25 @@
 #ifndef CLYRA_LEXER_H
 #define CLYRA_LEXER_H
 
+#define C(ENUM_VAL) ENUM_VAL,
+#define TOKEN_TYPES \
+    C(TOKEN_NUMBER) \
+    C(TOKEN_PLUS) \
+    C(TOKEN_MINUS) \
+    C(TOKEN_STAR) \
+    C(TOKEN_SLASH) \
+    C(TOKEN_ERROR) \
+    C(TOKEN_EOF)
+
 typedef enum {
-    TOKEN_NUMBER,
-    TOKEN_PLUS,
-    TOKEN_MINUS,
-    TOKEN_STAR,
-    TOKEN_SLASH,
-    TOKEN_ERROR,
-    TOKEN_EOF
+    TOKEN_TYPES
 } TokenType;
+
+#undef C
+#define C(ENUM_VAL) #ENUM_VAL,
+
+// Initialized in lexer.c
+const char* tokenTypes[];
 
 typedef struct {
     TokenType type;

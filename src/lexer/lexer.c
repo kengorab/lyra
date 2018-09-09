@@ -14,13 +14,16 @@ static char advance(Lexer* lexer) {
     return lexer->current[-1];
 }
 
+/* Helpers */
 #define IS_DIGIT(ch) ('0' <= ch && ch <= '9')
+
+const char* tokenTypes[] = { TOKEN_TYPES };
 
 Lexer newLexer(char* source) {
     Lexer l = {
         .current = source,
         .start = source,
-        .col = 0,
+        .col = 0, // Initialize col to 0, it'll be incremented at first advance()
         .line = 1
     };
     return l;
@@ -39,7 +42,7 @@ static void skipWhitespace(Lexer* lexer) {
             }
             case '\n': {
                 lexer->line++;
-                lexer->col = 1;
+                lexer->col = -1; // Reset col to -1, it'll be incremented twice (next line, and next advance())
                 advance(lexer);
                 break;
             }
