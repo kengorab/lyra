@@ -253,16 +253,24 @@ TEST(testTokenizePunctuation, {
 })
 
 TEST(testTokenizeValidString, {
-    Token tokens[1];
-    tokenizeStr("\"abc def\"", tokens);
+    Token tokens[2];
+    tokenizeStr("\"abc def\"\n'abc def'", tokens);
 
     char contents[10]; // Buffer for reading token contents into
 
+    // Double quotes
     ASSERT_EQ_INT(tokens[0].line, 1, "Token should be on line 1");
     ASSERT_EQ_INT(tokens[0].col, 1, "Token should be on column 1");
     sprintf(contents, "%.*s", tokens[0].length, tokens[0].start);
     ASSERT_EQ_STR(contents, "\"abc def\"", "Token should contain \"abc def\"");
     ASSERT_EQ_STR(tokenTypes[tokens[0].type], "TOKEN_STRING", "Token should be of type TOKEN_STRING");
+
+    // Single quotes
+    ASSERT_EQ_INT(tokens[1].line, 2, "Token should be on line 2");
+    ASSERT_EQ_INT(tokens[1].col, 1, "Token should be on column 1");
+    sprintf(contents, "%.*s", tokens[1].length, tokens[1].start);
+    ASSERT_EQ_STR(contents, "'abc def'", "Token should contain \"abc def\"");
+    ASSERT_EQ_STR(tokenTypes[tokens[1].type], "TOKEN_STRING", "Token should be of type TOKEN_STRING");
 })
 
 TEST(testTokenizeInvalidString_unterminatedByEOF, {
@@ -276,6 +284,14 @@ TEST(testTokenizeInvalidString_unterminatedByEOF, {
     sprintf(contents, "%.*s", tokens[0].length, tokens[0].start);
     ASSERT_EQ_STR(contents, "Unterminated string", "Token should be an 'Unterminated string' error");
     ASSERT_EQ_STR(tokenTypes[tokens[0].type], "TOKEN_ERROR", "Token should be of type TOKEN_ERROR");
+
+    tokenizeStr("'abc def", tokens);
+
+    ASSERT_EQ_INT(tokens[0].line, 1, "Token should be on line 1");
+    ASSERT_EQ_INT(tokens[0].col, 1, "Token should be on column 1");
+    sprintf(contents, "%.*s", tokens[0].length, tokens[0].start);
+    ASSERT_EQ_STR(contents, "Unterminated string", "Token should be an 'Unterminated string' error");
+    ASSERT_EQ_STR(tokenTypes[tokens[0].type], "TOKEN_ERROR", "Token should be of type TOKEN_ERROR");
 })
 
 TEST(testTokenizeInvalidString_unterminatedByNewline, {
@@ -283,6 +299,20 @@ TEST(testTokenizeInvalidString_unterminatedByNewline, {
     tokenizeStr("\"abc def\n\"ghi jkl", tokens);
 
     char contents[20]; // Buffer for reading token contents into
+
+    ASSERT_EQ_INT(tokens[0].line, 1, "Token should be on line 1");
+    ASSERT_EQ_INT(tokens[0].col, 1, "Token should be on column 1");
+    sprintf(contents, "%.*s", tokens[0].length, tokens[0].start);
+    ASSERT_EQ_STR(contents, "Unterminated string", "Token should be an 'Unterminated string' error");
+    ASSERT_EQ_STR(tokenTypes[tokens[0].type], "TOKEN_ERROR", "Token should be of type TOKEN_ERROR");
+
+    ASSERT_EQ_INT(tokens[1].line, 2, "Token should be on line 2");
+    ASSERT_EQ_INT(tokens[1].col, 1, "Token should be on column 1");
+    sprintf(contents, "%.*s", tokens[1].length, tokens[1].start);
+    ASSERT_EQ_STR(contents, "Unterminated string", "Token should be an 'Unterminated string' error");
+    ASSERT_EQ_STR(tokenTypes[tokens[1].type], "TOKEN_ERROR", "Token should be of type TOKEN_ERROR");
+
+    tokenizeStr("'abc def\n'ghi jkl", tokens);
 
     ASSERT_EQ_INT(tokens[0].line, 1, "Token should be on line 1");
     ASSERT_EQ_INT(tokens[0].col, 1, "Token should be on column 1");

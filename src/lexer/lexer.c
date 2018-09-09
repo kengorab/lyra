@@ -169,18 +169,20 @@ Token nextToken(Lexer* lexer) {
     }
 
     switch (c) {
-        case '"': {
-            int colStart = lexer->col;
-            while (PEEK(lexer) != '"' && !IS_AT_END(lexer)) {
-                if (PEEK(lexer) == '\n') return errorToken("Unterminated string", lexer, colStart);
-                advance(lexer);
-            }
-
-            if (IS_AT_END(lexer)) return errorToken("Unterminated string", lexer, colStart);
-
-            advance(lexer); // Consume the '"'
-            return newToken(TOKEN_STRING, lexer, colStart);
+#define QUOTE_CASE(quote) \
+        case quote: { \
+            int colStart = lexer->col; \
+            while (PEEK(lexer) != quote && !IS_AT_END(lexer)) { \
+                if (PEEK(lexer) == '\n') return errorToken("Unterminated string", lexer, colStart); \
+                advance(lexer); \
+            } \
+            if (IS_AT_END(lexer)) return errorToken("Unterminated string", lexer, colStart); \
+                advance(lexer); \
+            return newToken(TOKEN_STRING, lexer, colStart); \
         }
+
+        QUOTE_CASE('"')
+        QUOTE_CASE('\'')
         case '+': return newSingleCharToken(TOKEN_PLUS, lexer);
         case '-': return newSingleCharToken(TOKEN_MINUS, lexer);
         case '*': return newSingleCharToken(TOKEN_STAR, lexer);
@@ -213,8 +215,7 @@ Token nextToken(Lexer* lexer) {
             if (PEEK(lexer) == '|') {
                 advance(lexer); // Consume "|"
                 return newToken(TOKEN_OR, lexer, lexer->col - 1);
-            }
-            else return newSingleCharToken(TOKEN_PIPE, lexer);
+            } else return newSingleCharToken(TOKEN_PIPE, lexer);
         }
         case '[': return newSingleCharToken(TOKEN_LBRACK, lexer);
         case ']': return newSingleCharToken(TOKEN_RBRACK, lexer);
