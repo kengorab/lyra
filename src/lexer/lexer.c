@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "lexer.h"
 
 /* Functions/macros for moving the cursor around */
@@ -19,7 +20,7 @@ Lexer newLexer(char* source) {
     Lexer l = {
         .current = source,
         .start = source,
-        .col = 1,
+        .col = 0,
         .line = 1
     };
     return l;
@@ -32,50 +33,72 @@ static void skipWhitespace(Lexer* lexer) {
         switch (c) {
             case ' ':
             case '\r':
-            case '\t':
+            case '\t': {
                 advance(lexer);
                 break;
-            case '\n':
+            }
+            case '\n': {
                 lexer->line++;
                 lexer->col = 1;
                 advance(lexer);
                 break;
-            case '/':
+            }
+            case '/': {
                 if (PEEK_NEXT(lexer) == '/') {
                     while (PEEK(lexer) != '\n' && !IS_AT_END(lexer))
                         advance(lexer);
                 } else {
                     return;
                 }
-            default:
+            }
+            default: {
                 return;
+            }
         }
 
         return;
     }
 }
 
-static Token newToken(TokenType type, const Lexer* lexer) {
+static Token newToken(TokenType type, const Lexer* lexer, int col) {
     Token t = {
         .type = type,
         .start = lexer->start,
         .length = (int) (lexer->current - lexer->start),
+        .line = lexer->line,
+        .col = col
+    };
+    return t;
+}
+
+static Token newSingleCharToken(TokenType type, const Lexer* lexer) {
+    return newToken(type, lexer, lexer->col);
+}
+
+
+static Token errorToken(const char* message, const Lexer* lexer) {
+    Token t = {
+        .type = TOKEN_ERROR,
+        .start = message,
+        .length = (int) strlen(message),
         .line = lexer->line,
         .col = lexer->col
     };
     return t;
 }
 
+
 Token nextToken(Lexer* lexer) {
     // Skip the cursor (lexer->current) ahead, then reposition lexer->start
     skipWhitespace(lexer);
     lexer->start = lexer->current;
 
-    if (IS_AT_END(lexer)) return newToken(TOKEN_EOF, lexer);
+    if (IS_AT_END(lexer)) return newSingleCharToken(TOKEN_EOF, lexer);
 
     char c = advance(lexer);
 
     if (IS_DIGIT(c)) {
+        int col = lexer->col;
         while (IS_DIGIT(PEEK(lexer)))
             advance(lexer);
         if (PEEK(lexer) == '.' && IS_DIGIT(PEEK_NEXT(lexer))) {
@@ -84,8 +107,19 @@ Token nextToken(Lexer* lexer) {
             while (IS_DIGIT(PEEK(lexer)))
                 advance(lexer);
         }
-        return newToken(TOKEN_NUMBER, lexer);
+        return newToken(TOKEN_NUMBER, lexer, col);
     }
 
-    return newToken(TOKEN_EOF, lexer);
+    switch (c) {
+        case '+': return newSingleCharToken(TOKEN_PLUS, lexer);
+        case '-': return newSingleCharToken(TOKEN_MINUS, lexer);
+        case '*': return newSingleCharToken(TOKEN_STAR, lexer);
+        case '/': return newSingleCharToken(TOKEN_SLASH, lexer);
+
+        default: {
+            char msg[24];
+            sprintf(msg, "Unexpected character: %c", c);
+            return errorToken(msg, lexer);
+        }
+    }
 }

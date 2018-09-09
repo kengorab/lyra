@@ -3,6 +3,11 @@
 
 typedef enum {
     TOKEN_NUMBER,
+    TOKEN_PLUS,
+    TOKEN_MINUS,
+    TOKEN_STAR,
+    TOKEN_SLASH,
+    TOKEN_ERROR,
     TOKEN_EOF
 } TokenType;
 
@@ -15,8 +20,8 @@ typedef struct {
 } Token;
 
 #define PRINT_TOKEN(token) \
-    printf("Token { type: %d, line: %d, col: %d, contents: \"%s\" }",\
-        token.type, token.line, token.col, token.start)
+    printf("Token { type: %d, line: %d, col: %d, contents: \"%.*s\" }",\
+           token.type, token.line, token.col, token.length, token.start)
 
 
 typedef struct {
