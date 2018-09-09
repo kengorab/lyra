@@ -199,6 +199,7 @@ Token nextToken(Lexer* lexer) {
         }
         case '=': {
             if (match(lexer, '=')) return newToken(TOKEN_EQ_EQ, lexer, lexer->col - 1);
+            if (match(lexer, '>')) return newToken(TOKEN_ARROW, lexer, lexer->col - 1);
             else return newSingleCharToken(TOKEN_EQ, lexer);
         }
         case '&': {
@@ -209,11 +210,11 @@ Token nextToken(Lexer* lexer) {
             }
         }
         case '|': {
-            if (match(lexer, '|')) return newToken(TOKEN_OR, lexer, lexer->col - 1);
-            else {
-                advance(lexer);
-                return unexpectedCharError(lexer, c, lexer->col - 1);
+            if (PEEK(lexer) == '|') {
+                advance(lexer); // Consume "|"
+                return newToken(TOKEN_OR, lexer, lexer->col - 1);
             }
+            else return newSingleCharToken(TOKEN_PIPE, lexer);
         }
         case '[': return newSingleCharToken(TOKEN_LBRACK, lexer);
         case ']': return newSingleCharToken(TOKEN_RBRACK, lexer);
@@ -223,7 +224,10 @@ Token nextToken(Lexer* lexer) {
         case ')': return newSingleCharToken(TOKEN_RPAREN, lexer);
         case '.': return newSingleCharToken(TOKEN_DOT, lexer);
         case ',': return newSingleCharToken(TOKEN_COMMA, lexer);
-        case ':': return newSingleCharToken(TOKEN_COLON, lexer);
+        case ':': {
+            if (match(lexer, ':')) return newToken(TOKEN_COLON_COLON, lexer, lexer->col - 1);
+            else return newSingleCharToken(TOKEN_COLON, lexer);
+        }
 
         default: return unexpectedCharError(lexer, c, lexer->col);
     }

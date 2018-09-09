@@ -27,6 +27,9 @@
     C(TOKEN_DOT) \
     C(TOKEN_COMMA) \
     C(TOKEN_COLON) \
+    C(TOKEN_COLON_COLON) \
+    C(TOKEN_ARROW) \
+    C(TOKEN_PIPE) \
     C(TOKEN_STRING) \
     C(TOKEN_IDENT) \
     C(TOKEN_VAL) \

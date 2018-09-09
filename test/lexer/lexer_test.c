@@ -16,17 +16,10 @@ void tokenizeStr(char* str, Token* outTokens) {
 }
 
 TEST(testUnknownToken, {
-    Token tokens[2];
-    tokenizeStr("&+ |+", tokens);
-    Token token;
+    Token tokens[1];
+    tokenizeStr("&+", tokens);
 
-    // Test token 1
-    token = tokens[0];
-    ASSERT_EQ_STR(tokenTypes[token.type], "TOKEN_ERROR", "Token should be of type TOKEN_ERROR");
-
-    // Test token 2
-    token = tokens[1];
-    ASSERT_EQ_STR(tokenTypes[token.type], "TOKEN_ERROR", "Token should be of type TOKEN_ERROR");
+    ASSERT_EQ_STR(tokenTypes[tokens[0].type], "TOKEN_ERROR", "Token should be of type TOKEN_ERROR");
 })
 
 TEST(testLinesAndColumns, {
@@ -216,22 +209,47 @@ TEST(testTokenizeBrackets, {
 })
 
 TEST(testTokenizePunctuation, {
-    Token tokens[3];
-    tokenizeStr(". , :", tokens);
+    Token tokens[6];
+    tokenizeStr(". , : :: | =>", tokens);
+    Token token;
 
-    char contents[2]; // Buffer for reading token contents into
+    char contents[3]; // Buffer for reading token contents into
 
-    sprintf(contents, "%.*s", tokens[0].length, tokens[0].start);
+    // Token 1
+    token = tokens[0];
+    sprintf(contents, "%.*s", token.length, token.start);
     ASSERT_EQ_STR(contents, ".", "Token should contain \".\"");
-    ASSERT_EQ_STR(tokenTypes[tokens[0].type], "TOKEN_DOT", "Token should be of type TOKEN_DOT");
+    ASSERT_EQ_STR(tokenTypes[token.type], "TOKEN_DOT", "Token should be of type TOKEN_DOT");
 
-    sprintf(contents, "%.*s", tokens[1].length, tokens[1].start);
+    // Token 2
+    token = tokens[1];
+    sprintf(contents, "%.*s", token.length, token.start);
     ASSERT_EQ_STR(contents, ",", "Token should contain \",\"");
-    ASSERT_EQ_STR(tokenTypes[tokens[1].type], "TOKEN_COMMA", "Token should be of type TOKEN_COMMA");
+    ASSERT_EQ_STR(tokenTypes[token.type], "TOKEN_COMMA", "Token should be of type TOKEN_COMMA");
 
-    sprintf(contents, "%.*s", tokens[2].length, tokens[2].start);
+    // Token 3
+    token = tokens[2];
+    sprintf(contents, "%.*s", token.length, token.start);
     ASSERT_EQ_STR(contents, ":", "Token should contain \":\"");
-    ASSERT_EQ_STR(tokenTypes[tokens[2].type], "TOKEN_COLON", "Token should be of type TOKEN_COLON");
+    ASSERT_EQ_STR(tokenTypes[token.type], "TOKEN_COLON", "Token should be of type TOKEN_COLON");
+
+    // Token 4
+    token = tokens[3];
+    sprintf(contents, "%.*s", token.length, token.start);
+    ASSERT_EQ_STR(contents, "::", "Token should contain \"::\"");
+    ASSERT_EQ_STR(tokenTypes[token.type], "TOKEN_COLON_COLON", "Token should be of type TOKEN_COLON_COLON");
+
+    // Token 5
+    token = tokens[4];
+    sprintf(contents, "%.*s", token.length, token.start);
+    ASSERT_EQ_STR(contents, "|", "Token should contain \"|\"");
+    ASSERT_EQ_STR(tokenTypes[token.type], "TOKEN_PIPE", "Token should be of type TOKEN_PIPE");
+
+    // Token 6
+    token = tokens[5];
+    sprintf(contents, "%.*s", token.length, token.start);
+    ASSERT_EQ_STR(contents, "=>", "Token should contain \"=>\"");
+    ASSERT_EQ_STR(tokenTypes[token.type], "TOKEN_ARROW", "Token should be of type TOKEN_ARROW");
 })
 
 TEST(testTokenizeValidString, {
