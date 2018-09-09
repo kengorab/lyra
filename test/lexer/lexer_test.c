@@ -224,6 +224,43 @@ TEST(testTokenizePunctuation, {
     ASSERT_EQ_STR(tokenTypes[tokens[2].type], "TOKEN_COLON", "Token should be of type TOKEN_COLON");
 })
 
+TEST(testTokenizeValidString, {
+    Token tokens[1];
+    tokenizeStr("\"abc def\"", tokens);
+
+    char contents[10]; // Buffer for reading token contents into
+
+    sprintf(contents, "%.*s", tokens[0].length, tokens[0].start);
+    ASSERT_EQ_STR(contents, "\"abc def\"", "Token should contain \"abc def\"");
+    ASSERT_EQ_STR(tokenTypes[tokens[0].type], "TOKEN_STRING", "Token should be of type TOKEN_STRING");
+})
+
+TEST(testTokenizeInvalidString_unterminatedByEOF, {
+    Token tokens[1];
+    tokenizeStr("\"abc def", tokens);
+
+    char contents[20]; // Buffer for reading token contents into
+
+    sprintf(contents, "%.*s", tokens[0].length, tokens[0].start);
+    ASSERT_EQ_STR(contents, "Unterminated string", "Token should be an 'Unterminated string' error");
+    ASSERT_EQ_STR(tokenTypes[tokens[0].type], "TOKEN_ERROR", "Token should be of type TOKEN_ERROR");
+})
+
+TEST(testTokenizeInvalidString_unterminatedByNewline, {
+    Token tokens[2];
+    tokenizeStr("\"abc def\n\"ghi jkl", tokens);
+
+    char contents[20]; // Buffer for reading token contents into
+
+    sprintf(contents, "%.*s", tokens[0].length, tokens[0].start);
+    ASSERT_EQ_STR(contents, "Unterminated string", "Token should be an 'Unterminated string' error");
+    ASSERT_EQ_STR(tokenTypes[tokens[0].type], "TOKEN_ERROR", "Token should be of type TOKEN_ERROR");
+
+    sprintf(contents, "%.*s", tokens[1].length, tokens[1].start);
+    ASSERT_EQ_STR(contents, "Unterminated string", "Token should be an 'Unterminated string' error");
+    ASSERT_EQ_STR(tokenTypes[tokens[1].type], "TOKEN_ERROR", "Token should be of type TOKEN_ERROR");
+})
+
 void runLexerTests(Tester* tester) {
     tester->startSuite("Lexer");
     tester->run(testUnknownToken);
@@ -233,4 +270,7 @@ void runLexerTests(Tester* tester) {
     tester->run(testTokenizeOperators);
     tester->run(testTokenizeBrackets);
     tester->run(testTokenizePunctuation);
+    tester->run(testTokenizeValidString);
+    tester->run(testTokenizeInvalidString_unterminatedByEOF);
+    tester->run(testTokenizeInvalidString_unterminatedByNewline);
 }

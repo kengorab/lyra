@@ -127,6 +127,18 @@ Token nextToken(Lexer* lexer) {
     }
 
     switch (c) {
+        case '"': {
+            int colStart = lexer->col;
+            while (PEEK(lexer) != '"' && !IS_AT_END(lexer)) {
+                if (PEEK(lexer) == '\n') return errorToken("Unterminated string", lexer, colStart);
+                advance(lexer);
+            }
+
+            if (IS_AT_END(lexer)) return errorToken("Unterminated string", lexer, colStart);
+
+            advance(lexer); // Consume the '"'
+            return newToken(TOKEN_STRING, lexer, colStart);
+        }
         case '+': return newSingleCharToken(TOKEN_PLUS, lexer);
         case '-': return newSingleCharToken(TOKEN_MINUS, lexer);
         case '*': return newSingleCharToken(TOKEN_STAR, lexer);

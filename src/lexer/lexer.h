@@ -27,6 +27,7 @@
     C(TOKEN_DOT) \
     C(TOKEN_COMMA) \
     C(TOKEN_COLON) \
+    C(TOKEN_STRING) \
     C(TOKEN_ERROR) \
     C(TOKEN_EOF)
 
