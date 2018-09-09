@@ -46,4 +46,7 @@ int main() {
         numFail == 0 ? "s" : "",
         ANSI_ESC
     );
+
+    // Should only return a successful code if there are no failures
+    return numFail;
 }

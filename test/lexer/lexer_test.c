@@ -68,7 +68,7 @@ TEST(testTokenizingOperators, {
     Token tokens[3];
     tokenizeStr("1 + 2", tokens);
 
-    char contents[1]; // Buffer for reading token contents into
+    char contents[2]; // Buffer for reading token contents into
     sprintf(contents, "%.*s", tokens[0].length, tokens[0].start);
     ASSERT_EQ_STR(contents, "1", "Token should contain \"1\"");
     sprintf(contents, "%.*s", tokens[1].length, tokens[1].start);
@@ -79,7 +79,7 @@ TEST(testTokenizingOperators, {
 
 void runLexerTests(Tester* tester) {
     tester->startSuite("Lexer");
-//    tester->run(testTokenizingIntegers);
+    tester->run(testTokenizingIntegers);
     tester->run(testTokenizingFloats);
-//    tester->run(testTokenizingOperators);
+    tester->run(testTokenizingOperators);
 }
