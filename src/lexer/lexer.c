@@ -87,18 +87,22 @@ static Token newSingleCharToken(TokenType type, const Lexer* lexer) {
     return newToken(type, lexer, lexer->col);
 }
 
-
-static Token errorToken(const char* message, const Lexer* lexer) {
+static Token errorToken(const char* message, const Lexer* lexer, int col) {
     Token t = {
         .type = TOKEN_ERROR,
         .start = message,
         .length = (int) strlen(message),
         .line = lexer->line,
-        .col = lexer->col
+        .col = col
     };
     return t;
 }
 
+Token unexpectedCharError(Lexer* lexer, char ch, int col) {
+    char msg[24];
+    sprintf(msg, "Unexpected character: %c", ch);
+    return errorToken(msg, lexer, col);
+}
 
 Token nextToken(Lexer* lexer) {
     // Skip the cursor (lexer->current) ahead, then reposition lexer->start
@@ -143,6 +147,20 @@ Token nextToken(Lexer* lexer) {
             if (match(lexer, '=')) return newToken(TOKEN_EQ_EQ, lexer, lexer->col - 1);
             else return newSingleCharToken(TOKEN_EQ, lexer);
         }
+        case '&': {
+            if (match(lexer, '&')) return newToken(TOKEN_AND, lexer, lexer->col - 1);
+            else {
+                advance(lexer);
+                return unexpectedCharError(lexer, c, lexer->col - 1);
+            }
+        }
+        case '|': {
+            if (match(lexer, '|')) return newToken(TOKEN_OR, lexer, lexer->col - 1);
+            else {
+                advance(lexer);
+                return unexpectedCharError(lexer, c, lexer->col - 1);
+            }
+        }
         case '[': return newSingleCharToken(TOKEN_LBRACK, lexer);
         case ']': return newSingleCharToken(TOKEN_RBRACK, lexer);
         case '{': return newSingleCharToken(TOKEN_LBRACE, lexer);
@@ -153,10 +171,6 @@ Token nextToken(Lexer* lexer) {
         case ',': return newSingleCharToken(TOKEN_COMMA, lexer);
         case ':': return newSingleCharToken(TOKEN_COLON, lexer);
 
-        default: {
-            char msg[24];
-            sprintf(msg, "Unexpected character: %c", c);
-            return errorToken(msg, lexer);
-        }
+        default: return unexpectedCharError(lexer, c, lexer->col);
     }
 }

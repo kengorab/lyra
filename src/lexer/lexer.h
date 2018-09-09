@@ -16,6 +16,8 @@
     C(TOKEN_EQ_EQ) \
     C(TOKEN_BANG) \
     C(TOKEN_BANG_EQ) \
+    C(TOKEN_AND) \
+    C(TOKEN_OR) \
     C(TOKEN_LBRACK) \
     C(TOKEN_RBRACK) \
     C(TOKEN_LBRACE) \

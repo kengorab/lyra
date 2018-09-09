@@ -16,13 +16,16 @@ void tokenizeStr(char* str, Token* outTokens) {
 }
 
 TEST(testUnknownToken, {
-    Token tokens[1];
-    tokenizeStr("%", tokens);
+    Token tokens[2];
+    tokenizeStr("&+ |+", tokens);
+    Token token;
 
     // Test token 1
-    Token token = tokens[0];
-    ASSERT_EQ_INT(token.line, 1, "Token should be on line 1");
-    ASSERT_EQ_INT(token.col, 1, "Token should be on column 1");
+    token = tokens[0];
+    ASSERT_EQ_STR(tokenTypes[token.type], "TOKEN_ERROR", "Token should be of type TOKEN_ERROR");
+
+    // Test token 2
+    token = tokens[1];
     ASSERT_EQ_STR(tokenTypes[token.type], "TOKEN_ERROR", "Token should be of type TOKEN_ERROR");
 })
 
@@ -104,8 +107,8 @@ TEST(testTokenizeFloats, {
 })
 
 TEST(testTokenizeOperators, {
-    Token tokens[10];
-    tokenizeStr("+ - * / ! != < <= > >=", tokens);
+    Token tokens[12];
+    tokenizeStr("+ - * / ! != < <= > >= && ||", tokens);
     Token token;
 
     char contents[3]; // Buffer for reading token contents into
@@ -159,6 +162,16 @@ TEST(testTokenizeOperators, {
     sprintf(contents, "%.*s", token.length, token.start);
     ASSERT_EQ_STR(contents, ">=", "Token should contain \">=\"");
     ASSERT_EQ_STR(tokenTypes[token.type], "TOKEN_GTE", "Token should be of type TOKEN_GTE");
+
+    token = tokens[10];
+    sprintf(contents, "%.*s", token.length, token.start);
+    ASSERT_EQ_STR(contents, "&&", "Token should contain \"&&\"");
+    ASSERT_EQ_STR(tokenTypes[token.type], "TOKEN_AND", "Token should be of type TOKEN_AND");
+
+    token = tokens[11];
+    sprintf(contents, "%.*s", token.length, token.start);
+    ASSERT_EQ_STR(contents, "||", "Token should contain \"||\"");
+    ASSERT_EQ_STR(tokenTypes[token.type], "TOKEN_OR", "Token should be of type TOKEN_OR");
 })
 
 TEST(testTokenizeBrackets, {
