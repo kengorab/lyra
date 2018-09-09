@@ -18,6 +18,7 @@ static char advance(Lexer* lexer) {
 
 /* Helpers */
 #define IS_DIGIT(ch) ('0' <= ch && ch <= '9')
+#define IS_ALPHA(ch) ('a' <= ch && ch <= 'z' || 'A' <= ch && ch <= 'Z')
 
 const char* tokenTypes[] = {TOKEN_TYPES};
 
@@ -36,6 +37,7 @@ static bool match(Lexer* lexer, char expected) {
     if (*lexer->current != expected) return false;
 
     lexer->current++;
+    lexer->col++;
     return true;
 }
 
@@ -98,10 +100,43 @@ static Token errorToken(const char* message, const Lexer* lexer, int col) {
     return t;
 }
 
-Token unexpectedCharError(Lexer* lexer, char ch, int col) {
+static Token unexpectedCharError(Lexer* lexer, char ch, int col) {
     char msg[24];
     sprintf(msg, "Unexpected character: %c", ch);
     return errorToken(msg, lexer, col);
+}
+
+static bool verifyKeyword(Lexer* lexer, const char* keyword) {
+    size_t keywordLen = strlen(keyword);
+    if (lexer->current - lexer->start != keywordLen) {
+        return false;
+    }
+
+    if (memcmp(lexer->start, keyword, keywordLen) == 0) {
+        return true;
+    }
+
+    return false;
+}
+
+static TokenType tokenizeIdentOrKeyword(Lexer* lexer) {
+
+#define CASE(kwd, tok) \
+    if (verifyKeyword(lexer, kwd)) {\
+        return tok;\
+    }
+
+    CASE("val", TOKEN_VAL);
+    CASE("var", TOKEN_VAR);
+    CASE("type", TOKEN_TYPE);
+    CASE("func", TOKEN_FUNC);
+    CASE("if", TOKEN_IF);
+    CASE("else", TOKEN_ELSE);
+    CASE("true", TOKEN_TRUE);
+    CASE("false", TOKEN_FALSE);
+    CASE("nil", TOKEN_NIL);
+
+    return TOKEN_IDENT;
 }
 
 Token nextToken(Lexer* lexer) {
@@ -124,6 +159,13 @@ Token nextToken(Lexer* lexer) {
                 advance(lexer);
         }
         return newToken(TOKEN_NUMBER, lexer, col);
+    }
+
+    if (IS_ALPHA(c)) {
+        int startCol = lexer->col;
+        while (IS_ALPHA(PEEK(lexer)) || IS_DIGIT(PEEK(lexer)))
+            advance(lexer);
+        return newToken(tokenizeIdentOrKeyword(lexer), lexer, startCol);
     }
 
     switch (c) {

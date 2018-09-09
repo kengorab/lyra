@@ -28,6 +28,16 @@
     C(TOKEN_COMMA) \
     C(TOKEN_COLON) \
     C(TOKEN_STRING) \
+    C(TOKEN_IDENT) \
+    C(TOKEN_VAL) \
+    C(TOKEN_VAR) \
+    C(TOKEN_TYPE) \
+    C(TOKEN_FUNC) \
+    C(TOKEN_IF) \
+    C(TOKEN_ELSE) \
+    C(TOKEN_TRUE) \
+    C(TOKEN_FALSE) \
+    C(TOKEN_NIL) \
     C(TOKEN_ERROR) \
     C(TOKEN_EOF)
 
@@ -50,8 +60,8 @@ typedef struct {
 } Token;
 
 #define PRINT_TOKEN(token) \
-    printf("Token { type: %d, line: %d, col: %d, contents: \"%.*s\" }",\
-           token.type, token.line, token.col, token.length, token.start)
+    printf("Token { type: %s, line: %d, col: %d, contents: \"%.*s\" }\n",\
+           tokenTypes[token.type], token.line, token.col, token.length, token.start)
 
 
 typedef struct {
