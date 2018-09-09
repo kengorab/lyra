@@ -2,6 +2,6 @@
 # CMake builds are to be conducted out-of-source, ensured by going through this Makefile.
 
 test:
-	cd build && cmake .. && make && ./clyra_tests
+	mkdir -p build && cd build && cmake .. && make && ./clyra_tests
 
 .PHONY: test
