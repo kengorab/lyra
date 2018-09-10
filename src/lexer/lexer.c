@@ -74,33 +74,31 @@ static void skipWhitespace(Lexer* lexer) {
     }
 }
 
-static Token newToken(TokenType type, const Lexer* lexer, int col) {
-    Token t = {
-        .type = type,
-        .start = lexer->start,
-        .length = (int) (lexer->current - lexer->start),
-        .line = lexer->line,
-        .col = col
-    };
+static Token* newToken(TokenType type, const Lexer* lexer, int col) {
+    Token* t = malloc(sizeof(Token));
+    t->type = type;
+    t->start = lexer->start;
+    t->length = (int) (lexer->current - lexer->start);
+    t->line = lexer->line;
+    t->col = col;
     return t;
 }
 
-static Token newSingleCharToken(TokenType type, const Lexer* lexer) {
+static Token* newSingleCharToken(TokenType type, const Lexer* lexer) {
     return newToken(type, lexer, lexer->col);
 }
 
-static Token errorToken(const char* message, const Lexer* lexer, int col) {
-    Token t = {
-        .type = TOKEN_ERROR,
-        .start = message,
-        .length = (int) strlen(message),
-        .line = lexer->line,
-        .col = col
-    };
+static Token* errorToken(const char* message, const Lexer* lexer, int col) {
+    Token* t = malloc(sizeof(Token));
+    t->type = TOKEN_ERROR;
+    t->start = message;
+    t->length = (int) strlen(message);
+    t->line = lexer->line;
+    t->col = col;
     return t;
 }
 
-static Token unexpectedCharError(Lexer* lexer, char ch, int col) {
+static Token* unexpectedCharError(Lexer* lexer, char ch, int col) {
     char msg[24];
     sprintf(msg, "Unexpected character: %c", ch);
     return errorToken(msg, lexer, col);
@@ -139,7 +137,7 @@ static TokenType tokenizeIdentOrKeyword(Lexer* lexer) {
     return TOKEN_IDENT;
 }
 
-Token nextToken(Lexer* lexer) {
+Token* nextToken(Lexer* lexer) {
     // Skip the cursor (lexer->current) ahead, then reposition lexer->start
     skipWhitespace(lexer);
     lexer->start = lexer->current;

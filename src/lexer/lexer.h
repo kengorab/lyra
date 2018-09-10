@@ -1,6 +1,9 @@
 #ifndef CLYRA_LEXER_H
 #define CLYRA_LEXER_H
 
+#ifdef C
+#undef C
+#endif
 #define C(ENUM_VAL) ENUM_VAL,
 #define TOKEN_TYPES \
     C(TOKEN_NUMBER) \
@@ -62,10 +65,9 @@ typedef struct {
     int col;
 } Token;
 
-#define PRINT_TOKEN(token) \
+#define PRINT_TOKEN(pToken) \
     printf("Token { type: %s, line: %d, col: %d, contents: \"%.*s\" }\n",\
-           tokenTypes[token.type], token.line, token.col, token.length, token.start)
-
+           tokenTypes[pToken->type], pToken->line, pToken->col, pToken->length, pToken->start)
 
 typedef struct {
     char* start;
@@ -76,6 +78,6 @@ typedef struct {
 
 Lexer newLexer(char* source);
 
-Token nextToken(Lexer* lexer);
+Token* nextToken(Lexer* lexer);
 
 #endif //CLYRA_LEXER_H
