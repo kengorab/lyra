@@ -14,6 +14,7 @@ add_executable(
         src/lexer/lexer.c
         src/lexer/lexer.h
         src/main.c
+        src/debugging/mem_checks.h
 )
 
 enable_testing()
