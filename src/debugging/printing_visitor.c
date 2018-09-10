@@ -14,7 +14,8 @@ static void visitLiteralNode(LiteralNode* literalNode) {
             break;
         }
         case LITERAL_NODE_STRING: {
-            printf("\"%.*s\"", literalNode->token->length, literalNode->strVal);
+            // TODO: Don't store quotes in strVal!
+            printf("\"%.*s\"", literalNode->token->length - 2, literalNode->strVal + 1);
             break;
         }
         case LITERAL_NODE_BOOL: {
@@ -35,7 +36,6 @@ void printing_visit(Node* node) {
             break;
         }
         case NODE_TYPE_LITERAL: {
-            printf("%d\n", node->as.literalNode->token->length);
             visitLiteralNode(node->as.literalNode);
             break;
         }
