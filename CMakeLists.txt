@@ -23,7 +23,7 @@ add_executable(
         src/parser/parser.c
         src/parser/parser.h
         src/main.c
-)
+        src/common/list.c src/common/list.h)
 
 enable_testing()
 add_executable(

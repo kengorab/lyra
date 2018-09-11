@@ -11,7 +11,8 @@
 #define C(ENUM_VAL) ENUM_VAL,
 #define AST_NODE_TYPES \
     C(NODE_TYPE_LITERAL) \
-    C(NODE_TYPE_IDENT)
+    C(NODE_TYPE_IDENT) \
+    C(NODE_TYPE_VAL_DECL_STATEMENT)
 
 typedef enum {
     AST_NODE_TYPES
@@ -24,6 +25,13 @@ typedef enum {
 const char* astNodeTypes[];
 
 typedef struct Node Node;
+typedef struct IdentifierNode IdentifierNode;
+
+typedef struct {
+    Token* token;
+    IdentifierNode* ident;
+    Node* assignment;
+} ValDeclStmt;
 
 #undef C
 #define C(ENUM_VAL) ENUM_VAL,
@@ -54,26 +62,21 @@ typedef struct {
     };
 } LiteralNode;
 
-typedef struct {
+struct IdentifierNode {
     Token* token;
     const char* name;
-} IdentifierNode;
-
-//typedef struct {
-//    Token token;
-//    Node* lExpr;
-//    char* op;
-//    Node* rExpr;
-//} BinaryNode;
+};
 
 struct Node {
     AstNodeType type;
     union {
+        ValDeclStmt* valDeclStmt;
         LiteralNode* literalNode;
         IdentifierNode* identifierNode;
-//        BinaryNode* binaryNode;
     } as;
 };
+
+Node* newValDeclStmtNode(Token* token, Node* identNode, Node* assignment);
 
 Node* newLiteralNode(Token* token);
 

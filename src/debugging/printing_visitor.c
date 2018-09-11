@@ -1,4 +1,7 @@
 #include <stdio.h>
+#include <ast.h>
+#include <string.h>
+#include <stdlib.h>
 
 #include "printing_visitor.h"
 #include "../parser/ast.h"
@@ -7,7 +10,6 @@ static void visitLiteralNode(LiteralNode* literalNode) {
     switch (literalNode->type) {
         case LITERAL_NODE_INT: {
             printf("%d", literalNode->iVal);
-            break;
         }
         case LITERAL_NODE_DOUBLE: {
             printf("%f", literalNode->dVal);
@@ -26,11 +28,21 @@ static void visitLiteralNode(LiteralNode* literalNode) {
 }
 
 static void visitIdentifierNode(IdentifierNode* identifierNode) {
-    printf("%s", identifierNode->name);
+    printf("%.*s", identifierNode->token->length, identifierNode->name);
 }
 
-void printing_visit(Node* node) {
+static void visitValDeclStmtNode(ValDeclStmt* stmt) {
+    printf("val ");
+    visitIdentifierNode(stmt->ident);
+    printf(" = <null>");
+}
+
+static void visit(Node* node) {
     switch (node->type) {
+        case NODE_TYPE_VAL_DECL_STATEMENT: {
+            visitValDeclStmtNode(node->as.valDeclStmt);
+            break;
+        }
         case NODE_TYPE_IDENT: {
             visitIdentifierNode(node->as.identifierNode);
             break;
@@ -41,3 +53,13 @@ void printing_visit(Node* node) {
         }
     }
 }
+
+void printing_visit(Node* node) {
+    if (node == NULL) {
+        fprintf(stdout, "Node is NULL, cannot print!\n");
+        return;
+    }
+
+    visit(node);
+}
+

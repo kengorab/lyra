@@ -6,10 +6,10 @@
 #include "printing_visitor.h"
 
 int main() {
-    Lexer l = newLexer("1 \"2\" 3.0 true false");
+    Lexer l = newLexer("val a = 1");
 
     int idx = 0;
-    Token* tokens[5];
+    Token* tokens[4];
     while (true) {
         Token* t = nextToken(&l);
         if (t->type == TOKEN_EOF)
@@ -18,7 +18,7 @@ int main() {
         tokens[idx++] = t;
     }
 
-    Parser p = newParser(tokens + 1);
+    Parser p = newParser(tokens);
     Node* n = parse(&p);
 
     printing_visit(n);

@@ -6,6 +6,19 @@ const char* astNodeTypes[] = {AST_NODE_TYPES};
 
 const char* literalNodeTypes[] = {LITERAL_NODE_TYPES};
 
+Node* newValDeclStmtNode(Token* token, Node* identNode, Node* assignment) {
+    Node* n = malloc(sizeof(Node));
+    n->type = NODE_TYPE_VAL_DECL_STATEMENT;
+
+    ValDeclStmt* valDeclStmt = malloc(sizeof(ValDeclStmt));
+    valDeclStmt->token = token;
+    valDeclStmt->assignment = assignment;
+    valDeclStmt->ident = identNode->as.identifierNode;
+
+    n->as.valDeclStmt = valDeclStmt;
+    return n;
+}
+
 Node* newLiteralNode(Token* token) {
     Node* n = malloc(sizeof(Node));
     n->type = NODE_TYPE_LITERAL;
