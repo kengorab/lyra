@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "parser.h"
 
@@ -20,7 +21,7 @@ Parser newParser(Token** tokens) {
     return p;
 }
 
-Node* parseValDeclStmt(Token* valToken, Parser* parser) {
+static Node* parseValDeclStmt(Token* valToken, Parser* parser) {
     if (PEEK(parser)->type != TOKEN_IDENT)
         return NULL; // TODO: Parser error handling
     Token* identTok = advance(parser);
@@ -33,9 +34,7 @@ Node* parseValDeclStmt(Token* valToken, Parser* parser) {
     return newValDeclStmtNode(valToken, newIdentifierNode(identTok), NULL);
 }
 
-Node* parse(Parser* parser) {
-    Token* token = advance(parser);
-
+static Node* parseExpression(Token* token, Parser* parser) {
     switch (token->type) {
         case TOKEN_VAL: {
             return parseValDeclStmt(token, parser);
@@ -49,4 +48,23 @@ Node* parse(Parser* parser) {
         case TOKEN_IDENT: return newIdentifierNode(token);
         default: return NULL;
     }
+}
+
+static Node* parseStatement(Parser* parser) {
+    Token* token = advance(parser);
+    switch (token->type) {
+        case TOKEN_VAL: return parseValDeclStmt(token, parser);
+        default: return parseExpression(token, parser);
+    }
+}
+
+List* parse(Parser* parser) {
+    List* statements = newList();
+
+    while (!IS_AT_END(parser)) {
+        Node* stmt = parseStatement(parser);
+        listAdd(statements, (void**) &stmt);
+    }
+
+    return statements;
 }

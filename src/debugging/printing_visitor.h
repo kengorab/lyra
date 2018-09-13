@@ -1,8 +1,8 @@
 #ifndef CLYRA_PRINTING_VISITOR_H
 #define CLYRA_PRINTING_VISITOR_H
 
-#include "../parser/ast.h"
+#include "list.h"
 
-void printing_visit(Node* node);
+void printing_visit(List* nodes);
 
 #endif //CLYRA_PRINTING_VISITOR_H

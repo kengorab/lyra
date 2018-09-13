@@ -1,5 +1,7 @@
-#include "lexer/lexer_test.h"
 #include <stdio.h>
+
+#include "lexer/lexer_test.h"
+#include "common/list_test.h"
 
 #define ANSI_RED  "\x1b[31m"
 #define ANSI_GREEN  "\x1b[32m"
@@ -19,10 +21,10 @@ void testRunner(TestFn test) {
     TestResult result = test();
     if (result.pass) {
         numPass++;
-        printf("    Test %s... %s\n", result.testName, ANSI_GREEN "Pass" ANSI_ESC);
+        printf("    %s %s\n", ANSI_GREEN "✓" ANSI_ESC, result.testName);
     } else {
         numFail++;
-        printf("    Test %s... %s\n", result.testName, ANSI_RED "Fail" ANSI_ESC);
+        printf("    %s %s%s\n", ANSI_RED "✘", result.testName, ANSI_ESC);
         printf("        Reason: %s\n", result.message);
     }
 }
@@ -34,6 +36,7 @@ int main() {
     };
 
     runLexerTests(&t);
+    runListTests(&t);
 
     printf(
         "Ran %d tests; %s%d successful%s, %s%d failure%s%s\n",

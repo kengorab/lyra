@@ -1,25 +1,24 @@
 #include <stdlib.h>
 #include <stdbool.h>
+#include <lexer.h>
 
 #include "list.h"
-
-#define LIST_INIT_CAPACITY 8
 
 List* newList() {
     List* l = malloc(sizeof(List));
     l->count = 0;
     l->capacity = LIST_INIT_CAPACITY;
-    l->values = NULL;
+    l->values = malloc(LIST_INIT_CAPACITY * sizeof(void*));
     return l;
 }
 
-void listAdd(List* list, void* item) {
+void listAdd(List* list, void** item) {
     if (list->capacity < list->count + 1) {
         list->capacity = list->capacity * 2;
-        list->values = realloc(list->values, (size_t) list->capacity * 2);
+        list->values = realloc(list->values, (size_t) list->capacity * sizeof(void*) * 2);
     }
 
-    list->values[list->count++] = item;
+    list->values[list->count++] = *item;
 }
 
 void listFree(List* list) {

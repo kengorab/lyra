@@ -1,27 +1,28 @@
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 #include "lexer.h"
 #include "parser.h"
 #include "printing_visitor.h"
+#include "common/list.h"
 
 int main() {
-    Lexer l = newLexer("val a = 1");
+    Lexer l = newLexer("val a = 1\nval b = 2");
 
-    int idx = 0;
-    Token* tokens[4];
+    List* tokenList = newList();
     while (true) {
         Token* t = nextToken(&l);
+        listAdd(tokenList, (void**) &t);
+
         if (t->type == TOKEN_EOF)
             break;
-        PRINT_TOKEN(t);
-        tokens[idx++] = t;
     }
 
-    Parser p = newParser(tokens);
-    Node* n = parse(&p);
+    Parser p = newParser((Token**) tokenList->values);
+    List* nodes = parse(&p);
 
-    printing_visit(n);
+    printing_visit(nodes);
 
     return 0;
 }

@@ -3,6 +3,7 @@
 
 #include "lexer.h"
 #include "ast.h"
+#include "list.h"
 
 typedef struct {
     Token** start;
@@ -11,6 +12,6 @@ typedef struct {
 
 Parser newParser(Token** tokens);
 
-Node* parse(Parser* parser);
+List* parse(Parser* parser);
 
 #endif //CLYRA_PARSER_H

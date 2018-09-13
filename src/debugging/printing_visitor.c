@@ -1,10 +1,9 @@
 #include <stdio.h>
-#include <ast.h>
 #include <string.h>
 #include <stdlib.h>
 
 #include "printing_visitor.h"
-#include "../parser/ast.h"
+#include "ast.h"
 
 static void visitLiteralNode(LiteralNode* literalNode) {
     switch (literalNode->type) {
@@ -54,12 +53,15 @@ static void visit(Node* node) {
     }
 }
 
-void printing_visit(Node* node) {
-    if (node == NULL) {
-        fprintf(stdout, "Node is NULL, cannot print!\n");
+void printing_visit(List* nodes) {
+    if (nodes->count == 0) {
+        fprintf(stdout, "No nodes, nothing to do!\n");
         return;
     }
 
-    visit(node);
+    for (int i = 0; i < nodes->count; ++i) {
+        visit((Node*) nodes->values[i]);
+        printf("\n");
+    }
 }
 
