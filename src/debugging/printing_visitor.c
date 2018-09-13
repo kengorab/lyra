@@ -5,10 +5,13 @@
 #include "printing_visitor.h"
 #include "ast.h"
 
+static void visit(Node* node);
+
 static void visitLiteralNode(LiteralNode* literalNode) {
     switch (literalNode->type) {
         case LITERAL_NODE_INT: {
             printf("%d", literalNode->iVal);
+            break;
         }
         case LITERAL_NODE_DOUBLE: {
             printf("%f", literalNode->dVal);
@@ -33,7 +36,8 @@ static void visitIdentifierNode(IdentifierNode* identifierNode) {
 static void visitValDeclStmtNode(ValDeclStmt* stmt) {
     printf("val ");
     visitIdentifierNode(stmt->ident);
-    printf(" = <null>");
+    printf(" = ");
+    visit(stmt->assignment);
 }
 
 static void visit(Node* node) {

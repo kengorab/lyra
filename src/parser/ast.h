@@ -39,7 +39,8 @@ typedef struct {
     C(LITERAL_NODE_INT) \
     C(LITERAL_NODE_DOUBLE) \
     C(LITERAL_NODE_STRING) \
-    C(LITERAL_NODE_BOOL)
+    C(LITERAL_NODE_BOOL) \
+    C(LITERAL_NODE_NIL)
 
 typedef enum {
     LITERAL_NODE_TYPES

@@ -27,6 +27,7 @@ Node* newLiteralNode(Token* token) {
     literalNode->token = token;
     switch (token->type) {
         case TOKEN_NUMBER: {
+            // TODO: This shit sucks, fix it! This will cause ANY integer to be parsed as a float as long as there is a dot SOMEWHERE else in the file...
             if (strstr(token->start, ".") != NULL) {
                 literalNode->type = LITERAL_NODE_DOUBLE;
                 literalNode->dVal = strtod(token->start, NULL);
@@ -45,6 +46,10 @@ Node* newLiteralNode(Token* token) {
         case TOKEN_FALSE: {
             literalNode->type = LITERAL_NODE_BOOL;
             literalNode->bVal = token->type == TOKEN_TRUE;
+            break;
+        }
+        case TOKEN_NIL: {
+            literalNode->type = LITERAL_NODE_NIL;
             break;
         }
         default: {
