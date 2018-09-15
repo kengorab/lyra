@@ -7,8 +7,13 @@
 #include "debugging/printing_visitor.h"
 #include "common/list.h"
 
-int main() {
-    Lexer l = newLexer("val a = 1\nval b = 12.34\nval c = \"hello!\"");
+int main(int argc, char** argv) {
+    char* source = "val a = 1\nval b = 12.34\nval c = \"hello!\"";
+    if (argc == 2) {
+        source = argv[1];
+    }
+
+    Lexer l = newLexer(source);
 
     List* tokenList = newList();
     while (true) {
