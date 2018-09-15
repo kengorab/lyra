@@ -3,7 +3,7 @@
 #include <string.h>
 #include <stdbool.h>
 
-#include "lexer.h"
+#include "lexer/lexer.h"
 
 /* Functions/macros for moving the cursor around */
 #define PEEK(lexer) *lexer->current

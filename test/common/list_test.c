@@ -2,7 +2,7 @@
 #include <string.h>
 
 #include "list_test.h"
-#include "list.h"
+#include "common/list.h"
 
 TEST(testCreateEmptyList, {
     List* l = newList();

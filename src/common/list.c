@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include <stdbool.h>
-#include <lexer.h>
 
 #include "list.h"
 

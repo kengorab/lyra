@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
-#include "ast.h"
+
+#include "parser/ast.h"
 
 const char* astNodeTypes[] = {AST_NODE_TYPES};
 

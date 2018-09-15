@@ -1,7 +1,7 @@
 #ifndef CLYRA_LIST_H
 #define CLYRA_LIST_H
 
-#include "lexer.h"
+#include "lexer/lexer.h"
 
 #define LIST_INIT_CAPACITY 8
 

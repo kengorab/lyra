@@ -1,7 +1,7 @@
 #ifndef CLYRA_PRINTING_VISITOR_H
 #define CLYRA_PRINTING_VISITOR_H
 
-#include "list.h"
+#include "common/list.h"
 
 void printing_visit(List* nodes);
 

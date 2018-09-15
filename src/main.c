@@ -2,9 +2,9 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#include "lexer.h"
-#include "parser.h"
-#include "printing_visitor.h"
+#include "lexer/lexer.h"
+#include "parser/parser.h"
+#include "debugging/printing_visitor.h"
 #include "common/list.h"
 
 int main() {

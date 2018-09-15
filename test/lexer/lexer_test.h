@@ -1,7 +1,7 @@
 #ifndef CLYRA_LEXER_TEST_H
 #define CLYRA_LEXER_TEST_H
 
-#include "../test.h"
+#include "test.h"
 
 void runLexerTests(Tester* tester);
 

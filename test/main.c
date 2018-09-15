@@ -1,5 +1,6 @@
 #include <stdio.h>
 
+#include "parser/parser_test.h"
 #include "lexer/lexer_test.h"
 #include "common/list_test.h"
 
@@ -37,6 +38,7 @@ int main() {
 
     runLexerTests(&t);
     runListTests(&t);
+    runParserTests(&t);
 
     printf(
         "Ran %d tests; %s%d successful%s, %s%d failure%s%s\n",

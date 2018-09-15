@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 #include "printing_visitor.h"
-#include "ast.h"
+#include "parser/ast.h"
 
 static void visit(Node* node);
 

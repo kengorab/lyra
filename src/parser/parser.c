@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "parser.h"
+#include "parser/parser.h"
 
 /* Functions/macros for moving the cursor around */
 #define PEEK(parser) (*parser->current)

@@ -1,8 +1,9 @@
 #include <stdio.h>
+#include <stdbool.h>
 #include <string.h>
 
-#include "lexer.h"
-#include "../test.h"
+#include "lexer_test.h"
+#include "lexer/lexer.h"
 
 void tokenizeStr(char* str, Token** outTokens) {
     Lexer l = newLexer(str);

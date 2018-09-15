@@ -1,9 +1,9 @@
 #ifndef CLYRA_PARSER_H
 #define CLYRA_PARSER_H
 
-#include "lexer.h"
-#include "ast.h"
-#include "list.h"
+#include "lexer/lexer.h"
+#include "parser/ast.h"
+#include "common/list.h"
 
 typedef struct {
     Token** start;

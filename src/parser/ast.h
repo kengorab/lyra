@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 
-#include "lexer.h"
+#include "lexer/lexer.h"
 
 #ifdef C
 #undef C
