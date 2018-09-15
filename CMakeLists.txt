@@ -5,14 +5,8 @@ set(CMAKE_C_STANDARD 99)
 set(CMAKE_BUILD_TYPE Debug)
 set(RUNTIME_OUTPUT_DIRECTORY build)
 
-#include_directories(src/common)
-#include_directories(src/debugging)
-#include_directories(src/lexer)
-#include_directories(src/parser)
 include_directories(src)
 include_directories(test)
-include_directories(test/common)
-include_directories(test/lexer)
 
 add_executable(
         clyra
@@ -49,5 +43,5 @@ add_executable(
         test/parser/parser_test.h
         test/main.c
         test/test.h
-)
+        test/parser/ast_test.c test/parser/ast_test.h)
 add_test(clyra_tests clyra_tests)

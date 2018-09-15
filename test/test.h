@@ -42,10 +42,12 @@ typedef struct {
         return result;\
     } while (false)
 
-#define ASSERT_EQ_INT(a, b, msg) \
-    if (a != b) FAIL(msg)
+#define ASSERT_EQ(a, b, msg) if (a != b) FAIL(msg)
 
-#define ASSERT_EQ_STR(a, b, msg) \
-    if (strcmp(a, b) != 0) FAIL(msg)
+#define ASSERT_TRUE(v, msg) if (!v) FAIL(msg)
+
+#define ASSERT_FALSE(v, msg) if (v) FAIL(msg)
+
+#define ASSERT_EQ_STR(a, b, msg) if (strcmp(a, b) != 0) FAIL(msg)
 
 #endif //CLYRA_TEST_H

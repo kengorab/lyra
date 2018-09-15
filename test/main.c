@@ -1,8 +1,9 @@
 #include <stdio.h>
 
-#include "parser/parser_test.h"
-#include "lexer/lexer_test.h"
 #include "common/list_test.h"
+#include "lexer/lexer_test.h"
+#include "parser/ast_test.h"
+#include "parser/parser_test.h"
 
 #define ANSI_RED  "\x1b[31m"
 #define ANSI_GREEN  "\x1b[32m"
@@ -36,8 +37,9 @@ int main() {
         .run = &testRunner
     };
 
-    runLexerTests(&t);
+    runAstTests(&t);
     runListTests(&t);
+    runLexerTests(&t);
     runParserTests(&t);
 
     printf(

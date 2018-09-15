@@ -8,7 +8,7 @@
 #include "common/list.h"
 
 int main() {
-    Lexer l = newLexer("val a = 1\nval b = 12.34");
+    Lexer l = newLexer("val a = 1\nval b = 12.34\nval c = \"hello!\"");
 
     List* tokenList = newList();
     while (true) {

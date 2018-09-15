@@ -31,18 +31,18 @@ TEST(testLinesAndColumns, {
 
     // Test token 1
     token = tokens[0];
-    ASSERT_EQ_INT(token->line, 1, "Token should be on line 1");
-    ASSERT_EQ_INT(token->col, 1, "Token should be on column 1");
+    ASSERT_EQ(token->line, 1, "Token should be on line 1");
+    ASSERT_EQ(token->col, 1, "Token should be on column 1");
 
     // Test token 2
     token = tokens[1];
-    ASSERT_EQ_INT(token->line, 2, "Token should be on line 2");
-    ASSERT_EQ_INT(token->col, 1, "Token should be on column 1");
+    ASSERT_EQ(token->line, 2, "Token should be on line 2");
+    ASSERT_EQ(token->col, 1, "Token should be on column 1");
 
     // Test token 3
     token = tokens[2];
-    ASSERT_EQ_INT(token->line, 3, "Token should be on line 3");
-    ASSERT_EQ_INT(token->col, 1, "Token should be on column 1");
+    ASSERT_EQ(token->line, 3, "Token should be on line 3");
+    ASSERT_EQ(token->col, 1, "Token should be on column 1");
 })
 
 TEST(testTokenizeIntegers, {
@@ -54,24 +54,24 @@ TEST(testTokenizeIntegers, {
 
     // Test token 1
     token = tokens[0];
-    ASSERT_EQ_INT(token->line, 1, "Token should be on line 1");
-    ASSERT_EQ_INT(token->col, 1, "Token should be on column 1");
+    ASSERT_EQ(token->line, 1, "Token should be on line 1");
+    ASSERT_EQ(token->col, 1, "Token should be on column 1");
     sprintf(contents, "%.*s", token->length, token->start);
     ASSERT_EQ_STR(contents, "1", "Token should contain \"1\"");
     ASSERT_EQ_STR(tokenTypes[token->type], "TOKEN_NUMBER", "Token should be of type TOKEN_NUMBER");
 
     // Test token 2
     token = tokens[1];
-    ASSERT_EQ_INT(token->line, 1, "Token should be on line 1");
-    ASSERT_EQ_INT(token->col, 3, "Token should be on column 3");
+    ASSERT_EQ(token->line, 1, "Token should be on line 1");
+    ASSERT_EQ(token->col, 3, "Token should be on column 3");
     sprintf(contents, "%.*s", token->length, token->start);
     ASSERT_EQ_STR(contents, "2", "Token should contain \"2\"");
     ASSERT_EQ_STR(tokenTypes[token->type], "TOKEN_NUMBER", "Token should be of type TOKEN_NUMBER");
 
     // Test token 3
     token = tokens[2];
-    ASSERT_EQ_INT(token->line, 1, "Token should be on line 1");
-    ASSERT_EQ_INT(token->col, 5, "Token should be on column 5");
+    ASSERT_EQ(token->line, 1, "Token should be on line 1");
+    ASSERT_EQ(token->col, 5, "Token should be on column 5");
     sprintf(contents, "%.*s", token->length, token->start);
     ASSERT_EQ_STR(contents, "3", "Token should contain \"3\"");
     ASSERT_EQ_STR(tokenTypes[token->type], "TOKEN_NUMBER", "Token should be of type TOKEN_NUMBER");
@@ -86,16 +86,16 @@ TEST(testTokenizeFloats, {
 
     // Test token 1
     token = tokens[0];
-    ASSERT_EQ_INT(token->line, 1, "Token should be on line 1");
-    ASSERT_EQ_INT(token->col, 1, "Token should be on column 1");
+    ASSERT_EQ(token->line, 1, "Token should be on line 1");
+    ASSERT_EQ(token->col, 1, "Token should be on column 1");
     sprintf(contents, "%.*s", token->length, token->start);
     ASSERT_EQ_STR(contents, "1.2", "Token should contain \"1.2\"");
     ASSERT_EQ_STR(tokenTypes[token->type], "TOKEN_NUMBER", "Token should be of type TOKEN_NUMBER");
 
     // Test token 2
     token = tokens[1];
-    ASSERT_EQ_INT(token->line, 1, "Token should be on line 1");
-    ASSERT_EQ_INT(token->col, 5, "Token should be on column 5");
+    ASSERT_EQ(token->line, 1, "Token should be on line 1");
+    ASSERT_EQ(token->col, 5, "Token should be on column 5");
     sprintf(contents, "%.*s", token->length, token->start);
     ASSERT_EQ_STR(contents, "2.3", "Token should contain \"2.3\"");
     ASSERT_EQ_STR(tokenTypes[token->type], "TOKEN_NUMBER", "Token should be of type TOKEN_NUMBER");
@@ -134,8 +134,8 @@ TEST(testTokenizeOperators, {
     ASSERT_EQ_STR(tokenTypes[token->type], "TOKEN_BANG", "Token should be of type TOKEN_BANG");
 
     token = tokens[5];
-    ASSERT_EQ_INT(token->line, 1, "Token should be on line 1");
-    ASSERT_EQ_INT(token->col, 11, "Token should be on column 11");
+    ASSERT_EQ(token->line, 1, "Token should be on line 1");
+    ASSERT_EQ(token->col, 11, "Token should be on column 11");
     sprintf(contents, "%.*s", token->length, token->start);
     ASSERT_EQ_STR(contents, "!=", "Token should contain \"!=\"");
     ASSERT_EQ_STR(tokenTypes[token->type], "TOKEN_BANG_EQ", "Token should be of type TOKEN_BANG_EQ");
@@ -146,8 +146,8 @@ TEST(testTokenizeOperators, {
     ASSERT_EQ_STR(tokenTypes[token->type], "TOKEN_LT", "Token should be of type TOKEN_LT");
 
     token = tokens[7];
-    ASSERT_EQ_INT(token->line, 1, "Token should be on line 1");
-    ASSERT_EQ_INT(token->col, 16, "Token should be on column 16");
+    ASSERT_EQ(token->line, 1, "Token should be on line 1");
+    ASSERT_EQ(token->col, 16, "Token should be on column 16");
     sprintf(contents, "%.*s", token->length, token->start);
     ASSERT_EQ_STR(contents, "<=", "Token should contain \"<=\"");
     ASSERT_EQ_STR(tokenTypes[token->type], "TOKEN_LTE", "Token should be of type TOKEN_LTE");
@@ -158,22 +158,22 @@ TEST(testTokenizeOperators, {
     ASSERT_EQ_STR(tokenTypes[token->type], "TOKEN_GT", "Token should be of type TOKEN_GT");
 
     token = tokens[9];
-    ASSERT_EQ_INT(token->line, 1, "Token should be on line 1");
-    ASSERT_EQ_INT(token->col, 21, "Token should be on column 21");
+    ASSERT_EQ(token->line, 1, "Token should be on line 1");
+    ASSERT_EQ(token->col, 21, "Token should be on column 21");
     sprintf(contents, "%.*s", token->length, token->start);
     ASSERT_EQ_STR(contents, ">=", "Token should contain \">=\"");
     ASSERT_EQ_STR(tokenTypes[token->type], "TOKEN_GTE", "Token should be of type TOKEN_GTE");
 
     token = tokens[10];
-    ASSERT_EQ_INT(token->line, 1, "Token should be on line 1");
-    ASSERT_EQ_INT(token->col, 24, "Token should be on column 24");
+    ASSERT_EQ(token->line, 1, "Token should be on line 1");
+    ASSERT_EQ(token->col, 24, "Token should be on column 24");
     sprintf(contents, "%.*s", token->length, token->start);
     ASSERT_EQ_STR(contents, "&&", "Token should contain \"&&\"");
     ASSERT_EQ_STR(tokenTypes[token->type], "TOKEN_AND", "Token should be of type TOKEN_AND");
 
     token = tokens[11];
-    ASSERT_EQ_INT(token->line, 1, "Token should be on line 1");
-    ASSERT_EQ_INT(token->col, 27, "Token should be on column 27");
+    ASSERT_EQ(token->line, 1, "Token should be on line 1");
+    ASSERT_EQ(token->col, 27, "Token should be on column 27");
     sprintf(contents, "%.*s", token->length, token->start);
     ASSERT_EQ_STR(contents, "||", "Token should contain \"||\"");
     ASSERT_EQ_STR(tokenTypes[token->type], "TOKEN_OR", "Token should be of type TOKEN_OR");
@@ -261,15 +261,15 @@ TEST(testTokenizeValidString, {
     char contents[10]; // Buffer for reading token contents into
 
     // Double quotes
-    ASSERT_EQ_INT(tokens[0]->line, 1, "Token should be on line 1");
-    ASSERT_EQ_INT(tokens[0]->col, 1, "Token should be on column 1");
+    ASSERT_EQ(tokens[0]->line, 1, "Token should be on line 1");
+    ASSERT_EQ(tokens[0]->col, 1, "Token should be on column 1");
     sprintf(contents, "%.*s", tokens[0]->length, tokens[0]->start);
     ASSERT_EQ_STR(contents, "\"abc def\"", "Token should contain \"abc def\"");
     ASSERT_EQ_STR(tokenTypes[tokens[0]->type], "TOKEN_STRING", "Token should be of type TOKEN_STRING");
 
     // Single quotes
-    ASSERT_EQ_INT(tokens[1]->line, 2, "Token should be on line 2");
-    ASSERT_EQ_INT(tokens[1]->col, 1, "Token should be on column 1");
+    ASSERT_EQ(tokens[1]->line, 2, "Token should be on line 2");
+    ASSERT_EQ(tokens[1]->col, 1, "Token should be on column 1");
     sprintf(contents, "%.*s", tokens[1]->length, tokens[1]->start);
     ASSERT_EQ_STR(contents, "'abc def'", "Token should contain \"abc def\"");
     ASSERT_EQ_STR(tokenTypes[tokens[1]->type], "TOKEN_STRING", "Token should be of type TOKEN_STRING");
@@ -281,16 +281,16 @@ TEST(testTokenizeInvalidString_unterminatedByEOF, {
 
     char contents[20]; // Buffer for reading token contents into
 
-    ASSERT_EQ_INT(tokens[0]->line, 1, "Token should be on line 1");
-    ASSERT_EQ_INT(tokens[0]->col, 1, "Token should be on column 1");
+    ASSERT_EQ(tokens[0]->line, 1, "Token should be on line 1");
+    ASSERT_EQ(tokens[0]->col, 1, "Token should be on column 1");
     sprintf(contents, "%.*s", tokens[0]->length, tokens[0]->start);
     ASSERT_EQ_STR(contents, "Unterminated string", "Token should be an 'Unterminated string' error");
     ASSERT_EQ_STR(tokenTypes[tokens[0]->type], "TOKEN_ERROR", "Token should be of type TOKEN_ERROR");
 
     tokenizeStr("'abc def", tokens);
 
-    ASSERT_EQ_INT(tokens[0]->line, 1, "Token should be on line 1");
-    ASSERT_EQ_INT(tokens[0]->col, 1, "Token should be on column 1");
+    ASSERT_EQ(tokens[0]->line, 1, "Token should be on line 1");
+    ASSERT_EQ(tokens[0]->col, 1, "Token should be on column 1");
     sprintf(contents, "%.*s", tokens[0]->length, tokens[0]->start);
     ASSERT_EQ_STR(contents, "Unterminated string", "Token should be an 'Unterminated string' error");
     ASSERT_EQ_STR(tokenTypes[tokens[0]->type], "TOKEN_ERROR", "Token should be of type TOKEN_ERROR");
@@ -302,28 +302,28 @@ TEST(testTokenizeInvalidString_unterminatedByNewline, {
 
     char contents[20]; // Buffer for reading token contents into
 
-    ASSERT_EQ_INT(tokens[0]->line, 1, "Token should be on line 1");
-    ASSERT_EQ_INT(tokens[0]->col, 1, "Token should be on column 1");
+    ASSERT_EQ(tokens[0]->line, 1, "Token should be on line 1");
+    ASSERT_EQ(tokens[0]->col, 1, "Token should be on column 1");
     sprintf(contents, "%.*s", tokens[0]->length, tokens[0]->start);
     ASSERT_EQ_STR(contents, "Unterminated string", "Token should be an 'Unterminated string' error");
     ASSERT_EQ_STR(tokenTypes[tokens[0]->type], "TOKEN_ERROR", "Token should be of type TOKEN_ERROR");
 
-    ASSERT_EQ_INT(tokens[1]->line, 2, "Token should be on line 2");
-    ASSERT_EQ_INT(tokens[1]->col, 1, "Token should be on column 1");
+    ASSERT_EQ(tokens[1]->line, 2, "Token should be on line 2");
+    ASSERT_EQ(tokens[1]->col, 1, "Token should be on column 1");
     sprintf(contents, "%.*s", tokens[1]->length, tokens[1]->start);
     ASSERT_EQ_STR(contents, "Unterminated string", "Token should be an 'Unterminated string' error");
     ASSERT_EQ_STR(tokenTypes[tokens[1]->type], "TOKEN_ERROR", "Token should be of type TOKEN_ERROR");
 
     tokenizeStr("'abc def\n'ghi jkl", tokens);
 
-    ASSERT_EQ_INT(tokens[0]->line, 1, "Token should be on line 1");
-    ASSERT_EQ_INT(tokens[0]->col, 1, "Token should be on column 1");
+    ASSERT_EQ(tokens[0]->line, 1, "Token should be on line 1");
+    ASSERT_EQ(tokens[0]->col, 1, "Token should be on column 1");
     sprintf(contents, "%.*s", tokens[0]->length, tokens[0]->start);
     ASSERT_EQ_STR(contents, "Unterminated string", "Token should be an 'Unterminated string' error");
     ASSERT_EQ_STR(tokenTypes[tokens[0]->type], "TOKEN_ERROR", "Token should be of type TOKEN_ERROR");
 
-    ASSERT_EQ_INT(tokens[1]->line, 2, "Token should be on line 2");
-    ASSERT_EQ_INT(tokens[1]->col, 1, "Token should be on column 1");
+    ASSERT_EQ(tokens[1]->line, 2, "Token should be on line 2");
+    ASSERT_EQ(tokens[1]->col, 1, "Token should be on column 1");
     sprintf(contents, "%.*s", tokens[1]->length, tokens[1]->start);
     ASSERT_EQ_STR(contents, "Unterminated string", "Token should be an 'Unterminated string' error");
     ASSERT_EQ_STR(tokenTypes[tokens[1]->type], "TOKEN_ERROR", "Token should be of type TOKEN_ERROR");
@@ -353,24 +353,24 @@ TEST(testTokenizeIdentifiers, {
 
     // Token 1
     token = tokens[0];
-    ASSERT_EQ_INT(token->line, 1, "Token should be on line 1");
-    ASSERT_EQ_INT(token->col, 1, "Token should be on column 1");
+    ASSERT_EQ(token->line, 1, "Token should be on line 1");
+    ASSERT_EQ(token->col, 1, "Token should be on column 1");
     sprintf(contents, "%.*s", token->length, token->start);
     ASSERT_EQ_STR(contents, "hey", "Token should contain \"hey\"");
     ASSERT_EQ_STR(tokenTypes[token->type], "TOKEN_IDENT", "Token should be of type TOKEN_IDENT");
 
     // Token 2
     token = tokens[1];
-    ASSERT_EQ_INT(token->line, 1, "Token should be on line 1");
-    ASSERT_EQ_INT(token->col, 5, "Token should be on column 5");
+    ASSERT_EQ(token->line, 1, "Token should be on line 1");
+    ASSERT_EQ(token->col, 5, "Token should be on column 5");
     sprintf(contents, "%.*s", token->length, token->start);
     ASSERT_EQ_STR(contents, "helloWorld", "Token should contain \"helloWorld\"");
     ASSERT_EQ_STR(tokenTypes[token->type], "TOKEN_IDENT", "Token should be of type TOKEN_IDENT");
 
     // Token 3
     token = tokens[2];
-    ASSERT_EQ_INT(token->line, 1, "Token should be on line 1");
-    ASSERT_EQ_INT(token->col, 16, "Token should be on column 16");
+    ASSERT_EQ(token->line, 1, "Token should be on line 1");
+    ASSERT_EQ(token->col, 16, "Token should be on column 16");
     sprintf(contents, "%.*s", token->length, token->start);
     ASSERT_EQ_STR(contents, "Point3D", "Token should contain \"Point3D\"");
     ASSERT_EQ_STR(tokenTypes[token->type], "TOKEN_IDENT", "Token should be of type TOKEN_IDENT");

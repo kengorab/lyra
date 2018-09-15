@@ -58,7 +58,10 @@ typedef struct {
     union {
         int iVal;
         double dVal;
-        const char* strVal;
+        struct {
+            const char* val;
+            int length;
+        } str;
         bool bVal;
     };
 } LiteralNode;

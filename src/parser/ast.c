@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include "parser/ast.h"
+#include "ast.h"
 
 const char* astNodeTypes[] = {AST_NODE_TYPES};
 
@@ -28,8 +29,13 @@ Node* newLiteralNode(Token* token) {
     literalNode->token = token;
     switch (token->type) {
         case TOKEN_NUMBER: {
-            // TODO: This shit sucks, fix it! This will cause ANY integer to be parsed as a float as long as there is a dot SOMEWHERE else in the file...
-            if (strstr(token->start, ".") != NULL) {
+            bool hasDecimal = false;
+            for (int i = 0; i < token->length; ++i) {
+                if (token->start[i] == '.')
+                    hasDecimal = true;
+            }
+
+            if (hasDecimal) {
                 literalNode->type = LITERAL_NODE_DOUBLE;
                 literalNode->dVal = strtod(token->start, NULL);
             } else {
@@ -40,7 +46,8 @@ Node* newLiteralNode(Token* token) {
         }
         case TOKEN_STRING: {
             literalNode->type = LITERAL_NODE_STRING;
-            literalNode->strVal = token->start;
+            literalNode->str.val = token->start;
+            literalNode->str.length = token->length;
             break;
         }
         case TOKEN_TRUE:

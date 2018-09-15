@@ -6,7 +6,7 @@
 
 TEST(testCreateEmptyList, {
     List* l = newList();
-    ASSERT_EQ_INT(0, l->count, "List should be empty");
+    ASSERT_EQ(0, l->count, "List should be empty");
 })
 
 typedef struct {
@@ -26,7 +26,7 @@ TEST(testStoringAndRetrievingObject, {
 
     SomeObj* someObj = newSomeObj("Some String", (char* []) {"String 1", "String 2"});
     listAdd(l, (void**) &someObj);
-    ASSERT_EQ_INT(1, l->count, "List should have 1 item in it");
+    ASSERT_EQ(1, l->count, "List should have 1 item in it");
 
     SomeObj* retrieved = l->values[0];
     ASSERT_EQ_STR("Some String", retrieved->someStr, "The `someStr` field of the retrieved object should be correct");
@@ -46,7 +46,7 @@ TEST(testAutoresizingList, {
         n++;
     }
 
-    ASSERT_EQ_INT(10, l->count, "List should have 10 items in it");
+    ASSERT_EQ(10, l->count, "List should have 10 items in it");
 
     n = 0;
     SomeObj* retrieved;

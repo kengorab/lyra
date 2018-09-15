@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <parser/ast.h>
 
 #include "printing_visitor.h"
 #include "parser/ast.h"
@@ -19,7 +20,7 @@ static void visitLiteralNode(LiteralNode* literalNode) {
         }
         case LITERAL_NODE_STRING: {
             // TODO: Don't store quotes in strVal!
-            printf("\"%.*s\"", literalNode->token->length - 2, literalNode->strVal + 1);
+            printf("\"%.*s\"", literalNode->str.length - 2, literalNode->str.val + 1);
             break;
         }
         case LITERAL_NODE_BOOL: {
