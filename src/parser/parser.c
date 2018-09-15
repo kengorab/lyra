@@ -27,8 +27,8 @@ static Node* parseExpression(Parser* parser);
 //             Statements
 // ------------------------------------
 
-static Node* parseValDeclStmt(Parser* parser, Token* valToken) {
-    advance(parser); // Consume "val" token
+static Node* parseValDeclStmt(Parser* parser) {
+    Token* valToken = advance(parser); // Consume "val" token
     if (PEEK(parser)->type != TOKEN_IDENT)
         return NULL; // TODO: Parser error handling
     Token* identTok = advance(parser);
@@ -45,7 +45,7 @@ static Node* parseValDeclStmt(Parser* parser, Token* valToken) {
 static Node* parseStatement(Parser* parser) {
     Token* token = PEEK(parser);
     switch (token->type) {
-        case TOKEN_VAL: return parseValDeclStmt(parser, token);
+        case TOKEN_VAL: return parseValDeclStmt(parser);
         default: return parseExpression(parser);
     }
 }
