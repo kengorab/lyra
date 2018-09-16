@@ -262,7 +262,7 @@ void runParserTests(Tester* tester) {
     tester->startSuite("Parser");
     tester->run(testParseIntLiteral);
     tester->run(testParseDoubleLiteral);
-//    tester->run(testParseBoolLiterals);
+    tester->run(testParseBoolLiterals);
     tester->run(testParseStringLiteral);
     tester->run(testParseNilLiteral);
     tester->run(testUnaryExpression_minus);
@@ -322,7 +322,7 @@ static TestResult assertLiteralNode(const char* testName, Node* n, LiteralNodeTy
             break;
         }
         case LITERAL_NODE_BOOL: {
-            bool val = va_arg(args, bool);
+            bool val = va_arg(args, int) == 1;
             msg = malloc(100);
             sprintf(msg, "The literal node should contain bVal=%s", val ? "true" : "false");
             ASSERT_EQ(val, literalNode->bVal, msg);
