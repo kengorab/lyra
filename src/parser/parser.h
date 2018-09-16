@@ -4,6 +4,7 @@
 #include "lexer/lexer.h"
 #include "parser/ast.h"
 #include "common/list.h"
+#include "parser_error.h"
 
 typedef struct {
     Token** start;
@@ -24,8 +25,8 @@ typedef enum {
     PREC_PRIMARY
 } Precedence;
 
-typedef Node* (* PrefixFn)(Parser*, Token**);
-typedef Node* (* InfixFn)(Parser*, Token**, Node**);
+typedef Node* (* PrefixFn)(Parser*, Token**, ParseError**);
+typedef Node* (* InfixFn)(Parser*, Token**, Node**, ParseError**);
 
 typedef struct {
     PrefixFn prefixFn;
@@ -35,6 +36,6 @@ typedef struct {
 
 Parser newParser(Token** tokens);
 
-List* parse(Parser* parser);
+List* parse(Parser* parser, List** outErrList);
 
 #endif //CLYRA_PARSER_H

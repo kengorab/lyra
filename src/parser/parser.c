@@ -21,32 +21,40 @@ Parser newParser(Token** tokens) {
     return p;
 }
 
-static Node* parseExpression(Parser* parser);
+static Node* parseExpression(Parser* parser, ParseError** outErr);
 
 // ------------------------------------
 //             Statements
 // ------------------------------------
 
-static Node* parseValDeclStmt(Parser* parser) {
+static Node* parseValDeclStmt(Parser* parser, ParseError** outErr) {
     Token* valToken = advance(parser); // Consume "val" token
-    if (PEEK(parser)->type != TOKEN_IDENT)
-        return NULL; // TODO: Parser error handling
+    if (PEEK(parser)->type != TOKEN_IDENT) {
+        *outErr = newParseError(PEEK(parser), 1, TOKEN_IDENT);
+        return NULL;
+    }
     Token* identTok = advance(parser);
 
-    if (PEEK(parser)->type != TOKEN_EQ)
-        return NULL; // TODO: Parser error handling
+    if (PEEK(parser)->type != TOKEN_EQ) {
+        *outErr = newParseError(PEEK(parser), 1, TOKEN_EQ);
+        return NULL;
+    }
     advance(parser); // Skip "="
 
-    Node* rhs = parseExpression(parser);
+    Node* rhs = parseExpression(parser, outErr);
+    if (rhs == NULL) {
+        *outErr = newParseError(PEEK(parser), 0, "expression");
+        return NULL;
+    }
 
     return newValDeclStmtNode(valToken, newIdentifierNode(identTok), rhs);
 }
 
-static Node* parseStatement(Parser* parser) {
+static Node* parseStatement(Parser* parser, ParseError** outErr) {
     Token* token = PEEK(parser);
     switch (token->type) {
-        case TOKEN_VAL: return parseValDeclStmt(parser);
-        default: return parseExpression(parser);
+        case TOKEN_VAL: return parseValDeclStmt(parser, outErr);
+        default: return parseExpression(parser, outErr);
     }
 }
 
@@ -58,19 +66,19 @@ static Node* parseStatement(Parser* parser) {
 #define GET_RULE(tokenType) (&parseRules[tokenType])
 #endif
 
-static Node* parseUnary(Parser* parser, Token** token);
+static Node* parseUnary(Parser* parser, Token** token, ParseError** outErr);
 
-static Node* parseBinary(Parser* parser, Token** opToken, Node** lExpr);
+static Node* parseBinary(Parser* parser, Token** opToken, Node** lExpr, ParseError** outErr);
 
-static Node* parseLiteral(Parser* parser, Token** token);
+static Node* parseLiteral(Parser* parser, Token** token, ParseError** outErr);
 
-static Node* parseIdentifier(Parser* parser, Token** token);
+static Node* parseIdentifier(Parser* parser, Token** token, ParseError** outErr);
 
-static Node* parseArray(Parser* parser, Token** token);
+static Node* parseArray(Parser* parser, Token** token, ParseError** outErr);
 
-static Node* parseObject(Parser* parser, Token** token);
+static Node* parseObject(Parser* parser, Token** token, ParseError** outErr);
 
-static Node* parseGrouping(Parser* parser, Token** token);
+static Node* parseGrouping(Parser* parser, Token** token, ParseError** outErr);
 
 ParseRule parseRules[] = { // These rules NEED to stay in Token order
     {.infixFn = NULL, .prefixFn = parseLiteral, .precedence = PREC_NONE},             // TOKEN_NUMBER
@@ -115,43 +123,50 @@ ParseRule parseRules[] = { // These rules NEED to stay in Token order
     {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_EOF
 };
 
-static Node* parsePrecedence(Parser* parser, Precedence precedence) {
+static Node* parsePrecedence(Parser* parser, Precedence precedence, ParseError** outErr) {
     Token* prefixToken = *parser->current;
 
-    // Cursor sits on token AFTER the match token; in-/prefix fns always start on token AFTER the one they match
-    advance(parser);
     ParseRule* rule = GET_RULE(prefixToken->type);
     if (rule == NULL || rule->prefixFn == NULL) {
-        printf("Error, no prefix rule for tokenType: %s\n", tokenTypes[prefixToken->type]);
+//        printf("Error, no prefix rule for tokenType: %s\n", tokenTypes[prefixToken->type]);
         return NULL;
     }
 
-    Node* left = rule->prefixFn(parser, &prefixToken);
+    // Cursor sits on token AFTER the match token; in-/prefix fns always start on token AFTER the one they match
+    advance(parser);
+
+    Node* left = rule->prefixFn(parser, &prefixToken, outErr);
 
     while (precedence <= GET_RULE((*parser->current)->type)->precedence) {
         Token* infixToken = *parser->current;
         advance(parser); // See comment above for prefix token
-        InfixFn infixFn = GET_RULE(infixToken->type)->infixFn;
-        left = infixFn(parser, &infixToken, &left);
+        rule = GET_RULE(infixToken->type);
+        if (rule == NULL || rule->infixFn == NULL) {
+//            printf("Error, no infix rule for tokenType: %s\n", tokenTypes[infixToken->type]);
+            return NULL;
+        }
+
+        InfixFn infixFn = rule->infixFn;
+        left = infixFn(parser, &infixToken, &left, outErr);
     }
 
     return left;
 }
 
-static Node* parseLiteral(Parser* parser, Token** token) {
+static Node* parseLiteral(Parser* parser, Token** token, ParseError** outErr) {
     return newLiteralNode(*token);
 }
 
-static Node* parseIdentifier(Parser* parser, Token** token) {
+static Node* parseIdentifier(Parser* parser, Token** token, ParseError** outErr) {
     return newIdentifierNode(*token);
 }
 
-static Node* parseUnary(Parser* parser, Token** token) {
-    Node* expr = parsePrecedence(parser, PREC_UNARY);
+static Node* parseUnary(Parser* parser, Token** token, ParseError** outErr) {
+    Node* expr = parsePrecedence(parser, PREC_UNARY, outErr);
     return newUnaryNode(*token, expr);
 }
 
-static Node* parseBinary(Parser* parser, Token** opToken, Node** lExpr) {
+static Node* parseBinary(Parser* parser, Token** opToken, Node** lExpr, ParseError** outErr) {
     Precedence prec;
     switch ((*opToken)->type) {
         case TOKEN_MINUS:
@@ -185,23 +200,26 @@ static Node* parseBinary(Parser* parser, Token** opToken, Node** lExpr) {
             break;
         }
         default: {
-            return NULL; // TODO: Parser error handling
+            // This is an invalid state, and should be unreachable
+            return NULL;
         }
     }
 
-    Node* rExpr = parsePrecedence(parser, prec);
+    Node* rExpr = parsePrecedence(parser, prec, outErr);
     return newBinaryNode(*opToken, *lExpr, rExpr);
 }
 
-static Node* parseArray(Parser* parser, Token** token) {
+static Node* parseArray(Parser* parser, Token** token, ParseError** outErr) {
     List* elements = newList();
     while (PEEK(parser)->type != TOKEN_RBRACK && !IS_AT_END(parser)) {
-        Node* elem = parseExpression(parser);
+        Node* elem = parseExpression(parser, outErr);
         listAdd(elements, (void**) &elem);
         if (PEEK(parser)->type == TOKEN_COMMA)
             advance(parser); // Consume the ","
-        else if (PEEK(parser)->type != TOKEN_RBRACK)
-            return NULL; // TODO: Parser error handling
+        else if (PEEK(parser)->type != TOKEN_RBRACK) {
+            *outErr = newParseError(PEEK(parser), 2, TOKEN_COMMA, TOKEN_RBRACK);
+            return NULL;
+        }
     }
     advance(parser); // Consume the "]"
 
@@ -209,26 +227,36 @@ static Node* parseArray(Parser* parser, Token** token) {
     return newArrayLiteralNode(*token, arrayElements, elements->count);
 }
 
-static Node* parseObject(Parser* parser, Token** token) {
+static Node* parseObject(Parser* parser, Token** token, ParseError** outErr) {
     List* keys = newList();
     List* entries = newList();
     while (!IS_AT_END(parser) && PEEK(parser)->type != TOKEN_RBRACE) {
-        if (PEEK(parser)->type != TOKEN_IDENT)
-            return NULL; // TODO: Parser error handling
+        if (PEEK(parser)->type != TOKEN_IDENT) {
+            *outErr = newParseError(PEEK(parser), 1, TOKEN_IDENT);
+            return NULL;
+        }
         Token* keyToken = advance(parser);
-        Node* key = parseIdentifier(parser, &keyToken);
+        Node* key = parseIdentifier(parser, &keyToken, outErr);
         listAdd(keys, (void**) &key);
 
-        if (PEEK(parser)->type != TOKEN_COLON)
-            return NULL; // TODO: Parser error handling
+        if (PEEK(parser)->type != TOKEN_COLON) {
+            *outErr = newParseError(PEEK(parser), 1, TOKEN_COLON);
+            return NULL;
+        }
         advance(parser); // Consume ":"
 
-        Node* value = parseExpression(parser);
+        Node* value = parseExpression(parser, outErr);
+        if (value == NULL) {
+            *outErr = newParseError(PEEK(parser), 0, "expression");
+            return NULL;
+        }
 
         if (PEEK(parser)->type == TOKEN_COMMA)
             advance(parser); // Consume the ","
-        else if (PEEK(parser)->type != TOKEN_RBRACE)
-            return NULL; // TODO: Parser error handling
+        else if (PEEK(parser)->type != TOKEN_RBRACE) {
+            *outErr = newParseError(PEEK(parser), 2, TOKEN_COMMA, TOKEN_RBRACE);
+            return NULL;
+        }
 
         ObjectLiteralEntry* entry = newObjectLiteralEntry(key, value);
         listAdd(entries, (void**) &entry);
@@ -238,22 +266,33 @@ static Node* parseObject(Parser* parser, Token** token) {
     return newObjectLiteralNode(*token, (ObjectLiteralEntry**) entries->values, (Node**) keys->values, entries->count);
 }
 
-static Node* parseGrouping(Parser* parser, Token** token) {
-    Node* expr = parseExpression(parser);
+static Node* parseGrouping(Parser* parser, Token** token, ParseError** outErr) {
+    Node* expr = parseExpression(parser, outErr);
     advance(parser); // Consume the ")"
     return newGroupingNode(*token, expr);
 }
 
-static Node* parseExpression(Parser* parser) {
-    return parsePrecedence(parser, PREC_ASSIGNMENT); // Start with lowest precedence
+static Node* parseExpression(Parser* parser, ParseError** outErr) {
+    return parsePrecedence(parser, PREC_ASSIGNMENT, outErr); // Start with lowest precedence
 }
 
-List* parse(Parser* parser) {
+static void skipToNextSafeZone(Parser* parser) {
+    while (!IS_AT_END(parser) && PEEK(parser)->type != TOKEN_VAL)
+        advance(parser);
+}
+
+List* parse(Parser* parser, List** outErrList) {
     List* statements = newList();
 
     while (!IS_AT_END(parser)) {
-        Node* stmt = parseStatement(parser);
-        listAdd(statements, (void**) &stmt);
+        ParseError* error = NULL;
+        Node* stmt = parseStatement(parser, &error);
+        if (error == NULL) {
+            listAdd(statements, (void**) &stmt);
+        } else {
+            listAdd(*outErrList, (void**) &error);
+            skipToNextSafeZone(parser);
+        }
     }
 
     return statements;

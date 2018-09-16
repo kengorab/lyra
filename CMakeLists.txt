@@ -21,6 +21,8 @@ add_executable(
         src/parser/ast.c
         src/parser/parser.c
         src/parser/parser.h
+        src/parser/parser_error.c
+        src/parser/parser_error.h
         src/main.c
 )
 
@@ -35,13 +37,17 @@ add_executable(
         src/parser/ast.c
         src/parser/parser.c
         src/parser/parser.h
+        src/parser/parser_error.c
+        src/parser/parser_error.h
         test/common/list_test.c
         test/common/list_test.h
         test/lexer/lexer_test.c
         test/lexer/lexer_test.h
+        test/parser/ast_test.c
+        test/parser/ast_test.h
         test/parser/parser_test.c
         test/parser/parser_test.h
         test/main.c
         test/test.h
-        test/parser/ast_test.c test/parser/ast_test.h)
+)
 add_test(clyra_tests clyra_tests)
