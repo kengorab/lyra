@@ -82,6 +82,20 @@ TEST(testParseNilLiteral, {
     return assertLiteralNode(testName, nodes->values[0], LITERAL_NODE_NIL);
 })
 
+TEST(testParseIdentifier, {
+    Token** tokens = ((Token* []) {
+        makeToken("abc", TOKEN_IDENT),
+        makeToken("", TOKEN_EOF),
+    });
+
+    Parser p = newParser(tokens);
+    List* nodes = parse(&p);
+    ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
+
+    Node* n = nodes->values[0];
+    ASSERT_EQ_STR("NODE_TYPE_IDENT", astNodeTypes[n->type], "The node type should be NODE_TYPE_IDENT");
+})
+
 TEST(testUnaryExpression_minus, {
     Token** tokens = ((Token* []) {
         makeToken("-", TOKEN_MINUS),
@@ -215,7 +229,8 @@ TEST(testArrayLiteralExpression, {
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
 
     Node* n = nodes->values[0];
-    ASSERT_EQ_STR("NODE_TYPE_ARRAY_LITERAL", astNodeTypes[n->type], "The node should have type NODE_TYPE_ARRAY_LITERAL");
+    ASSERT_EQ_STR("NODE_TYPE_ARRAY_LITERAL", astNodeTypes[n->type],
+                  "The node should have type NODE_TYPE_ARRAY_LITERAL");
     ArrayLiteralNode* array = n->as.arrayLiteralNode;
 
     TestResult res = assertLiteralNode(testName, array->elements[0], LITERAL_NODE_INT, 1);
@@ -239,7 +254,8 @@ TEST(testArrayLiteralExpression_trailingCommas, {
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
 
     Node* n = nodes->values[0];
-    ASSERT_EQ_STR("NODE_TYPE_ARRAY_LITERAL", astNodeTypes[n->type], "The node should have type NODE_TYPE_ARRAY_LITERAL");
+    ASSERT_EQ_STR("NODE_TYPE_ARRAY_LITERAL", astNodeTypes[n->type],
+                  "The node should have type NODE_TYPE_ARRAY_LITERAL");
     ArrayLiteralNode* array = n->as.arrayLiteralNode;
 
     TestResult res = assertLiteralNode(testName, array->elements[0], LITERAL_NODE_INT, 1);
@@ -259,7 +275,8 @@ TEST(testArrayLiteralExpression_emptyArray, {
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
 
     Node* n = nodes->values[0];
-    ASSERT_EQ_STR("NODE_TYPE_ARRAY_LITERAL", astNodeTypes[n->type], "The node should have type NODE_TYPE_ARRAY_LITERAL");
+    ASSERT_EQ_STR("NODE_TYPE_ARRAY_LITERAL", astNodeTypes[n->type],
+                  "The node should have type NODE_TYPE_ARRAY_LITERAL");
     ArrayLiteralNode* array = n->as.arrayLiteralNode;
     ASSERT_EQ(0, array->size, "There should be no elements in the array");
 })
@@ -328,6 +345,7 @@ void runParserTests(Tester* tester) {
     tester->run(testParseBoolLiterals);
     tester->run(testParseStringLiteral);
     tester->run(testParseNilLiteral);
+    tester->run(testParseIdentifier);
     tester->run(testUnaryExpression_minus);
     tester->run(testUnaryExpression_negate);
     tester->run(testBinaryExpression);

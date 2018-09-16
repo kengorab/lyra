@@ -64,6 +64,8 @@ static Node* parseBinary(Parser* parser, Token** opToken, Node** lExpr);
 
 static Node* parseLiteral(Parser* parser, Token** token);
 
+static Node* parseIdentifier(Parser* parser, Token** token);
+
 static Node* parseArray(Parser* parser, Token** token);
 
 ParseRule parseRules[] = { // These rules NEED to stay in Token order
@@ -95,7 +97,7 @@ ParseRule parseRules[] = { // These rules NEED to stay in Token order
     {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_ARROW
     {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_PIPE
     {.infixFn = NULL, .prefixFn = parseLiteral, .precedence = PREC_NONE},             // TOKEN_STRING
-    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_IDENT
+    {.infixFn = NULL, .prefixFn = parseIdentifier, .precedence = PREC_NONE},          // TOKEN_IDENT
     {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_VAL
     {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_VAR
     {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_TYPE
@@ -134,6 +136,10 @@ static Node* parsePrecedence(Parser* parser, Precedence precedence) {
 
 static Node* parseLiteral(Parser* parser, Token** token) {
     return newLiteralNode(*token);
+}
+
+static Node* parseIdentifier(Parser* parser, Token** token) {
+    return newIdentifierNode(*token);
 }
 
 static Node* parseUnary(Parser* parser, Token** token) {
