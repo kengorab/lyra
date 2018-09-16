@@ -69,8 +69,6 @@ static void skipWhitespace(Lexer* lexer) {
                 return;
             }
         }
-
-        return;
     }
 }
 
