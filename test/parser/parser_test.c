@@ -262,7 +262,7 @@ void runParserTests(Tester* tester) {
     tester->startSuite("Parser");
     tester->run(testParseIntLiteral);
     tester->run(testParseDoubleLiteral);
-    tester->run(testParseBoolLiterals);
+//    tester->run(testParseBoolLiterals);
     tester->run(testParseStringLiteral);
     tester->run(testParseNilLiteral);
     tester->run(testUnaryExpression_minus);
