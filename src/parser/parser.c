@@ -60,9 +60,11 @@ static Node* parseStatement(Parser* parser) {
 
 static Node* parseUnary(Parser* parser, Token** token);
 
-static Node* parseBinary(Parser* parser, Token** opToken, Node** left);
+static Node* parseBinary(Parser* parser, Token** opToken, Node** lExpr);
 
 static Node* parseLiteral(Parser* parser, Token** token);
+
+static Node* parseArray(Parser* parser, Token** token);
 
 ParseRule parseRules[] = { // These rules NEED to stay in Token order
     {.infixFn = NULL, .prefixFn = parseLiteral, .precedence = PREC_NONE},             // TOKEN_NUMBER
@@ -80,7 +82,7 @@ ParseRule parseRules[] = { // These rules NEED to stay in Token order
     {.infixFn = parseBinary, .prefixFn = NULL, .precedence = PREC_EQUALITY},          // TOKEN_BANG_EQ
     {.infixFn = parseBinary, .prefixFn = NULL, .precedence = PREC_AND},               // TOKEN_AND
     {.infixFn = parseBinary, .prefixFn = NULL, .precedence = PREC_OR},                // TOKEN_OR
-    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_LBRACK
+    {.infixFn = NULL, .prefixFn = parseArray, .precedence = PREC_NONE},               // TOKEN_LBRACK
     {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_RBRACK
     {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_LBRACE
     {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_RBRACE
@@ -179,6 +181,20 @@ static Node* parseBinary(Parser* parser, Token** opToken, Node** lExpr) {
 
     Node* rExpr = parsePrecedence(parser, prec);
     return newBinaryNode(*opToken, *lExpr, rExpr);
+}
+
+static Node* parseArray(Parser* parser, Token** token) {
+    List* elements = newList();
+    while (PEEK(parser)->type != TOKEN_RBRACK && !IS_AT_END(parser)) {
+        Node* elem = parseExpression(parser);
+        listAdd(elements, (void**) &elem);
+        if (PEEK(parser)->type == TOKEN_COMMA)
+            advance(parser); // Consume the ","
+    }
+    advance(parser); // Consume the "]"
+
+    Node** arrayElements = (Node**) elements->values;
+    return newArrayLiteralNode(*token, arrayElements, elements->count);
 }
 
 static Node* parseExpression(Parser* parser) {

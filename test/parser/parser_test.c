@@ -143,8 +143,7 @@ TEST(testBinaryExpression, {
     return assertLiteralNode(testName, binary->rExpr, LITERAL_NODE_INT, 2);
 })
 
-TestResult testBinaryExpression_precedences() {
-    const char* testName = "testBinaryExpression_precedences";
+TEST(testBinaryExpression_precedences, {
     // 1 + 2 * 3 >= 4 && false == true
     // (((1 + (2 * 3)) >= 4) && (false == true))
     Token** tokens = ((Token* []) {
@@ -199,7 +198,71 @@ TestResult testBinaryExpression_precedences() {
     res = assertLiteralNode(testName, binary->lExpr, LITERAL_NODE_INT, 2);
     if (!res.pass) return res;
     return assertLiteralNode(testName, binary->rExpr, LITERAL_NODE_INT, 3);
-}
+})
+
+TEST(testArrayLiteralExpression, {
+    Token** tokens = ((Token* []) {
+        makeToken("[", TOKEN_LBRACK),
+        makeToken("1", TOKEN_NUMBER),
+        makeToken(",", TOKEN_COMMA),
+        makeToken("2", TOKEN_NUMBER),
+        makeToken("]", TOKEN_RBRACK),
+        makeToken("", TOKEN_EOF),
+    });
+
+    Parser p = newParser(tokens);
+    List* nodes = parse(&p);
+    ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
+
+    Node* n = nodes->values[0];
+    ASSERT_EQ_STR("NODE_TYPE_ARRAY_LITERAL", astNodeTypes[n->type], "The node should have type NODE_TYPE_ARRAY_LITERAL");
+    ArrayLiteralNode* array = n->as.arrayLiteralNode;
+
+    TestResult res = assertLiteralNode(testName, array->elements[0], LITERAL_NODE_INT, 1);
+    if (!res.pass) return res;
+    return assertLiteralNode(testName, array->elements[1], LITERAL_NODE_INT, 2);
+})
+
+TEST(testArrayLiteralExpression_trailingCommas, {
+    Token** tokens = ((Token* []) {
+        makeToken("[", TOKEN_LBRACK),
+        makeToken("1", TOKEN_NUMBER),
+        makeToken(",", TOKEN_COMMA),
+        makeToken("2", TOKEN_NUMBER),
+        makeToken(",", TOKEN_COMMA),
+        makeToken("]", TOKEN_RBRACK),
+        makeToken("", TOKEN_EOF),
+    });
+
+    Parser p = newParser(tokens);
+    List* nodes = parse(&p);
+    ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
+
+    Node* n = nodes->values[0];
+    ASSERT_EQ_STR("NODE_TYPE_ARRAY_LITERAL", astNodeTypes[n->type], "The node should have type NODE_TYPE_ARRAY_LITERAL");
+    ArrayLiteralNode* array = n->as.arrayLiteralNode;
+
+    TestResult res = assertLiteralNode(testName, array->elements[0], LITERAL_NODE_INT, 1);
+    if (!res.pass) return res;
+    return assertLiteralNode(testName, array->elements[1], LITERAL_NODE_INT, 2);
+})
+
+TEST(testArrayLiteralExpression_emptyArray, {
+    Token** tokens = ((Token* []) {
+        makeToken("[", TOKEN_LBRACK),
+        makeToken("]", TOKEN_RBRACK),
+        makeToken("", TOKEN_EOF),
+    });
+
+    Parser p = newParser(tokens);
+    List* nodes = parse(&p);
+    ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
+
+    Node* n = nodes->values[0];
+    ASSERT_EQ_STR("NODE_TYPE_ARRAY_LITERAL", astNodeTypes[n->type], "The node should have type NODE_TYPE_ARRAY_LITERAL");
+    ArrayLiteralNode* array = n->as.arrayLiteralNode;
+    ASSERT_EQ(0, array->size, "There should be no elements in the array");
+})
 
 TEST(testParseValDeclStatement, {
     Token** tokens = ((Token* []) {
@@ -269,6 +332,9 @@ void runParserTests(Tester* tester) {
     tester->run(testUnaryExpression_negate);
     tester->run(testBinaryExpression);
     tester->run(testBinaryExpression_precedences);
+    tester->run(testArrayLiteralExpression);
+    tester->run(testArrayLiteralExpression_emptyArray);
+    tester->run(testArrayLiteralExpression_trailingCommas);
     tester->run(testParseValDeclStatement);
     tester->run(testParseValDeclStatements);
 }

@@ -97,6 +97,19 @@ Node* newBinaryNode(Token* token, Node* lExpr, Node* rExpr) {
     return n;
 }
 
+Node* newArrayLiteralNode(Token* token, Node** elements, int size) {
+    Node* n = malloc(sizeof(Node));
+    n->type = NODE_TYPE_ARRAY_LITERAL;
+
+    ArrayLiteralNode* array = malloc(sizeof(ArrayLiteralNode));
+    array->token = token;
+    array->elements = elements;
+    array->size = size;
+
+    n->as.arrayLiteralNode = array;
+    return n;
+}
+
 // ------------------------------------
 //             Statements
 // ------------------------------------

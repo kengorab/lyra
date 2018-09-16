@@ -11,6 +11,7 @@
 #define C(ENUM_VAL) ENUM_VAL,
 #define AST_NODE_TYPES \
     C(NODE_TYPE_LITERAL) \
+    C(NODE_TYPE_ARRAY_LITERAL) \
     C(NODE_TYPE_IDENT) \
     C(NODE_TYPE_UNARY) \
     C(NODE_TYPE_BINARY) \
@@ -81,6 +82,12 @@ typedef struct {
     Node* rExpr;
 } BinaryNode;
 
+typedef struct {
+    Token* token;
+    Node** elements;
+    int size;
+} ArrayLiteralNode;
+
 // ------------------------------------
 //             Statements
 // ------------------------------------
@@ -100,6 +107,7 @@ struct Node {
     union {
         ValDeclStmt* valDeclStmt;
         LiteralNode* literalNode;
+        ArrayLiteralNode* arrayLiteralNode;
         IdentifierNode* identifierNode;
         UnaryNode* unaryNode;
         BinaryNode* binaryNode;
@@ -113,6 +121,8 @@ Node* newIdentifierNode(Token* token);
 Node* newUnaryNode(Token* token, Node* expr);
 
 Node* newBinaryNode(Token* token, Node* lExpr, Node* rExpr);
+
+Node* newArrayLiteralNode(Token* token, Node** elements, int size);
 
 Node* newValDeclStmtNode(Token* token, Node* identNode, Node* assignment);
 

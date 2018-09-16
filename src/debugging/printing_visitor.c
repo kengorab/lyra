@@ -54,6 +54,16 @@ static void visitValDeclStmtNode(ValDeclStmt* stmt) {
     visit(stmt->assignment);
 }
 
+static void visitArrayLiteralNode(ArrayLiteralNode* node) {
+    printf("[");
+    for (int i = 0; i < node->size - 1; ++i) {
+        visit(node->elements[i]);
+        printf(", ");
+    }
+    visit(node->elements[node->size - 1]);
+    printf("]");
+}
+
 static void visit(Node* node) {
     switch (node->type) {
         case NODE_TYPE_IDENT: {
@@ -70,6 +80,10 @@ static void visit(Node* node) {
         }
         case NODE_TYPE_BINARY: {
             visitBinaryNode(node->as.binaryNode);
+            break;
+        }
+        case NODE_TYPE_ARRAY_LITERAL: {
+            visitArrayLiteralNode(node->as.arrayLiteralNode);
             break;
         }
         case NODE_TYPE_VAL_DECL_STATEMENT: {
