@@ -15,6 +15,7 @@
     C(NODE_TYPE_IDENT) \
     C(NODE_TYPE_UNARY) \
     C(NODE_TYPE_BINARY) \
+    C(NODE_TYPE_GROUPING) \
     C(NODE_TYPE_VAL_DECL_STATEMENT)
 
 typedef enum {
@@ -88,6 +89,11 @@ typedef struct {
     int size;
 } ArrayLiteralNode;
 
+typedef struct {
+    Token* token;
+    Node* expr;
+} GroupingNode;
+
 // ------------------------------------
 //             Statements
 // ------------------------------------
@@ -111,6 +117,7 @@ struct Node {
         IdentifierNode* identifierNode;
         UnaryNode* unaryNode;
         BinaryNode* binaryNode;
+        GroupingNode* groupingNode;
     } as;
 };
 
@@ -123,6 +130,8 @@ Node* newUnaryNode(Token* token, Node* expr);
 Node* newBinaryNode(Token* token, Node* lExpr, Node* rExpr);
 
 Node* newArrayLiteralNode(Token* token, Node** elements, int size);
+
+Node* newGroupingNode(Token* token, Node* expr);
 
 Node* newValDeclStmtNode(Token* token, Node* identNode, Node* assignment);
 

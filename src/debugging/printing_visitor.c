@@ -36,11 +36,9 @@ static void visitUnaryNode(UnaryNode* node) {
 }
 
 static void visitBinaryNode(BinaryNode* node) {
-    printf("(");
     visit(node->lExpr);
     printf(" %.*s ", node->token->length, node->token->start);
     visit(node->rExpr);
-    printf(")");
 }
 
 static void visitIdentifierNode(IdentifierNode* identifierNode) {
@@ -64,6 +62,12 @@ static void visitArrayLiteralNode(ArrayLiteralNode* node) {
     printf("]");
 }
 
+static void visitGroupingNodeNode(GroupingNode* node) {
+    printf("(");
+    visit(node->expr);
+    printf(")");
+}
+
 static void visit(Node* node) {
     switch (node->type) {
         case NODE_TYPE_IDENT: {
@@ -84,6 +88,10 @@ static void visit(Node* node) {
         }
         case NODE_TYPE_ARRAY_LITERAL: {
             visitArrayLiteralNode(node->as.arrayLiteralNode);
+            break;
+        }
+        case NODE_TYPE_GROUPING: {
+            visitGroupingNodeNode(node->as.groupingNode);
             break;
         }
         case NODE_TYPE_VAL_DECL_STATEMENT: {

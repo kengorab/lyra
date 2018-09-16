@@ -68,6 +68,8 @@ static Node* parseIdentifier(Parser* parser, Token** token);
 
 static Node* parseArray(Parser* parser, Token** token);
 
+static Node* parseGrouping(Parser* parser, Token** token);
+
 ParseRule parseRules[] = { // These rules NEED to stay in Token order
     {.infixFn = NULL, .prefixFn = parseLiteral, .precedence = PREC_NONE},             // TOKEN_NUMBER
     {.infixFn = parseBinary, .prefixFn = NULL, .precedence = PREC_ADDITION},          // TOKEN_PLUS
@@ -88,7 +90,7 @@ ParseRule parseRules[] = { // These rules NEED to stay in Token order
     {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_RBRACK
     {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_LBRACE
     {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_RBRACE
-    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_LPAREN
+    {.infixFn = NULL, .prefixFn = parseGrouping, .precedence = PREC_NONE},            // TOKEN_LPAREN
     {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_RPAREN
     {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_DOT
     {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_COMMA
@@ -201,6 +203,12 @@ static Node* parseArray(Parser* parser, Token** token) {
 
     Node** arrayElements = (Node**) elements->values;
     return newArrayLiteralNode(*token, arrayElements, elements->count);
+}
+
+static Node* parseGrouping(Parser* parser, Token** token) {
+    Node* expr = parseExpression(parser);
+    advance(parser); // Consume the ")"
+    return newGroupingNode(*token, expr);
 }
 
 static Node* parseExpression(Parser* parser) {

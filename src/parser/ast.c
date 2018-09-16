@@ -110,6 +110,18 @@ Node* newArrayLiteralNode(Token* token, Node** elements, int size) {
     return n;
 }
 
+Node* newGroupingNode(Token* token, Node* expr) {
+    Node* n = malloc(sizeof(Node));
+    n->type = NODE_TYPE_GROUPING;
+
+    GroupingNode* grouping = malloc(sizeof(GroupingNode));
+    grouping->token = token;
+    grouping->expr = expr;
+
+    n->as.groupingNode= grouping;
+    return n;
+}
+
 // ------------------------------------
 //             Statements
 // ------------------------------------
