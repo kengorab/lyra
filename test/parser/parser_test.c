@@ -341,6 +341,8 @@ TEST(testObjectLiteralExpression_trailingCommas, {
     ObjectLiteralNode* obj = n->as.objectLiteralNode;
 
     ASSERT_EQ(2, obj->size, "There should be 2 entries in the object");
+    ASSERT_EQ_STR("key1", obj->keys[0]->as.identifierNode->name, "The first key should be key1");
+    ASSERT_EQ_STR("key2", obj->keys[1]->as.identifierNode->name, "The second key should be key2");
 
     ObjectLiteralEntry* entry = obj->entries[0];
     ASSERT_EQ_STR("key1", entry->ident->as.identifierNode->name, "The first key should be key1");
