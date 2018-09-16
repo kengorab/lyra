@@ -110,6 +110,27 @@ Node* newArrayLiteralNode(Token* token, Node** elements, int size) {
     return n;
 }
 
+ObjectLiteralEntry* newObjectLiteralEntry(Node* key, Node* value) {
+    ObjectLiteralEntry* entry = malloc(sizeof(ObjectLiteralEntry));
+    entry->ident = key;
+    entry->value = value;
+    return entry;
+}
+
+Node* newObjectLiteralNode(Token* token, ObjectLiteralEntry** entries, Node** keys, int size) {
+    Node* n = malloc(sizeof(Node));
+    n->type = NODE_TYPE_OBJECT_LITERAL;
+
+    ObjectLiteralNode* object = malloc(sizeof(ObjectLiteralNode));
+    object->token = token;
+    object->size = size;
+    object->entries = entries;
+    object->keys = keys;
+
+    n->as.objectLiteralNode = object;
+    return n;
+}
+
 Node* newGroupingNode(Token* token, Node* expr) {
     Node* n = malloc(sizeof(Node));
     n->type = NODE_TYPE_GROUPING;

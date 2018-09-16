@@ -68,6 +68,8 @@ static Node* parseIdentifier(Parser* parser, Token** token);
 
 static Node* parseArray(Parser* parser, Token** token);
 
+static Node* parseObject(Parser* parser, Token** token);
+
 static Node* parseGrouping(Parser* parser, Token** token);
 
 ParseRule parseRules[] = { // These rules NEED to stay in Token order
@@ -88,7 +90,7 @@ ParseRule parseRules[] = { // These rules NEED to stay in Token order
     {.infixFn = parseBinary, .prefixFn = NULL, .precedence = PREC_OR},                // TOKEN_OR
     {.infixFn = NULL, .prefixFn = parseArray, .precedence = PREC_NONE},               // TOKEN_LBRACK
     {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_RBRACK
-    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_LBRACE
+    {.infixFn = NULL, .prefixFn = parseObject, .precedence = PREC_NONE},              // TOKEN_LBRACE
     {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_RBRACE
     {.infixFn = NULL, .prefixFn = parseGrouping, .precedence = PREC_NONE},            // TOKEN_LPAREN
     {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_RPAREN
@@ -198,11 +200,42 @@ static Node* parseArray(Parser* parser, Token** token) {
         listAdd(elements, (void**) &elem);
         if (PEEK(parser)->type == TOKEN_COMMA)
             advance(parser); // Consume the ","
+        else if (PEEK(parser)->type != TOKEN_RBRACK)
+            return NULL; // TODO: Parser error handling
     }
     advance(parser); // Consume the "]"
 
     Node** arrayElements = (Node**) elements->values;
     return newArrayLiteralNode(*token, arrayElements, elements->count);
+}
+
+static Node* parseObject(Parser* parser, Token** token) {
+    List* keys = newList();
+    List* entries = newList();
+    while (!IS_AT_END(parser) && PEEK(parser)->type != TOKEN_RBRACE) {
+        if (PEEK(parser)->type != TOKEN_IDENT)
+            return NULL; // TODO: Parser error handling
+        Token* keyToken = advance(parser);
+        Node* key = parseIdentifier(parser, &keyToken);
+        listAdd(keys, (void**) &key);
+
+        if (PEEK(parser)->type != TOKEN_COLON)
+            return NULL; // TODO: Parser error handling
+        advance(parser); // Consume ":"
+
+        Node* value = parseExpression(parser);
+
+        if (PEEK(parser)->type == TOKEN_COMMA)
+            advance(parser); // Consume the ","
+        else if (PEEK(parser)->type != TOKEN_RBRACE)
+            return NULL; // TODO: Parser error handling
+
+        ObjectLiteralEntry* entry = newObjectLiteralEntry(key, value);
+        listAdd(entries, (void**) &entry);
+    }
+    advance(parser); // Consume "}"
+
+    return newObjectLiteralNode(*token, (ObjectLiteralEntry**) entries->values, (Node**) keys->values, entries->count);
 }
 
 static Node* parseGrouping(Parser* parser, Token** token) {
