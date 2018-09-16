@@ -12,6 +12,8 @@
 #define AST_NODE_TYPES \
     C(NODE_TYPE_LITERAL) \
     C(NODE_TYPE_IDENT) \
+    C(NODE_TYPE_UNARY) \
+    C(NODE_TYPE_BINARY) \
     C(NODE_TYPE_VAL_DECL_STATEMENT)
 
 typedef enum {
@@ -25,13 +27,6 @@ typedef enum {
 const char* astNodeTypes[];
 
 typedef struct Node Node;
-typedef struct IdentifierNode IdentifierNode;
-
-typedef struct {
-    Token* token;
-    IdentifierNode* ident;
-    Node* assignment;
-} ValDeclStmt;
 
 #undef C
 #define C(ENUM_VAL) ENUM_VAL,
@@ -52,6 +47,10 @@ typedef enum {
 // Ignore warning; initialized statically
 const char* literalNodeTypes[];
 
+// ------------------------------------
+//             Expressions
+// ------------------------------------
+
 typedef struct {
     Token* token;
     LiteralNodeType type;
@@ -66,10 +65,35 @@ typedef struct {
     };
 } LiteralNode;
 
-struct IdentifierNode {
+typedef struct {
     Token* token;
     const char* name;
-};
+} IdentifierNode;
+
+typedef struct {
+    Token* token;
+    Node* expr;
+} UnaryNode;
+
+typedef struct {
+    Token* token;
+    Node* lExpr;
+    Node* rExpr;
+} BinaryNode;
+
+// ------------------------------------
+//             Statements
+// ------------------------------------
+
+typedef struct {
+    Token* token;
+    IdentifierNode* ident;
+    Node* assignment;
+} ValDeclStmt;
+
+// ------------------------------------
+//             Base Node
+// ------------------------------------
 
 struct Node {
     AstNodeType type;
@@ -77,13 +101,19 @@ struct Node {
         ValDeclStmt* valDeclStmt;
         LiteralNode* literalNode;
         IdentifierNode* identifierNode;
+        UnaryNode* unaryNode;
+        BinaryNode* binaryNode;
     } as;
 };
-
-Node* newValDeclStmtNode(Token* token, Node* identNode, Node* assignment);
 
 Node* newLiteralNode(Token* token);
 
 Node* newIdentifierNode(Token* token);
+
+Node* newUnaryNode(Token* token, Node* expr);
+
+Node* newBinaryNode(Token* token, Node* lExpr, Node* rExpr);
+
+Node* newValDeclStmtNode(Token* token, Node* identNode, Node* assignment);
 
 #endif //CLYRA_AST_H

@@ -30,6 +30,19 @@ static void visitLiteralNode(LiteralNode* literalNode) {
     }
 }
 
+static void visitUnaryNode(UnaryNode* node) {
+    printf("%.*s", node->token->length, node->token->start);
+    visit(node->expr);
+}
+
+static void visitBinaryNode(BinaryNode* node) {
+    printf("(");
+    visit(node->lExpr);
+    printf(" %.*s ", node->token->length, node->token->start);
+    visit(node->rExpr);
+    printf(")");
+}
+
 static void visitIdentifierNode(IdentifierNode* identifierNode) {
     printf("%.*s", identifierNode->token->length, identifierNode->name);
 }
@@ -43,16 +56,24 @@ static void visitValDeclStmtNode(ValDeclStmt* stmt) {
 
 static void visit(Node* node) {
     switch (node->type) {
-        case NODE_TYPE_VAL_DECL_STATEMENT: {
-            visitValDeclStmtNode(node->as.valDeclStmt);
-            break;
-        }
         case NODE_TYPE_IDENT: {
             visitIdentifierNode(node->as.identifierNode);
             break;
         }
         case NODE_TYPE_LITERAL: {
             visitLiteralNode(node->as.literalNode);
+            break;
+        }
+        case NODE_TYPE_UNARY: {
+            visitUnaryNode(node->as.unaryNode);
+            break;
+        }
+        case NODE_TYPE_BINARY: {
+            visitBinaryNode(node->as.binaryNode);
+            break;
+        }
+        case NODE_TYPE_VAL_DECL_STATEMENT: {
+            visitValDeclStmtNode(node->as.valDeclStmt);
             break;
         }
     }

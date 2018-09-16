@@ -8,18 +8,9 @@ const char* astNodeTypes[] = {AST_NODE_TYPES};
 
 const char* literalNodeTypes[] = {LITERAL_NODE_TYPES};
 
-Node* newValDeclStmtNode(Token* token, Node* identNode, Node* assignment) {
-    Node* n = malloc(sizeof(Node));
-    n->type = NODE_TYPE_VAL_DECL_STATEMENT;
-
-    ValDeclStmt* valDeclStmt = malloc(sizeof(ValDeclStmt));
-    valDeclStmt->token = token;
-    valDeclStmt->assignment = assignment;
-    valDeclStmt->ident = identNode->as.identifierNode;
-
-    n->as.valDeclStmt = valDeclStmt;
-    return n;
-}
+// ------------------------------------
+//             Expressions
+// ------------------------------------
 
 Node* newLiteralNode(Token* token) {
     Node* n = malloc(sizeof(Node));
@@ -80,3 +71,46 @@ Node* newIdentifierNode(Token* token) {
     n->as.identifierNode = ident;
     return n;
 }
+
+Node* newUnaryNode(Token* token, Node* expr) {
+    Node* n = malloc(sizeof(Node));
+    n->type = NODE_TYPE_UNARY;
+
+    UnaryNode* unary = malloc(sizeof(UnaryNode));
+    unary->token = token;
+    unary->expr = expr;
+
+    n->as.unaryNode = unary;
+    return n;
+}
+
+Node* newBinaryNode(Token* token, Node* lExpr, Node* rExpr) {
+    Node* n = malloc(sizeof(Node));
+    n->type = NODE_TYPE_BINARY;
+
+    BinaryNode* binary = malloc(sizeof(BinaryNode));
+    binary->token = token;
+    binary->lExpr = lExpr;
+    binary->rExpr = rExpr;
+
+    n->as.binaryNode = binary;
+    return n;
+}
+
+// ------------------------------------
+//             Statements
+// ------------------------------------
+
+Node* newValDeclStmtNode(Token* token, Node* identNode, Node* assignment) {
+    Node* n = malloc(sizeof(Node));
+    n->type = NODE_TYPE_VAL_DECL_STATEMENT;
+
+    ValDeclStmt* valDeclStmt = malloc(sizeof(ValDeclStmt));
+    valDeclStmt->token = token;
+    valDeclStmt->assignment = assignment;
+    valDeclStmt->ident = identNode->as.identifierNode;
+
+    n->as.valDeclStmt = valDeclStmt;
+    return n;
+}
+

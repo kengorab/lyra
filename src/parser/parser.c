@@ -58,54 +58,54 @@ static Node* parseStatement(Parser* parser) {
 #define GET_RULE(tokenType) (&parseRules[tokenType])
 #endif
 
+static Node* parseUnary(Parser* parser, Token** token);
+
+static Node* parseBinary(Parser* parser, Token** opToken, Node** left);
+
 static Node* parseLiteral(Parser* parser, Token** token);
 
 ParseRule parseRules[] = { // These rules NEED to stay in Token order
-    {.infixFn = NULL, .prefixFn = parseLiteral, .precedence = PREC_NONE},           // TOKEN_NUMBER
-    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_ADDITION},               // TOKEN_PLUS
-    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_ADDITION},               // TOKEN_MINUS
-    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_MULTIPLICATION},         // TOKEN_STAR
-    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_MULTIPLICATION},         // TOKEN_SLASH
-    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_COMPARISON},             // TOKEN_LT
-    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_COMPARISON},             // TOKEN_LTE
-    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_COMPARISON},             // TOKEN_GT
-    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_COMPARISON},             // TOKEN_GTE
-    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_COMPARISON},             // TOKEN_EQ
-    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_COMPARISON},             // TOKEN_EQ_EQ
-    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_COMPARISON},             // TOKEN_BANG
-    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_COMPARISON},             // TOKEN_BANG_EQ
-    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_AND},                    // TOKEN_AND
-    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_OR},                     // TOKEN_OR
-    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                   // TOKEN_LBRACK
-    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                   // TOKEN_RBRACK
-    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                   // TOKEN_LBRACE
-    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                   // TOKEN_RBRACE
-    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                   // TOKEN_LPAREN
-    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                   // TOKEN_RPAREN
-    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                   // TOKEN_DOT
-    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                   // TOKEN_COMMA
-    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                   // TOKEN_COLON
-    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                   // TOKEN_COLON_COLON
-    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                   // TOKEN_ARROW
-    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                   // TOKEN_PIPE
-    {.infixFn = NULL, .prefixFn = parseLiteral, .precedence = PREC_NONE},           // TOKEN_STRING
-    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                   // TOKEN_IDENT
-    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                   // TOKEN_VAL
-    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                   // TOKEN_VAR
-    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                   // TOKEN_TYPE
-    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                   // TOKEN_FUNC
-    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                   // TOKEN_IF
-    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                   // TOKEN_ELSE
-    {.infixFn = NULL, .prefixFn = parseLiteral, .precedence = PREC_NONE},           // TOKEN_TRUE
-    {.infixFn = NULL, .prefixFn = parseLiteral, .precedence = PREC_NONE},           // TOKEN_FALSE
-    {.infixFn = NULL, .prefixFn = parseLiteral, .precedence = PREC_NONE},           // TOKEN_NIL
-    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                   // TOKEN_ERROR
-    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                   // TOKEN_EOF
+    {.infixFn = NULL, .prefixFn = parseLiteral, .precedence = PREC_NONE},             // TOKEN_NUMBER
+    {.infixFn = parseBinary, .prefixFn = NULL, .precedence = PREC_ADDITION},          // TOKEN_PLUS
+    {.infixFn = parseBinary, .prefixFn = parseUnary, .precedence = PREC_ADDITION},    // TOKEN_MINUS
+    {.infixFn = parseBinary, .prefixFn = NULL, .precedence = PREC_MULTIPLICATION},    // TOKEN_STAR
+    {.infixFn = parseBinary, .prefixFn = NULL, .precedence = PREC_MULTIPLICATION},    // TOKEN_SLASH
+    {.infixFn = parseBinary, .prefixFn = NULL, .precedence = PREC_COMPARISON},        // TOKEN_LT
+    {.infixFn = parseBinary, .prefixFn = NULL, .precedence = PREC_COMPARISON},        // TOKEN_LTE
+    {.infixFn = parseBinary, .prefixFn = NULL, .precedence = PREC_COMPARISON},        // TOKEN_GT
+    {.infixFn = parseBinary, .prefixFn = NULL, .precedence = PREC_COMPARISON},        // TOKEN_GTE
+    {.infixFn = parseBinary, .prefixFn = NULL, .precedence = PREC_COMPARISON},        // TOKEN_EQ
+    {.infixFn = parseBinary, .prefixFn = NULL, .precedence = PREC_EQUALITY},          // TOKEN_EQ_EQ
+    {.infixFn = NULL, .prefixFn = parseUnary, .precedence = PREC_NONE},               // TOKEN_BANG
+    {.infixFn = parseBinary, .prefixFn = NULL, .precedence = PREC_EQUALITY},          // TOKEN_BANG_EQ
+    {.infixFn = parseBinary, .prefixFn = NULL, .precedence = PREC_AND},               // TOKEN_AND
+    {.infixFn = parseBinary, .prefixFn = NULL, .precedence = PREC_OR},                // TOKEN_OR
+    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_LBRACK
+    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_RBRACK
+    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_LBRACE
+    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_RBRACE
+    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_LPAREN
+    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_RPAREN
+    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_DOT
+    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_COMMA
+    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_COLON
+    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_COLON_COLON
+    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_ARROW
+    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_PIPE
+    {.infixFn = NULL, .prefixFn = parseLiteral, .precedence = PREC_NONE},             // TOKEN_STRING
+    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_IDENT
+    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_VAL
+    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_VAR
+    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_TYPE
+    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_FUNC
+    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_IF
+    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_ELSE
+    {.infixFn = NULL, .prefixFn = parseLiteral, .precedence = PREC_NONE},             // TOKEN_TRUE
+    {.infixFn = NULL, .prefixFn = parseLiteral, .precedence = PREC_NONE},             // TOKEN_FALSE
+    {.infixFn = NULL, .prefixFn = parseLiteral, .precedence = PREC_NONE},             // TOKEN_NIL
+    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_ERROR
+    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_EOF
 };
-
-static Node* parseLiteral(Parser* parser, Token** token) {
-    return newLiteralNode(*token);
-}
 
 static Node* parsePrecedence(Parser* parser, Precedence precedence) {
     Token* prefixToken = *parser->current;
@@ -128,6 +128,57 @@ static Node* parsePrecedence(Parser* parser, Precedence precedence) {
     }
 
     return left;
+}
+
+static Node* parseLiteral(Parser* parser, Token** token) {
+    return newLiteralNode(*token);
+}
+
+static Node* parseUnary(Parser* parser, Token** token) {
+    Node* expr = parsePrecedence(parser, PREC_UNARY);
+    return newUnaryNode(*token, expr);
+}
+
+static Node* parseBinary(Parser* parser, Token** opToken, Node** lExpr) {
+    Precedence prec;
+    switch ((*opToken)->type) {
+        case TOKEN_MINUS:
+        case TOKEN_PLUS: {
+            prec = PREC_ADDITION;
+            break;
+        }
+        case TOKEN_STAR:
+        case TOKEN_SLASH: {
+            prec = PREC_MULTIPLICATION;
+            break;
+        }
+        case TOKEN_LT:
+        case TOKEN_LTE:
+        case TOKEN_GT:
+        case TOKEN_GTE: {
+            prec = PREC_COMPARISON;
+            break;
+        }
+        case TOKEN_EQ_EQ:
+        case TOKEN_BANG_EQ: {
+            prec = PREC_EQUALITY;
+            break;
+        }
+        case TOKEN_AND: {
+            prec = PREC_AND;
+            break;
+        }
+        case TOKEN_OR: {
+            prec = PREC_OR;
+            break;
+        }
+        default: {
+            return NULL; // TODO: Parser error handling
+        }
+    }
+
+    Node* rExpr = parsePrecedence(parser, prec);
+    return newBinaryNode(*opToken, *lExpr, rExpr);
 }
 
 static Node* parseExpression(Parser* parser) {
