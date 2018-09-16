@@ -58,8 +58,30 @@ static void visitArrayLiteralNode(ArrayLiteralNode* node) {
         visit(node->elements[i]);
         printf(", ");
     }
-    visit(node->elements[node->size - 1]);
+
+    if (node->size >= 1) {
+        visit(node->elements[node->size - 1]);
+    }
+
     printf("]");
+}
+
+static void visitObjectLiteralNode(ObjectLiteralNode* node) {
+    printf("{ ");
+    for (int i = 0; i < node->size - 1; ++i) {
+        visitIdentifierNode(node->entries[i]->ident->as.identifierNode);
+        printf(": ");
+        visit(node->entries[i]->value);
+        printf(", ");
+    }
+
+    if (node->size >= 1) {
+        visitIdentifierNode(node->entries[node->size - 1]->ident->as.identifierNode);
+        printf(": ");
+        visit(node->entries[node->size - 1]->value);
+    }
+
+    printf(" }");
 }
 
 static void visitGroupingNodeNode(GroupingNode* node) {
@@ -88,6 +110,10 @@ static void visit(Node* node) {
         }
         case NODE_TYPE_ARRAY_LITERAL: {
             visitArrayLiteralNode(node->as.arrayLiteralNode);
+            break;
+        }
+        case NODE_TYPE_OBJECT_LITERAL: {
+            visitObjectLiteralNode(node->as.objectLiteralNode);
             break;
         }
         case NODE_TYPE_GROUPING: {

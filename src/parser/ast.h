@@ -12,6 +12,7 @@
 #define AST_NODE_TYPES \
     C(NODE_TYPE_LITERAL) \
     C(NODE_TYPE_ARRAY_LITERAL) \
+    C(NODE_TYPE_OBJECT_LITERAL) \
     C(NODE_TYPE_IDENT) \
     C(NODE_TYPE_UNARY) \
     C(NODE_TYPE_BINARY) \
@@ -90,6 +91,17 @@ typedef struct {
 } ArrayLiteralNode;
 
 typedef struct {
+    Node* ident;
+    Node* value;
+} ObjectLiteralEntry;
+typedef struct {
+    Token* token;
+    ObjectLiteralEntry** entries;
+    Node** keys;
+    int size;
+} ObjectLiteralNode;
+
+typedef struct {
     Token* token;
     Node* expr;
 } GroupingNode;
@@ -114,6 +126,7 @@ struct Node {
         ValDeclStmt* valDeclStmt;
         LiteralNode* literalNode;
         ArrayLiteralNode* arrayLiteralNode;
+        ObjectLiteralNode* objectLiteralNode;
         IdentifierNode* identifierNode;
         UnaryNode* unaryNode;
         BinaryNode* binaryNode;
@@ -130,6 +143,10 @@ Node* newUnaryNode(Token* token, Node* expr);
 Node* newBinaryNode(Token* token, Node* lExpr, Node* rExpr);
 
 Node* newArrayLiteralNode(Token* token, Node** elements, int size);
+
+ObjectLiteralEntry* newObjectLiteralEntry(Node* key, Node* value);
+
+Node* newObjectLiteralNode(Token* token, ObjectLiteralEntry** entries, Node** keys, int size);
 
 Node* newGroupingNode(Token* token, Node* expr);
 

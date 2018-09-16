@@ -281,6 +281,96 @@ TEST(testArrayLiteralExpression_emptyArray, {
     ASSERT_EQ(0, array->size, "There should be no elements in the array");
 })
 
+TEST(testObjectLiteralExpression, {
+    Token** tokens = ((Token* []) {
+        makeToken("{", TOKEN_LBRACE),
+        makeToken("key1", TOKEN_IDENT),
+        makeToken(":", TOKEN_COLON),
+        makeToken("1", TOKEN_NUMBER),
+        makeToken(",", TOKEN_COMMA),
+        makeToken("key2", TOKEN_IDENT),
+        makeToken(":", TOKEN_COLON),
+        makeToken("\"hello\"", TOKEN_STRING),
+        makeToken("}", TOKEN_RBRACE),
+        makeToken("", TOKEN_EOF),
+    });
+
+    Parser p = newParser(tokens);
+    List* nodes = parse(&p);
+    ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
+
+    Node* n = nodes->values[0];
+    ASSERT_EQ_STR("NODE_TYPE_OBJECT_LITERAL", astNodeTypes[n->type],
+                  "The node should have type NODE_TYPE_OBJECT_LITERAL");
+    ObjectLiteralNode* obj = n->as.objectLiteralNode;
+
+    ASSERT_EQ(2, obj->size, "There should be 2 entries in the object");
+
+    ObjectLiteralEntry* entry = obj->entries[0];
+    ASSERT_EQ_STR("key1", entry->ident->as.identifierNode->name, "The first key should be key1");
+    TestResult res = assertLiteralNode(testName, entry->value, LITERAL_NODE_INT, 1);
+    if (!res.pass) return res;
+
+     entry = obj->entries[1];
+    ASSERT_EQ_STR("key2", entry->ident->as.identifierNode->name, "The second key should be key2");
+    return assertLiteralNode(testName, entry->value, LITERAL_NODE_STRING, "\"hello\"", 7);
+})
+
+TEST(testObjectLiteralExpression_trailingCommas, {
+    Token** tokens = ((Token* []) {
+        makeToken("{", TOKEN_LBRACE),
+        makeToken("key1", TOKEN_IDENT),
+        makeToken(":", TOKEN_COLON),
+        makeToken("1", TOKEN_NUMBER),
+        makeToken(",", TOKEN_COMMA),
+        makeToken("key2", TOKEN_IDENT),
+        makeToken(":", TOKEN_COLON),
+        makeToken("\"hello\"", TOKEN_STRING),
+        makeToken(",", TOKEN_COMMA),
+        makeToken("}", TOKEN_RBRACE),
+        makeToken("", TOKEN_EOF),
+    });
+
+    Parser p = newParser(tokens);
+    List* nodes = parse(&p);
+    ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
+
+    Node* n = nodes->values[0];
+    ASSERT_EQ_STR("NODE_TYPE_OBJECT_LITERAL", astNodeTypes[n->type],
+                  "The node should have type NODE_TYPE_OBJECT_LITERAL");
+    ObjectLiteralNode* obj = n->as.objectLiteralNode;
+
+    ASSERT_EQ(2, obj->size, "There should be 2 entries in the object");
+
+    ObjectLiteralEntry* entry = obj->entries[0];
+    ASSERT_EQ_STR("key1", entry->ident->as.identifierNode->name, "The first key should be key1");
+    TestResult res = assertLiteralNode(testName, entry->value, LITERAL_NODE_INT, 1);
+    if (!res.pass) return res;
+
+    entry = obj->entries[1];
+    ASSERT_EQ_STR("key2", entry->ident->as.identifierNode->name, "The second key should be key2");
+    return assertLiteralNode(testName, entry->value, LITERAL_NODE_STRING, "\"hello\"", 7);
+})
+
+TEST(testObjectLiteralExpression_emptyObject, {
+    Token** tokens = ((Token* []) {
+        makeToken("{", TOKEN_LBRACE),
+        makeToken("}", TOKEN_RBRACE),
+        makeToken("", TOKEN_EOF),
+    });
+
+    Parser p = newParser(tokens);
+    List* nodes = parse(&p);
+    ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
+
+    Node* n = nodes->values[0];
+    ASSERT_EQ_STR("NODE_TYPE_OBJECT_LITERAL", astNodeTypes[n->type],
+                  "The node should have type NODE_TYPE_OBJECT_LITERAL");
+    ObjectLiteralNode* obj = n->as.objectLiteralNode;
+
+    ASSERT_EQ(0, obj->size, "There should be 0 entries in the object");
+})
+
 TEST(testParseValDeclStatement, {
     Token** tokens = ((Token* []) {
         makeToken("val", TOKEN_VAL),
@@ -353,6 +443,9 @@ void runParserTests(Tester* tester) {
     tester->run(testArrayLiteralExpression);
     tester->run(testArrayLiteralExpression_emptyArray);
     tester->run(testArrayLiteralExpression_trailingCommas);
+    tester->run(testObjectLiteralExpression);
+    tester->run(testObjectLiteralExpression_trailingCommas);
+    tester->run(testObjectLiteralExpression_emptyObject);
     tester->run(testParseValDeclStatement);
     tester->run(testParseValDeclStatements);
 }
