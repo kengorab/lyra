@@ -139,7 +139,21 @@ Node* newGroupingNode(Token* token, Node* expr) {
     grouping->token = token;
     grouping->expr = expr;
 
-    n->as.groupingNode= grouping;
+    n->as.groupingNode = grouping;
+    return n;
+}
+
+Node* newIfElseNode(Token* token, Node* condExpr, Node* thenExpr, Node* elseExpr) {
+    Node* n = malloc(sizeof(Node));
+    n->type = NODE_TYPE_IF_ELSE;
+
+    IfElseNode* ifElse = malloc(sizeof(IfElseNode));
+    ifElse->token = token;
+    ifElse->conditionExpr = condExpr;
+    ifElse->thenExpr = thenExpr;
+    ifElse->elseExpr = elseExpr;
+
+    n->as.ifElseNode = ifElse;
     return n;
 }
 

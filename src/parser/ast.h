@@ -17,6 +17,7 @@
     C(NODE_TYPE_UNARY) \
     C(NODE_TYPE_BINARY) \
     C(NODE_TYPE_GROUPING) \
+    C(NODE_TYPE_IF_ELSE) \
     C(NODE_TYPE_VAL_DECL_STATEMENT)
 
 typedef enum {
@@ -106,6 +107,15 @@ typedef struct {
     Node* expr;
 } GroupingNode;
 
+// An if-else node can either be a statement or expression
+// If it's an expression the else block is required
+typedef struct {
+    Token* token;
+    Node* conditionExpr;
+    Node* thenExpr;
+    Node* elseExpr;
+} IfElseNode;
+
 // ------------------------------------
 //             Statements
 // ------------------------------------
@@ -131,6 +141,7 @@ struct Node {
         UnaryNode* unaryNode;
         BinaryNode* binaryNode;
         GroupingNode* groupingNode;
+        IfElseNode* ifElseNode;
     } as;
 };
 
@@ -149,6 +160,8 @@ ObjectLiteralEntry* newObjectLiteralEntry(Node* key, Node* value);
 Node* newObjectLiteralNode(Token* token, ObjectLiteralEntry** entries, Node** keys, int size);
 
 Node* newGroupingNode(Token* token, Node* expr);
+
+Node* newIfElseNode(Token* token, Node* condExpr, Node* thenExpr, Node* elseExpr);
 
 Node* newValDeclStmtNode(Token* token, Node* identNode, Node* assignment);
 
