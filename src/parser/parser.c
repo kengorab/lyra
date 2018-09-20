@@ -43,7 +43,8 @@ static Node* parseValDeclStmt(Parser* parser, ParseError** outErr) {
 
     Node* rhs = parseExpression(parser, outErr);
     if (rhs == NULL) {
-        *outErr = newParseError(PEEK(parser), 0, "expression");
+        if (*outErr == NULL)
+            *outErr = newParseError(PEEK(parser), 0, "expression");
         return NULL;
     }
 
@@ -80,6 +81,8 @@ static Node* parseObject(Parser* parser, Token** token, ParseError** outErr);
 
 static Node* parseGrouping(Parser* parser, Token** token, ParseError** outErr);
 
+static Node* parseIfElseExpr(Parser* parser, Token** token, ParseError** outErr);
+
 ParseRule parseRules[] = { // These rules NEED to stay in Token order
     {.infixFn = NULL, .prefixFn = parseLiteral, .precedence = PREC_NONE},             // TOKEN_NUMBER
     {.infixFn = parseBinary, .prefixFn = NULL, .precedence = PREC_ADDITION},          // TOKEN_PLUS
@@ -114,7 +117,7 @@ ParseRule parseRules[] = { // These rules NEED to stay in Token order
     {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_VAR
     {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_TYPE
     {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_FUNC
-    {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_IF
+    {.infixFn = NULL, .prefixFn = parseIfElseExpr, .precedence = PREC_NONE},          // TOKEN_IF
     {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_ELSE
     {.infixFn = NULL, .prefixFn = parseLiteral, .precedence = PREC_NONE},             // TOKEN_TRUE
     {.infixFn = NULL, .prefixFn = parseLiteral, .precedence = PREC_NONE},             // TOKEN_FALSE
@@ -247,14 +250,16 @@ static Node* parseObject(Parser* parser, Token** token, ParseError** outErr) {
 
         Node* value = parseExpression(parser, outErr);
         if (value == NULL) {
-            *outErr = newParseError(PEEK(parser), 0, "expression");
+            if (*outErr == NULL)
+                *outErr = newParseError(PEEK(parser), 0, "expression");
             return NULL;
         }
 
         if (PEEK(parser)->type == TOKEN_COMMA)
             advance(parser); // Consume the ","
         else if (PEEK(parser)->type != TOKEN_RBRACE) {
-            *outErr = newParseError(PEEK(parser), 2, TOKEN_COMMA, TOKEN_RBRACE);
+            if (*outErr == NULL)
+                *outErr = newParseError(PEEK(parser), 2, TOKEN_COMMA, TOKEN_RBRACE);
             return NULL;
         }
 
@@ -270,6 +275,51 @@ static Node* parseGrouping(Parser* parser, Token** token, ParseError** outErr) {
     Node* expr = parseExpression(parser, outErr);
     advance(parser); // Consume the ")"
     return newGroupingNode(*token, expr);
+}
+
+static Node* parseIfElseExpr(Parser* parser, Token** token, ParseError** outErr) {
+    if (PEEK(parser)->type != TOKEN_LPAREN) {
+        if (*outErr == NULL)
+            *outErr = newParseError(PEEK(parser), 1, TOKEN_LPAREN);
+        return NULL;
+    }
+    advance(parser); // Consume "("
+
+    Node* condExpr = parseExpression(parser, outErr);
+    if (condExpr == NULL) {
+        if (*outErr == NULL)
+            *outErr = newParseError(PEEK(parser), 0, "expression");
+        return NULL;
+    }
+
+    if (PEEK(parser)->type != TOKEN_RPAREN) {
+        if (*outErr == NULL)
+            *outErr = newParseError(PEEK(parser), 1, TOKEN_RPAREN);
+        return NULL;
+    }
+    advance(parser); // Consume ")"
+
+    // TODO: Handle block expressions here
+
+    Node* thenExpr = parseExpression(parser, outErr);
+    if (thenExpr == NULL) {
+        if (*outErr == NULL)
+            *outErr = newParseError(PEEK(parser), 0, "expression");
+        return NULL;
+    }
+
+    Node* elseExpr = NULL;
+    if (PEEK(parser)->type == TOKEN_ELSE) {
+        advance(parser); // Consume "else"
+        elseExpr = parseExpression(parser, outErr);
+        if (elseExpr == NULL) {
+            if (*outErr == NULL)
+                *outErr = newParseError(PEEK(parser), 0, "expression");
+            return NULL;
+        }
+    }
+
+    return newIfElseNode(*token, condExpr, thenExpr, elseExpr);
 }
 
 static Node* parseExpression(Parser* parser, ParseError** outErr) {

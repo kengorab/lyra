@@ -45,6 +45,17 @@ static void visitIdentifierNode(IdentifierNode* identifierNode) {
     printf("%.*s", identifierNode->token->length, identifierNode->name);
 }
 
+static void visitIfElseNode(IfElseNode* ifElseNode) {
+    printf("if (");
+    visit(ifElseNode->conditionExpr);
+    printf(") ");
+    visit(ifElseNode->thenExpr);
+    if (ifElseNode->elseExpr != NULL) {
+        printf(" else ");
+        visit(ifElseNode->elseExpr);
+    }
+}
+
 static void visitValDeclStmtNode(ValDeclStmt* stmt) {
     printf("val ");
     visitIdentifierNode(stmt->ident);
@@ -122,6 +133,10 @@ static void visit(Node* node) {
         }
         case NODE_TYPE_VAL_DECL_STATEMENT: {
             visitValDeclStmtNode(node->as.valDeclStmt);
+            break;
+        }
+        case NODE_TYPE_IF_ELSE: {
+            visitIfElseNode(node->as.ifElseNode);
             break;
         }
     }
