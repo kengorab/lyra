@@ -18,6 +18,7 @@
     C(NODE_TYPE_BINARY) \
     C(NODE_TYPE_GROUPING) \
     C(NODE_TYPE_IF_ELSE) \
+    C(NODE_TYPE_BLOCK) \
     C(NODE_TYPE_VAL_DECL_STATEMENT)
 
 typedef enum {
@@ -107,6 +108,12 @@ typedef struct {
     Node* expr;
 } GroupingNode;
 
+typedef struct {
+    Token* token;
+    Node** exprs;
+    int numExprs;
+} BlockNode;
+
 // An if-else node can either be a statement or expression
 // If it's an expression the else block is required
 typedef struct {
@@ -143,6 +150,7 @@ struct Node {
         BinaryNode* binaryNode;
         GroupingNode* groupingNode;
         IfElseNode* ifElseNode;
+        BlockNode* blockNode;
     } as;
 };
 
@@ -163,6 +171,8 @@ Node* newObjectLiteralNode(Token* token, ObjectLiteralEntry** entries, Node** ke
 Node* newGroupingNode(Token* token, Node* expr);
 
 Node* newIfElseNode(Token* token, Node* condExpr, Node* thenExpr, Node* elseExpr);
+
+Node* newBlockNode(Token* token, Node** exprs, int numExprs);
 
 Node* newValDeclStmtNode(Token* token, Node* identNode, Node* assignment, bool isMutable);
 
