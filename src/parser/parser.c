@@ -103,7 +103,7 @@ static Node* parseIdentifier(Parser* parser, Token** token, ParseError** outErr)
 
 static Node* parseArray(Parser* parser, Token** token, ParseError** outErr);
 
-static Node* parseObject(Parser* parser, Token** token, ParseError** outErr);
+static Node* handleParseLBrace(Parser* parser, Token** token, ParseError** outErr);
 
 static Node* parseGrouping(Parser* parser, Token** token, ParseError** outErr);
 
@@ -127,7 +127,7 @@ ParseRule parseRules[] = { // These rules NEED to stay in Token order
     {.infixFn = parseBinary, .prefixFn = NULL, .precedence = PREC_OR},                // TOKEN_OR
     {.infixFn = NULL, .prefixFn = parseArray, .precedence = PREC_NONE},               // TOKEN_LBRACK
     {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_RBRACK
-    {.infixFn = NULL, .prefixFn = parseObject, .precedence = PREC_NONE},              // TOKEN_LBRACE
+    {.infixFn = NULL, .prefixFn = handleParseLBrace, .precedence = PREC_NONE},        // TOKEN_LBRACE
     {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_RBRACE
     {.infixFn = NULL, .prefixFn = parseGrouping, .precedence = PREC_NONE},            // TOKEN_LPAREN
     {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_RPAREN
@@ -295,6 +295,30 @@ static Node* parseObject(Parser* parser, Token** token, ParseError** outErr) {
     advance(parser); // Consume "}"
 
     return newObjectLiteralNode(*token, (ObjectLiteralEntry**) entries->values, (Node**) keys->values, entries->count);
+}
+
+static Node* parseBlock(Parser* parser, Token** token, ParseError** outErr) {
+    List* exprStmts = newList();
+    while (!IS_AT_END(parser) && PEEK(parser)->type != TOKEN_RBRACE) {
+        Node* exprStmt = parseStatement(parser, outErr);
+        listAdd(exprStmts, (void**) &exprStmt);
+    }
+    advance(parser); // Consume "}"
+    return newBlockNode(*token, (Node**) exprStmts->values, exprStmts->count);
+}
+
+static Node* handleParseLBrace(Parser* parser, Token** token, ParseError** outErr) {
+    if (!IS_AT_END(parser) && PEEK(parser)->type == TOKEN_RBRACE) {
+        advance(parser); // Consume "}"
+        return newObjectLiteralNode(*token, NULL, NULL, 0);
+    } else if (!IS_AT_END(parser) && PEEK(parser)->type == TOKEN_IDENT && PEEK_NEXT(parser)->type == TOKEN_COLON) {
+        return parseObject(parser, token, outErr);
+    } else if (!IS_AT_END(parser) && PEEK(parser)->type == TOKEN_COLON) {
+        *outErr = newParseError(PEEK(parser), 1, TOKEN_IDENT);
+        return NULL;
+    } else {
+        return parseBlock(parser, token, outErr);
+    }
 }
 
 static Node* parseGrouping(Parser* parser, Token** token, ParseError** outErr) {

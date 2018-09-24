@@ -157,6 +157,19 @@ Node* newIfElseNode(Token* token, Node* condExpr, Node* thenExpr, Node* elseExpr
     return n;
 }
 
+Node* newBlockNode(Token* token, Node** exprs, int numExprs) {
+    Node* n = malloc(sizeof(Node));
+    n->type = NODE_TYPE_BLOCK;
+
+    BlockNode* block = malloc(sizeof(BlockNode));
+    block->token = token;
+    block->exprs = exprs;
+    block->numExprs = numExprs;
+
+    n->as.blockNode = block;
+    return n;
+}
+
 // ------------------------------------
 //             Statements
 // ------------------------------------
