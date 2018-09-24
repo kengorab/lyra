@@ -103,7 +103,6 @@ static Node* parseIdentifier(Parser* parser, Token** token, ParseError** outErr)
 
 static Node* parseArray(Parser* parser, Token** token, ParseError** outErr);
 
-//static Node* parseObject(Parser* parser, Token** token, ParseError** outErr);
 static Node* handleParseLBrace(Parser* parser, Token** token, ParseError** outErr);
 
 static Node* parseGrouping(Parser* parser, Token** token, ParseError** outErr);
