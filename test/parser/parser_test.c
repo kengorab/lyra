@@ -738,6 +738,7 @@ TEST(testParseValDeclStatement, {
 
     ValDeclStmt* valDeclStmt = n->as.valDeclStmt;
     ASSERT_EQ_STR("someValue", valDeclStmt->ident->name, "The ident should be someValue");
+    ASSERT_FALSE(valDeclStmt->isMutable, "The binding should be declared as immutable");
     return assertLiteralNode(testName, valDeclStmt->assignment, LITERAL_NODE_INT, 123);
 })
 
@@ -765,6 +766,7 @@ TEST(testParseValDeclStatements, {
 
     ValDeclStmt* valDeclStmt = n->as.valDeclStmt;
     ASSERT_EQ_STR("someValue", valDeclStmt->ident->name, "The ident should be someValue");
+    ASSERT_FALSE(valDeclStmt->isMutable, "The binding should be declared as immutable");
     TestResult res = assertLiteralNode(testName, valDeclStmt->assignment, LITERAL_NODE_INT, 123);
     if (!res.pass) return res;
 
@@ -774,6 +776,7 @@ TEST(testParseValDeclStatements, {
 
     valDeclStmt = n->as.valDeclStmt;
     ASSERT_EQ_STR("someValue2", valDeclStmt->ident->name, "The ident should be someValue2");
+    ASSERT_FALSE(valDeclStmt->isMutable, "The binding should be declared as immutable");
     return assertLiteralNode(testName, valDeclStmt->assignment, LITERAL_NODE_STRING, "\"hello!\"", 8);
 })
 
@@ -831,6 +834,52 @@ TEST(testParseValDeclStatement_errorNoExpr, {
     ASSERT_EQ_STR("TOKEN_EOF", tokenTypes[error->actual->type], "The actual token should be TOKEN_EOF");
 })
 
+TEST(testParseVarDeclStatement_noAssignment, {
+    Token** tokens = ((Token* []) {
+        makeToken("var", TOKEN_VAR),
+        makeToken("someValue", TOKEN_IDENT),
+        makeToken("", TOKEN_EOF),
+    });
+
+    Parser p = newParser(tokens);
+    List* errorList = newList();
+    List* nodes = parse(&p, &errorList);
+    ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
+
+    Node* n = nodes->values[0];
+    ASSERT_EQ_STR("NODE_TYPE_VAL_DECL_STATEMENT", astNodeTypes[n->type],
+                  "The node should have type NODE_TYPE_VAL_DECL_STATEMENT");
+
+    ValDeclStmt* valDeclStmt = n->as.valDeclStmt;
+    ASSERT_EQ_STR("someValue", valDeclStmt->ident->name, "The ident should be someValue");
+    ASSERT_TRUE(valDeclStmt->isMutable, "The binding should be declared as mutable");
+    ASSERT_TRUE(valDeclStmt->assignment == NULL, "The binding shouldn't have an assignment");
+})
+
+TEST(testParseVarDeclStatement_withAssignment, {
+    Token** tokens = ((Token* []) {
+        makeToken("var", TOKEN_VAR),
+        makeToken("someValue", TOKEN_IDENT),
+        makeToken("=", TOKEN_EQ),
+        makeToken("123", TOKEN_NUMBER),
+        makeToken("", TOKEN_EOF),
+    });
+
+    Parser p = newParser(tokens);
+    List* errorList = newList();
+    List* nodes = parse(&p, &errorList);
+    ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
+
+    Node* n = nodes->values[0];
+    ASSERT_EQ_STR("NODE_TYPE_VAL_DECL_STATEMENT", astNodeTypes[n->type],
+                  "The node should have type NODE_TYPE_VAL_DECL_STATEMENT");
+
+    ValDeclStmt* valDeclStmt = n->as.valDeclStmt;
+    ASSERT_EQ_STR("someValue", valDeclStmt->ident->name, "The ident should be someValue");
+    ASSERT_TRUE(valDeclStmt->isMutable, "The binding should be declared as mutable");
+    return assertLiteralNode(testName, valDeclStmt->assignment, LITERAL_NODE_INT, 123);
+})
+
 void runParserTests(Tester* tester) {
     tester->startSuite("Parser");
     tester->run(testParseIntLiteral);
@@ -869,6 +918,8 @@ void runParserTests(Tester* tester) {
     tester->run(testParseValDeclStatement_errorNoIdent);
     tester->run(testParseValDeclStatement_errorNoEq);
     tester->run(testParseValDeclStatement_errorNoExpr);
+    tester->run(testParseVarDeclStatement_noAssignment);
+    tester->run(testParseVarDeclStatement_withAssignment);
 }
 
 static Token* makeToken(const char* contents, TokenType type) {

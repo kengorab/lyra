@@ -124,6 +124,7 @@ typedef struct {
     Token* token;
     IdentifierNode* ident;
     Node* assignment;
+    bool isMutable;
 } ValDeclStmt;
 
 // ------------------------------------
@@ -163,6 +164,6 @@ Node* newGroupingNode(Token* token, Node* expr);
 
 Node* newIfElseNode(Token* token, Node* condExpr, Node* thenExpr, Node* elseExpr);
 
-Node* newValDeclStmtNode(Token* token, Node* identNode, Node* assignment);
+Node* newValDeclStmtNode(Token* token, Node* identNode, Node* assignment, bool isMutable);
 
 #endif //CLYRA_AST_H

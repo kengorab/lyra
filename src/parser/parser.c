@@ -48,13 +48,39 @@ static Node* parseValDeclStmt(Parser* parser, ParseError** outErr) {
         return NULL;
     }
 
-    return newValDeclStmtNode(valToken, newIdentifierNode(identTok), rhs);
+    return newValDeclStmtNode(valToken, newIdentifierNode(identTok), rhs, false);
+}
+
+static Node* parseVarDeclStmt(Parser* parser, ParseError** outErr) {
+    Token* varToken = advance(parser); // Consume "var" token
+    if (PEEK(parser)->type != TOKEN_IDENT) {
+        *outErr = newParseError(PEEK(parser), 1, TOKEN_IDENT);
+        return NULL;
+    }
+    Token* identTok = advance(parser);
+
+    // Var declaration statements don't require an assignment
+    if (PEEK(parser)->type != TOKEN_EQ) {
+        return newValDeclStmtNode(varToken, newIdentifierNode(identTok), NULL, true);
+    }
+
+    advance(parser); // Skip "="
+
+    Node* rhs = parseExpression(parser, outErr);
+    if (rhs == NULL) {
+        if (*outErr == NULL)
+            *outErr = newParseError(PEEK(parser), 0, "expression");
+        return NULL;
+    }
+
+    return newValDeclStmtNode(varToken, newIdentifierNode(identTok), rhs, true);
 }
 
 static Node* parseStatement(Parser* parser, ParseError** outErr) {
     Token* token = PEEK(parser);
     switch (token->type) {
         case TOKEN_VAL: return parseValDeclStmt(parser, outErr);
+        case TOKEN_VAR: return parseVarDeclStmt(parser, outErr);
         default: return parseExpression(parser, outErr);
     }
 }
