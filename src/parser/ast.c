@@ -161,7 +161,7 @@ Node* newIfElseNode(Token* token, Node* condExpr, Node* thenExpr, Node* elseExpr
 //             Statements
 // ------------------------------------
 
-Node* newValDeclStmtNode(Token* token, Node* identNode, Node* assignment) {
+Node* newValDeclStmtNode(Token* token, Node* identNode, Node* assignment, bool isMutable) {
     Node* n = malloc(sizeof(Node));
     n->type = NODE_TYPE_VAL_DECL_STATEMENT;
 
@@ -169,6 +169,7 @@ Node* newValDeclStmtNode(Token* token, Node* identNode, Node* assignment) {
     valDeclStmt->token = token;
     valDeclStmt->assignment = assignment;
     valDeclStmt->ident = identNode->as.identifierNode;
+    valDeclStmt->isMutable = isMutable;
 
     n->as.valDeclStmt = valDeclStmt;
     return n;
