@@ -188,3 +188,18 @@ Node* newValDeclStmtNode(Token* token, Node* identNode, Node* assignment, bool i
     return n;
 }
 
+Node* newFuncDeclStmtNode(Token* token, Node* nameNode, int numParams, Node** params, Node* body) {
+    Node* n = malloc(sizeof(Node));
+    n->type = NODE_TYPE_FUNC_DECL_STATEMENT;
+
+    FuncDeclStmt* funcDeclStmt = malloc(sizeof(FuncDeclStmt));
+    funcDeclStmt->token = token;
+    funcDeclStmt->name = nameNode->as.identifierNode;
+    funcDeclStmt->numParams = numParams;
+    funcDeclStmt->params = params;
+    funcDeclStmt->body = body;
+
+    n->as.funcDeclStmt = funcDeclStmt;
+    return n;
+}
+

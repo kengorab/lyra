@@ -56,11 +56,47 @@ static void visitIfElseNode(IfElseNode* ifElseNode) {
     }
 }
 
+static void visitBlockNode(BlockNode* blockNode) {
+    printf("{\n");
+    for (int i = 0; i < blockNode->numExprs - 1; ++i) {
+        printf("  ");
+        visit(blockNode->exprs[i]);
+        printf("\n");
+    }
+
+    if (blockNode->numExprs >= 1) {
+        printf("  ");
+        visit(blockNode->exprs[blockNode->numExprs - 1]);
+        printf("\n");
+    }
+    printf("}");
+}
+
 static void visitValDeclStmtNode(ValDeclStmt* stmt) {
     printf("val ");
     visitIdentifierNode(stmt->ident);
     printf(" = ");
     visit(stmt->assignment);
+}
+
+static void visitFuncDeclStmtNode(FuncDeclStmt* stmt) {
+    printf("func ");
+    visitIdentifierNode(stmt->name);
+    printf("(");
+    for (int i = 0; i < stmt->numParams - 1; ++i) {
+        visitIdentifierNode(stmt->params[i]->as.identifierNode);
+        printf(", ");
+    }
+
+    if (stmt->numParams >= 1) {
+        visitIdentifierNode(stmt->params[stmt->numParams - 1]->as.identifierNode);
+    }
+    printf(") ");
+
+    if (stmt->body->type != NODE_TYPE_BLOCK) {
+        printf("= ");
+    }
+    visit(stmt->body);
 }
 
 static void visitArrayLiteralNode(ArrayLiteralNode* node) {
@@ -135,8 +171,16 @@ static void visit(Node* node) {
             visitValDeclStmtNode(node->as.valDeclStmt);
             break;
         }
+        case NODE_TYPE_FUNC_DECL_STATEMENT: {
+            visitFuncDeclStmtNode(node->as.funcDeclStmt);
+            break;
+        }
         case NODE_TYPE_IF_ELSE: {
             visitIfElseNode(node->as.ifElseNode);
+            break;
+        }
+        case NODE_TYPE_BLOCK: {
+            visitBlockNode(node->as.blockNode);
             break;
         }
     }

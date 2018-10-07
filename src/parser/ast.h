@@ -19,7 +19,8 @@
     C(NODE_TYPE_GROUPING) \
     C(NODE_TYPE_IF_ELSE) \
     C(NODE_TYPE_BLOCK) \
-    C(NODE_TYPE_VAL_DECL_STATEMENT)
+    C(NODE_TYPE_VAL_DECL_STATEMENT) \
+    C(NODE_TYPE_FUNC_DECL_STATEMENT)
 
 typedef enum {
     AST_NODE_TYPES
@@ -134,6 +135,14 @@ typedef struct {
     bool isMutable;
 } ValDeclStmt;
 
+typedef struct {
+    Token* token;
+    IdentifierNode* name;
+    int numParams;
+    Node** params;
+    Node* body;
+} FuncDeclStmt;
+
 // ------------------------------------
 //             Base Node
 // ------------------------------------
@@ -142,6 +151,7 @@ struct Node {
     AstNodeType type;
     union {
         ValDeclStmt* valDeclStmt;
+        FuncDeclStmt* funcDeclStmt;
         LiteralNode* literalNode;
         ArrayLiteralNode* arrayLiteralNode;
         ObjectLiteralNode* objectLiteralNode;
@@ -175,5 +185,7 @@ Node* newIfElseNode(Token* token, Node* condExpr, Node* thenExpr, Node* elseExpr
 Node* newBlockNode(Token* token, Node** exprs, int numExprs);
 
 Node* newValDeclStmtNode(Token* token, Node* identNode, Node* assignment, bool isMutable);
+
+Node* newFuncDeclStmtNode(Token* token, Node* nameNode, int numParams, Node** params, Node* body);
 
 #endif //CLYRA_AST_H
