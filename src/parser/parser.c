@@ -23,6 +23,8 @@ Parser newParser(Token** tokens) {
 
 static Node* parseExpression(Parser* parser, ParseError** outErr);
 
+static Node* parseBlock(Parser* parser, Token** token, ParseError** outErr);
+
 // ------------------------------------
 //             Statements
 // ------------------------------------
@@ -76,11 +78,61 @@ static Node* parseVarDeclStmt(Parser* parser, ParseError** outErr) {
     return newValDeclStmtNode(varToken, newIdentifierNode(identTok), rhs, true);
 }
 
+static Node* parseFuncDeclStmt(Parser* parser, ParseError** outErr) {
+    Token* funcToken = advance(parser); // Consume "func" token
+    if (PEEK(parser)->type != TOKEN_IDENT) {
+        *outErr = newParseError(PEEK(parser), 1, TOKEN_IDENT);
+        return NULL;
+    }
+    Token* identTok = advance(parser);
+
+    if (PEEK(parser)->type != TOKEN_LPAREN) {
+        *outErr = newParseError(PEEK(parser), 1, TOKEN_LPAREN);
+        return NULL;
+    }
+    advance(parser); // Consume "("
+
+    List* params = newList();
+    while (PEEK(parser)->type != TOKEN_RPAREN && !IS_AT_END(parser)) {
+        if (PEEK(parser)->type != TOKEN_IDENT) {
+            *outErr = newParseError(PEEK(parser), 2, TOKEN_IDENT, TOKEN_RPAREN);
+            return NULL;
+        }
+
+        Token* paramTok = advance(parser);
+        Node* param = newIdentifierNode(paramTok);
+        listAdd(params, (void**) &param);
+
+        if (PEEK(parser)->type == TOKEN_COMMA)
+            advance(parser); // Consume the ","
+        else if (PEEK(parser)->type != TOKEN_RPAREN) {
+            *outErr = newParseError(PEEK(parser), 2, TOKEN_COMMA, TOKEN_RPAREN);
+            return NULL;
+        }
+    }
+    advance(parser); // Consume ")"
+
+    Node* body;
+    if (PEEK(parser)->type == TOKEN_LBRACE) {
+        Token* lBrace = advance(parser);
+        body = parseBlock(parser, &lBrace, outErr);
+    } else if (PEEK(parser)->type == TOKEN_EQ) {
+        advance(parser); // Consume "="
+        body = parseExpression(parser, outErr);
+    } else {
+        *outErr = newParseError(PEEK(parser), 2, TOKEN_LBRACE, TOKEN_EQ);
+        return NULL;
+    }
+
+    return newFuncDeclStmtNode(funcToken, newIdentifierNode(identTok), params->count, (Node**) params->values, body);
+}
+
 static Node* parseStatement(Parser* parser, ParseError** outErr) {
     Token* token = PEEK(parser);
     switch (token->type) {
         case TOKEN_VAL: return parseValDeclStmt(parser, outErr);
         case TOKEN_VAR: return parseVarDeclStmt(parser, outErr);
+        case TOKEN_FUNC: return parseFuncDeclStmt(parser, outErr);
         default: return parseExpression(parser, outErr);
     }
 }
