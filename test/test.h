@@ -14,9 +14,11 @@ typedef TestResult (* TestFn)();
 typedef void (* TestRunner)(TestFn);
 
 typedef void (* SuiteStarter)(const char*);
+typedef void (* SubSuiteStarter)(const char*, const char*);
 
 typedef struct {
     const SuiteStarter startSuite;
+    const SubSuiteStarter startSubsuite;
     const TestRunner run;
 } Tester;
 
