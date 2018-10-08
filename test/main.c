@@ -17,6 +17,10 @@ void startSuite(const char* suiteName) {
     printf("Running suite: %s\n", suiteName);
 }
 
+void startSubsuite(const char* suiteName, const char* subsuiteName) {
+    printf("  Running sub-suite: %s/%s\n", suiteName, subsuiteName);
+}
+
 void testRunner(TestFn test) {
     numTests++;
 
@@ -34,6 +38,7 @@ void testRunner(TestFn test) {
 int main() {
     Tester t = {
         .startSuite = &startSuite,
+        .startSubsuite = &startSubsuite,
         .run = &testRunner
     };
 

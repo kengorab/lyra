@@ -45,9 +45,27 @@ add_executable(
         test/lexer/lexer_test.h
         test/parser/ast_test.c
         test/parser/ast_test.h
+        test/parser/array_tests.c
+        test/parser/array_tests.h
+        test/parser/block_tests.c
+        test/parser/block_tests.h
+        test/parser/func_decl_tests.c
+        test/parser/func_decl_tests.h
+        test/parser/ifelse_tests.c
+        test/parser/ifelse_tests.h
         test/parser/parser_test.c
         test/parser/parser_test.h
         test/main.c
         test/test.h
+        test/parser/literal_tests.c
+        test/parser/literal_tests.h
+        test/parser/object_tests.c
+        test/parser/object_tests.h
+        test/parser/unary_binary_tests.c
+        test/parser/unary_binary_tests.h
+        test/parser/utils.c
+        test/parser/utils.h
+        test/parser/val_decl_tests.c
+        test/parser/val_decl_tests.h
 )
 add_test(clyra_tests clyra_tests)
