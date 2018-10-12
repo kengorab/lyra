@@ -72,6 +72,20 @@ static void visitBlockNode(BlockNode* blockNode) {
     printf("}");
 }
 
+static void visitInvocationNode(InvocationNode* node) {
+    visit(node->target);
+    printf("(");
+    for (int i = 0; i < node->numArgs - 1; ++i) {
+        visit(node->arguments[i]);
+        printf(", ");
+    }
+
+    if (node->numArgs >= 1) {
+        visit(node->arguments[node->numArgs - 1]);
+    }
+    printf(")");
+}
+
 static void visitValDeclStmtNode(ValDeclStmt* stmt) {
     printf("val ");
     visitIdentifierNode(stmt->ident);
@@ -181,6 +195,10 @@ static void visit(Node* node) {
         }
         case NODE_TYPE_BLOCK: {
             visitBlockNode(node->as.blockNode);
+            break;
+        }
+        case NODE_TYPE_INVOCATION: {
+            visitInvocationNode(node->as.invocationNode);
             break;
         }
     }

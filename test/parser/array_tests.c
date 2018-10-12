@@ -4,19 +4,11 @@
 #include "parser/ast.h"
 #include "parser/ast.h"
 #include "parser/parser.h"
-#include "parser/utils.h"
+#include "test_utils.h"
 
 TEST(testArrayLiteralExpression, {
-    Token** tokens = ((Token* []) {
-        makeToken("[", TOKEN_LBRACK),
-        makeToken("1", TOKEN_NUMBER),
-        makeToken(",", TOKEN_COMMA),
-        makeToken("2", TOKEN_NUMBER),
-        makeToken("]", TOKEN_RBRACK),
-        makeToken("", TOKEN_EOF),
-    });
+    Parser p = parseString("[1, 2]");
 
-    Parser p = newParser(tokens);
     List* errorList = newList();
     List* nodes = parse(&p, &errorList);
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
@@ -32,17 +24,8 @@ TEST(testArrayLiteralExpression, {
 })
 
 TEST(testArrayLiteralExpression_trailingCommas, {
-    Token** tokens = ((Token* []) {
-        makeToken("[", TOKEN_LBRACK),
-        makeToken("1", TOKEN_NUMBER),
-        makeToken(",", TOKEN_COMMA),
-        makeToken("2", TOKEN_NUMBER),
-        makeToken(",", TOKEN_COMMA),
-        makeToken("]", TOKEN_RBRACK),
-        makeToken("", TOKEN_EOF),
-    });
+    Parser p = parseString("[1, 2,]");
 
-    Parser p = newParser(tokens);
     List* errorList = newList();
     List* nodes = parse(&p, &errorList);
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
@@ -58,13 +41,8 @@ TEST(testArrayLiteralExpression_trailingCommas, {
 })
 
 TEST(testArrayLiteralExpression_emptyArray, {
-    Token** tokens = ((Token* []) {
-        makeToken("[", TOKEN_LBRACK),
-        makeToken("]", TOKEN_RBRACK),
-        makeToken("", TOKEN_EOF),
-    });
+    Parser p = parseString("[]");
 
-    Parser p = newParser(tokens);
     List* errorList = newList();
     List* nodes = parse(&p, &errorList);
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
@@ -77,15 +55,8 @@ TEST(testArrayLiteralExpression_emptyArray, {
 })
 
 TEST(testArrayLiteralExpression_errorNoCommaSeparator, {
-    Token** tokens = ((Token* []) {
-        makeToken("[", TOKEN_LBRACK),
-        makeToken("\"hello\"", TOKEN_STRING),
-        makeToken("\"world\"", TOKEN_STRING),
-        makeToken("]", TOKEN_RBRACK),
-        makeToken("", TOKEN_EOF),
-    });
+    Parser p = parseString("[\"hello\"\"world\"]");
 
-    Parser p = newParser(tokens);
     List* errorList = newList();
     parse(&p, &errorList);
 
@@ -95,15 +66,8 @@ TEST(testArrayLiteralExpression_errorNoCommaSeparator, {
 })
 
 TEST(testArrayLiteralExpression_errorNoClosingBracket, {
-    Token** tokens = ((Token* []) {
-        makeToken("[", TOKEN_LBRACK),
-        makeToken("\"hello\"", TOKEN_STRING),
-        makeToken(",", TOKEN_COMMA),
-        makeToken("\"world\"", TOKEN_STRING),
-        makeToken("", TOKEN_EOF),
-    });
+    Parser p = parseString("[\"hello\", \"world\"");
 
-    Parser p = newParser(tokens);
     List* errorList = newList();
     parse(&p, &errorList);
 

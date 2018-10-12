@@ -19,6 +19,7 @@
     C(NODE_TYPE_GROUPING) \
     C(NODE_TYPE_IF_ELSE) \
     C(NODE_TYPE_BLOCK) \
+    C(NODE_TYPE_INVOCATION) \
     C(NODE_TYPE_VAL_DECL_STATEMENT) \
     C(NODE_TYPE_FUNC_DECL_STATEMENT)
 
@@ -124,6 +125,13 @@ typedef struct {
     Node* elseExpr;
 } IfElseNode;
 
+typedef struct {
+    Token* token;
+    Node* target;
+    int numArgs;
+    Node** arguments;
+} InvocationNode;
+
 // ------------------------------------
 //             Statements
 // ------------------------------------
@@ -161,6 +169,7 @@ struct Node {
         GroupingNode* groupingNode;
         IfElseNode* ifElseNode;
         BlockNode* blockNode;
+        InvocationNode* invocationNode;
     } as;
 };
 
@@ -183,6 +192,8 @@ Node* newGroupingNode(Token* token, Node* expr);
 Node* newIfElseNode(Token* token, Node* condExpr, Node* thenExpr, Node* elseExpr);
 
 Node* newBlockNode(Token* token, Node** exprs, int numExprs);
+
+Node* newInvocationNode(Token* token, Node* target, int numArgs, Node** arguments);
 
 Node* newValDeclStmtNode(Token* token, Node* identNode, Node* assignment, bool isMutable);
 

@@ -4,19 +4,11 @@
 #include "parser/ast.h"
 #include "parser/ast.h"
 #include "parser/parser.h"
-#include "parser/utils.h"
+#include "test_utils.h"
 
 TEST(testParseIfElseStatement_noElse, {
-    Token** tokens = ((Token* []) {
-        makeToken("if", TOKEN_IF),
-        makeToken("(", TOKEN_LPAREN),
-        makeToken("true", TOKEN_TRUE),
-        makeToken(")", TOKEN_RPAREN),
-        makeToken("123", TOKEN_NUMBER),
-        makeToken("", TOKEN_EOF),
-    });
+    Parser p = parseString("if (true) 123");
 
-    Parser p = newParser(tokens);
     List* errorList = newList();
     List* nodes = parse(&p, &errorList);
 
@@ -33,18 +25,8 @@ TEST(testParseIfElseStatement_noElse, {
 })
 
 TEST(testParseIfElseStatement_blockExpr_noElse, {
-    Token** tokens = ((Token* []) {
-        makeToken("if", TOKEN_IF),
-        makeToken("(", TOKEN_LPAREN),
-        makeToken("true", TOKEN_TRUE),
-        makeToken(")", TOKEN_RPAREN),
-        makeToken("{", TOKEN_LBRACE),
-        makeToken("123", TOKEN_NUMBER),
-        makeToken("}", TOKEN_RBRACE),
-        makeToken("", TOKEN_EOF),
-    });
+    Parser p = parseString("if (true) { 123 }");
 
-    Parser p = newParser(tokens);
     List* errorList = newList();
     List* nodes = parse(&p, &errorList);
 
@@ -64,18 +46,8 @@ TEST(testParseIfElseStatement_blockExpr_noElse, {
 })
 
 TEST(testParseIfElseStatement_withElse, {
-    Token** tokens = ((Token* []) {
-        makeToken("if", TOKEN_IF),
-        makeToken("(", TOKEN_LPAREN),
-        makeToken("true", TOKEN_TRUE),
-        makeToken(")", TOKEN_RPAREN),
-        makeToken("123", TOKEN_NUMBER),
-        makeToken("else", TOKEN_ELSE),
-        makeToken("456", TOKEN_NUMBER),
-        makeToken("", TOKEN_EOF),
-    });
+    Parser p = parseString("if (true) 123 else 456");
 
-    Parser p = newParser(tokens);
     List* errorList = newList();
     List* nodes = parse(&p, &errorList);
 
@@ -92,24 +64,8 @@ TEST(testParseIfElseStatement_withElse, {
 })
 
 TEST(testParseIfElseStatement_nestedIfElseStmt, {
-    Token** tokens = ((Token* []) {
-        makeToken("if", TOKEN_IF),
-        makeToken("(", TOKEN_LPAREN),
-        makeToken("true", TOKEN_TRUE),
-        makeToken(")", TOKEN_RPAREN),
-        makeToken("if", TOKEN_IF),
-        makeToken("(", TOKEN_LPAREN),
-        makeToken("false", TOKEN_FALSE),
-        makeToken(")", TOKEN_RPAREN),
-        makeToken("123", TOKEN_NUMBER),
-        makeToken("else", TOKEN_ELSE),
-        makeToken("456", TOKEN_NUMBER),
-        makeToken("else", TOKEN_ELSE),
-        makeToken("789", TOKEN_NUMBER),
-        makeToken("", TOKEN_EOF),
-    });
+    Parser p = parseString("if (true) if (false) 123 else 456 else 789");
 
-    Parser p = newParser(tokens);
     List* errorList = newList();
     List* nodes = parse(&p, &errorList);
 
@@ -135,17 +91,8 @@ TEST(testParseIfElseStatement_nestedIfElseStmt, {
 })
 
 TEST(testParseIfElseStatement_errorNoLParen, {
-    Token** tokens = ((Token* []) {
-        makeToken("if", TOKEN_IF),
-        makeToken("true", TOKEN_TRUE),
-        makeToken(")", TOKEN_RPAREN),
-        makeToken("123", TOKEN_NUMBER),
-        makeToken("else", TOKEN_ELSE),
-        makeToken("456", TOKEN_NUMBER),
-        makeToken("", TOKEN_EOF),
-    });
+    Parser p = parseString("if true) 123 else 456");
 
-    Parser p = newParser(tokens);
     List* errorList = newList();
     parse(&p, &errorList);
 
@@ -155,17 +102,8 @@ TEST(testParseIfElseStatement_errorNoLParen, {
 })
 
 TEST(testParseIfElseStatement_errorNoCondExpr, {
-    Token** tokens = ((Token* []) {
-        makeToken("if", TOKEN_IF),
-        makeToken("(", TOKEN_LPAREN),
-        makeToken(")", TOKEN_RPAREN),
-        makeToken("123", TOKEN_NUMBER),
-        makeToken("else", TOKEN_ELSE),
-        makeToken("456", TOKEN_NUMBER),
-        makeToken("", TOKEN_EOF),
-    });
+    Parser p = parseString("if () 123 else 456");
 
-    Parser p = newParser(tokens);
     List* errorList = newList();
     parse(&p, &errorList);
 
@@ -175,17 +113,8 @@ TEST(testParseIfElseStatement_errorNoCondExpr, {
 })
 
 TEST(testParseIfElseStatement_errorNoRParen, {
-    Token** tokens = ((Token* []) {
-        makeToken("if", TOKEN_IF),
-        makeToken("(", TOKEN_LPAREN),
-        makeToken("true", TOKEN_TRUE),
-        makeToken("123", TOKEN_NUMBER),
-        makeToken("else", TOKEN_ELSE),
-        makeToken("456", TOKEN_NUMBER),
-        makeToken("", TOKEN_EOF),
-    });
+    Parser p = parseString("if (true 123 else 456");
 
-    Parser p = newParser(tokens);
     List* errorList = newList();
     parse(&p, &errorList);
 
@@ -195,17 +124,8 @@ TEST(testParseIfElseStatement_errorNoRParen, {
 })
 
 TEST(testParseIfElseStatement_errorNoThenExpr, {
-    Token** tokens = ((Token* []) {
-        makeToken("if", TOKEN_IF),
-        makeToken("(", TOKEN_LPAREN),
-        makeToken("true", TOKEN_TRUE),
-        makeToken(")", TOKEN_RPAREN),
-        makeToken("else", TOKEN_ELSE),
-        makeToken("456", TOKEN_NUMBER),
-        makeToken("", TOKEN_EOF),
-    });
+    Parser p = parseString("if (true) else 456");
 
-    Parser p = newParser(tokens);
     List* errorList = newList();
     parse(&p, &errorList);
 
@@ -215,17 +135,8 @@ TEST(testParseIfElseStatement_errorNoThenExpr, {
 })
 
 TEST(testParseIfElseStatement_errorNoElseExpr, {
-    Token** tokens = ((Token* []) {
-        makeToken("if", TOKEN_IF),
-        makeToken("(", TOKEN_LPAREN),
-        makeToken("true", TOKEN_TRUE),
-        makeToken(")", TOKEN_RPAREN),
-        makeToken("123", TOKEN_NUMBER),
-        makeToken("else", TOKEN_ELSE),
-        makeToken("", TOKEN_EOF),
-    });
+    Parser p = parseString("if (true) 123 else");
 
-    Parser p = newParser(tokens);
     List* errorList = newList();
     parse(&p, &errorList);
 

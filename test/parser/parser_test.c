@@ -11,6 +11,7 @@
 #include "ifelse_tests.h"
 #include "val_decl_tests.h"
 #include "func_decl_tests.h"
+#include "invocation_tests.h"
 
 void runParserTests(Tester* tester) {
     tester->startSuite("Parser");
@@ -38,4 +39,7 @@ void runParserTests(Tester* tester) {
 
     tester->startSubsuite("Parser", "Func");
     runFuncDeclTests(tester);
+
+    tester->startSubsuite("Parser", "Invocation");
+    runInvocationTests(tester);
 }

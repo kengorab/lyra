@@ -1,21 +1,15 @@
 #include <string.h>
 
 #include "val_decl_tests.h"
+#include "common/strings.h"
 #include "parser/ast.h"
 #include "parser/ast.h"
 #include "parser/parser.h"
-#include "parser/utils.h"
+#include "test_utils.h"
 
 TEST(testParseValDeclStatement, {
-    Token** tokens = ((Token* []) {
-        makeToken("val", TOKEN_VAL),
-        makeToken("someValue", TOKEN_IDENT),
-        makeToken("=", TOKEN_EQ),
-        makeToken("123", TOKEN_NUMBER),
-        makeToken("", TOKEN_EOF),
-    });
+    Parser p = parseString("val someValue = 123");
 
-    Parser p = newParser(tokens);
     List* errorList = newList();
     List* nodes = parse(&p, &errorList);
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
@@ -25,25 +19,15 @@ TEST(testParseValDeclStatement, {
                   "The node should have type NODE_TYPE_VAL_DECL_STATEMENT");
 
     ValDeclStmt* valDeclStmt = n->as.valDeclStmt;
-    ASSERT_EQ_STR("someValue", valDeclStmt->ident->name, "The ident should be someValue");
+    ASSERT_EQ_STR("someValue", substring(valDeclStmt->ident->name, 9), "The ident should be someValue"); // TODO: #21
     ASSERT_FALSE(valDeclStmt->isMutable, "The binding should be declared as immutable");
     return assertLiteralNode(testName, valDeclStmt->assignment, LITERAL_NODE_INT, 123);
 })
 
 TEST(testParseValDeclStatements, {
-    Token** tokens = ((Token* []) {
-        makeToken("val", TOKEN_VAL),
-        makeToken("someValue", TOKEN_IDENT),
-        makeToken("=", TOKEN_EQ),
-        makeToken("123", TOKEN_NUMBER),
-        makeToken("val", TOKEN_VAL),
-        makeToken("someValue2", TOKEN_IDENT),
-        makeToken("=", TOKEN_EQ),
-        makeToken("\"hello!\"", TOKEN_STRING),
-        makeToken("", TOKEN_EOF),
-    });
+    Parser p = parseString("val someValue = 123"
+                           "val someValue2 = \"hello!\"");
 
-    Parser p = newParser(tokens);
     List* errorList = newList();
     List* nodes = parse(&p, &errorList);
     ASSERT_EQ(2, nodes->count, "There should be 2 elements in the list");
@@ -53,7 +37,7 @@ TEST(testParseValDeclStatements, {
                   "The node should have type NODE_TYPE_VAL_DECL_STATEMENT");
 
     ValDeclStmt* valDeclStmt = n->as.valDeclStmt;
-    ASSERT_EQ_STR("someValue", valDeclStmt->ident->name, "The ident should be someValue");
+    ASSERT_EQ_STR("someValue", substring(valDeclStmt->ident->name, 9), "The ident should be someValue"); // TODO: #21
     ASSERT_FALSE(valDeclStmt->isMutable, "The binding should be declared as immutable");
     TestResult res = assertLiteralNode(testName, valDeclStmt->assignment, LITERAL_NODE_INT, 123);
     if (!res.pass) return res;
@@ -63,20 +47,14 @@ TEST(testParseValDeclStatements, {
                   "The node should have type NODE_TYPE_VAL_DECL_STATEMENT");
 
     valDeclStmt = n->as.valDeclStmt;
-    ASSERT_EQ_STR("someValue2", valDeclStmt->ident->name, "The ident should be someValue2");
+    ASSERT_EQ_STR("someValue2", substring(valDeclStmt->ident->name, 10), "The ident should be someValue2"); // TODO: #21
     ASSERT_FALSE(valDeclStmt->isMutable, "The binding should be declared as immutable");
     return assertLiteralNode(testName, valDeclStmt->assignment, LITERAL_NODE_STRING, "\"hello!\"", 8);
 })
 
 TEST(testParseValDeclStatement_errorNoIdent, {
-    Token** tokens = ((Token* []) {
-        makeToken("val", TOKEN_VAL),
-        makeToken("=", TOKEN_EQ),
-        makeToken("123", TOKEN_NUMBER),
-        makeToken("", TOKEN_EOF),
-    });
+    Parser p = parseString("val = 123");
 
-    Parser p = newParser(tokens);
     List* errorList = newList();
     parse(&p, &errorList);
     ASSERT_EQ(1, errorList->count, "There should be 1 error");
@@ -87,14 +65,8 @@ TEST(testParseValDeclStatement_errorNoIdent, {
 })
 
 TEST(testParseValDeclStatement_errorNoEq, {
-    Token** tokens = ((Token* []) {
-        makeToken("val", TOKEN_VAL),
-        makeToken("abc", TOKEN_IDENT),
-        makeToken("123", TOKEN_NUMBER),
-        makeToken("", TOKEN_EOF),
-    });
+    Parser p = parseString("val abc 123");
 
-    Parser p = newParser(tokens);
     List* errorList = newList();
     parse(&p, &errorList);
     ASSERT_EQ(1, errorList->count, "There should be 1 error");
@@ -105,14 +77,8 @@ TEST(testParseValDeclStatement_errorNoEq, {
 })
 
 TEST(testParseValDeclStatement_errorNoExpr, {
-    Token** tokens = ((Token* []) {
-        makeToken("val", TOKEN_VAL),
-        makeToken("abc", TOKEN_IDENT),
-        makeToken("=", TOKEN_EQ),
-        makeToken("", TOKEN_EOF),
-    });
+    Parser p = parseString("val abc =");
 
-    Parser p = newParser(tokens);
     List* errorList = newList();
     parse(&p, &errorList);
     ASSERT_EQ(1, errorList->count, "There should be 1 error");
@@ -123,13 +89,8 @@ TEST(testParseValDeclStatement_errorNoExpr, {
 })
 
 TEST(testParseVarDeclStatement_noAssignment, {
-    Token** tokens = ((Token* []) {
-        makeToken("var", TOKEN_VAR),
-        makeToken("someValue", TOKEN_IDENT),
-        makeToken("", TOKEN_EOF),
-    });
+    Parser p = parseString("var someValue");
 
-    Parser p = newParser(tokens);
     List* errorList = newList();
     List* nodes = parse(&p, &errorList);
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
@@ -139,21 +100,14 @@ TEST(testParseVarDeclStatement_noAssignment, {
                   "The node should have type NODE_TYPE_VAL_DECL_STATEMENT");
 
     ValDeclStmt* valDeclStmt = n->as.valDeclStmt;
-    ASSERT_EQ_STR("someValue", valDeclStmt->ident->name, "The ident should be someValue");
+    ASSERT_EQ_STR("someValue", substring(valDeclStmt->ident->name, 9), "The ident should be someValue"); // TODO: #21
     ASSERT_TRUE(valDeclStmt->isMutable, "The binding should be declared as mutable");
     ASSERT_TRUE(valDeclStmt->assignment == NULL, "The binding shouldn't have an assignment");
 })
 
 TEST(testParseVarDeclStatement_withAssignment, {
-    Token** tokens = ((Token* []) {
-        makeToken("var", TOKEN_VAR),
-        makeToken("someValue", TOKEN_IDENT),
-        makeToken("=", TOKEN_EQ),
-        makeToken("123", TOKEN_NUMBER),
-        makeToken("", TOKEN_EOF),
-    });
+    Parser p = parseString("var someValue = 123");
 
-    Parser p = newParser(tokens);
     List* errorList = newList();
     List* nodes = parse(&p, &errorList);
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
@@ -163,7 +117,7 @@ TEST(testParseVarDeclStatement_withAssignment, {
                   "The node should have type NODE_TYPE_VAL_DECL_STATEMENT");
 
     ValDeclStmt* valDeclStmt = n->as.valDeclStmt;
-    ASSERT_EQ_STR("someValue", valDeclStmt->ident->name, "The ident should be someValue");
+    ASSERT_EQ_STR("someValue", substring(valDeclStmt->ident->name, 9), "The ident should be someValue"); // TODO: #21
     ASSERT_TRUE(valDeclStmt->isMutable, "The binding should be declared as mutable");
     return assertLiteralNode(testName, valDeclStmt->assignment, LITERAL_NODE_INT, 123);
 })

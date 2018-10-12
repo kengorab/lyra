@@ -3,7 +3,9 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#include "utils.h"
+#include "test_utils.h"
+#include "common/strings.h"
+#include "parser/ast.h"
 
 Token* makeToken(const char* contents, TokenType type) {
     Token* t = malloc(sizeof(Token));
@@ -15,9 +17,27 @@ Token* makeToken(const char* contents, TokenType type) {
     return t;
 }
 
+Parser parseString(char* sourceStr) {
+    Lexer l = newLexer(sourceStr);
+
+    List* tokenList = newList();
+    while (true) {
+        Token* t = nextToken(&l);
+        listAdd(tokenList, (void**) &t);
+
+        if (t->type == TOKEN_EOF)
+            break;
+    }
+
+    return newParser((Token**) tokenList->values);
+}
+
 TestResult assertIdentNode(const char* testName, Node* n, const char* name) {
     ASSERT_EQ_STR("NODE_TYPE_IDENT", astNodeTypes[n->type], "The node should have type NODE_TYPE_IDENT");
-    ASSERT_EQ_STR(name, n->as.identifierNode->name, "The ident name should match");
+
+    IdentifierNode* ident = n->as.identifierNode;
+    char* identName = substring(ident->token->start, (size_t) ident->token->length);
+    ASSERT_EQ_STR(name, identName, "The ident name should match");
     PASS;
 }
 
@@ -37,7 +57,8 @@ TestResult assertLiteralNode(const char* testName, Node* n, LiteralNodeType litT
             char* str = va_arg(args, char*);
             msg = malloc(100);
             sprintf(msg, "The literal node should contain str.val=%s", str);
-            ASSERT_EQ_STR(str, literalNode->str.val, msg);
+            char* literalStr = substring(literalNode->str.val, (size_t) literalNode->str.length);
+            ASSERT_EQ_STR(str, literalStr, msg);
 
             int len = va_arg(args, int);
             msg = malloc(100);

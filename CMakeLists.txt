@@ -24,7 +24,7 @@ add_executable(
         src/parser/parser_error.c
         src/parser/parser_error.h
         src/main.c
-)
+        src/common/strings.c src/common/strings.h)
 
 enable_testing()
 add_executable(
@@ -53,6 +53,8 @@ add_executable(
         test/parser/func_decl_tests.h
         test/parser/ifelse_tests.c
         test/parser/ifelse_tests.h
+        test/parser/invocation_tests.c
+        test/parser/invocation_tests.h
         test/parser/parser_test.c
         test/parser/parser_test.h
         test/main.c
@@ -63,9 +65,9 @@ add_executable(
         test/parser/object_tests.h
         test/parser/unary_binary_tests.c
         test/parser/unary_binary_tests.h
-        test/parser/utils.c
-        test/parser/utils.h
+        test/test_utils.c
+        test/test_utils.h
         test/parser/val_decl_tests.c
         test/parser/val_decl_tests.h
-)
+        src/common/strings.c src/common/strings.h)
 add_test(clyra_tests clyra_tests)
