@@ -1,23 +1,15 @@
 #include <string.h>
 
 #include "func_decl_tests.h"
+#include "common/strings.h"
 #include "parser/ast.h"
 #include "parser/ast.h"
 #include "parser/parser.h"
-#include "parser/utils.h"
+#include "test_utils.h"
 
 TEST(testParseFuncDeclStatement_noParams, {
-    Token** tokens = ((Token* []) {
-        makeToken("func", TOKEN_FUNC),
-        makeToken("myFunc", TOKEN_IDENT),
-        makeToken("(", TOKEN_LPAREN),
-        makeToken(")", TOKEN_RPAREN),
-        makeToken("=", TOKEN_EQ),
-        makeToken("123", TOKEN_NUMBER),
-        makeToken("", TOKEN_EOF),
-    });
+    Parser p = parseString("func myFunc() = 123");
 
-    Parser p = newParser(tokens);
     List* errorList = newList();
     List* nodes = parse(&p, &errorList);
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
@@ -27,25 +19,15 @@ TEST(testParseFuncDeclStatement_noParams, {
                   "The node should have type NODE_TYPE_FUNC_DECL_STATEMENT");
 
     FuncDeclStmt* funcDeclStmt = n->as.funcDeclStmt;
-    ASSERT_EQ_STR("myFunc", funcDeclStmt->name->name, "The ident should be abc");
+    ASSERT_EQ_STR("myFunc", substring(funcDeclStmt->name->name, 6), "The ident should be myFunc"); // TODO: #21
     ASSERT_TRUE(funcDeclStmt->numParams == 0, "There should be no params for the function");
 
     return assertLiteralNode(testName, funcDeclStmt->body, LITERAL_NODE_INT, 123);
 })
 
 TEST(testParseFuncDeclStatement_with1Param, {
-    Token** tokens = ((Token* []) {
-        makeToken("func", TOKEN_FUNC),
-        makeToken("myFunc", TOKEN_IDENT),
-        makeToken("(", TOKEN_LPAREN),
-        makeToken("a", TOKEN_IDENT),
-        makeToken(")", TOKEN_RPAREN),
-        makeToken("=", TOKEN_EQ),
-        makeToken("123", TOKEN_NUMBER),
-        makeToken("", TOKEN_EOF),
-    });
+    Parser p = parseString("func myFunc(a) = 123");
 
-    Parser p = newParser(tokens);
     List* errorList = newList();
     List* nodes = parse(&p, &errorList);
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
@@ -55,7 +37,7 @@ TEST(testParseFuncDeclStatement_with1Param, {
                   "The node should have type NODE_TYPE_FUNC_DECL_STATEMENT");
 
     FuncDeclStmt* funcDeclStmt = n->as.funcDeclStmt;
-    ASSERT_EQ_STR("myFunc", funcDeclStmt->name->name, "The ident should be abc");
+    ASSERT_EQ_STR("myFunc", substring(funcDeclStmt->name->name, 6), "The ident should be abc"); // TODO: #21
     ASSERT_TRUE(funcDeclStmt->numParams == 1, "There should be 1 param for the function");
     TestResult res = assertIdentNode(testName, funcDeclStmt->params[0], "a");
     if (!res.pass) return res;
@@ -64,21 +46,8 @@ TEST(testParseFuncDeclStatement_with1Param, {
 })
 
 TEST(testParseFuncDeclStatement_with2Params_trailingComma, {
-    Token** tokens = ((Token* []) {
-        makeToken("func", TOKEN_FUNC),
-        makeToken("myFunc", TOKEN_IDENT),
-        makeToken("(", TOKEN_LPAREN),
-        makeToken("a", TOKEN_IDENT),
-        makeToken(",", TOKEN_COMMA),
-        makeToken("b", TOKEN_IDENT),
-        makeToken(",", TOKEN_COMMA),
-        makeToken(")", TOKEN_RPAREN),
-        makeToken("=", TOKEN_EQ),
-        makeToken("123", TOKEN_NUMBER),
-        makeToken("", TOKEN_EOF),
-    });
+    Parser p = parseString("func myFunc(a, b,) = 123");
 
-    Parser p = newParser(tokens);
     List* errorList = newList();
     List* nodes = parse(&p, &errorList);
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
@@ -88,7 +57,7 @@ TEST(testParseFuncDeclStatement_with2Params_trailingComma, {
                   "The node should have type NODE_TYPE_FUNC_DECL_STATEMENT");
 
     FuncDeclStmt* funcDeclStmt = n->as.funcDeclStmt;
-    ASSERT_EQ_STR("myFunc", funcDeclStmt->name->name, "The ident should be abc");
+    ASSERT_EQ_STR("myFunc", substring(funcDeclStmt->name->name, 6), "The ident should be abc"); // TODO: #21
     ASSERT_TRUE(funcDeclStmt->numParams == 2, "There should be 2 params for the function");
     TestResult res = assertIdentNode(testName, funcDeclStmt->params[0], "a");
     if (!res.pass) return res;
@@ -99,18 +68,8 @@ TEST(testParseFuncDeclStatement_with2Params_trailingComma, {
 })
 
 TEST(testParseFuncDeclStatement_blockAsBody, {
-    Token** tokens = ((Token* []) {
-        makeToken("func", TOKEN_FUNC),
-        makeToken("myFunc", TOKEN_IDENT),
-        makeToken("(", TOKEN_LPAREN),
-        makeToken(")", TOKEN_RPAREN),
-        makeToken("{", TOKEN_LBRACE),
-        makeToken("123", TOKEN_NUMBER),
-        makeToken("}", TOKEN_RBRACE),
-        makeToken("", TOKEN_EOF),
-    });
+    Parser p = parseString("func myFunc() = { 123 }");
 
-    Parser p = newParser(tokens);
     List* errorList = newList();
     List* nodes = parse(&p, &errorList);
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
@@ -120,7 +79,7 @@ TEST(testParseFuncDeclStatement_blockAsBody, {
                   "The node should have type NODE_TYPE_FUNC_DECL_STATEMENT");
 
     FuncDeclStmt* funcDeclStmt = n->as.funcDeclStmt;
-    ASSERT_EQ_STR("myFunc", funcDeclStmt->name->name, "The ident should be abc");
+    ASSERT_EQ_STR("myFunc", substring(funcDeclStmt->name->name, 6), "The ident should be abc"); // TODO: #21
     ASSERT_TRUE(funcDeclStmt->numParams == 0, "There should be no params for the function");
 
     ASSERT_EQ_STR("NODE_TYPE_BLOCK", astNodeTypes[funcDeclStmt->body->type],
@@ -131,16 +90,8 @@ TEST(testParseFuncDeclStatement_blockAsBody, {
 })
 
 TEST(testParseFuncDeclStatement_errorNoIdent, {
-    Token** tokens = ((Token* []) {
-        makeToken("func", TOKEN_FUNC),
-        makeToken("(", TOKEN_LPAREN),
-        makeToken(")", TOKEN_RPAREN),
-        makeToken("=", TOKEN_EQ),
-        makeToken("123", TOKEN_NUMBER),
-        makeToken("", TOKEN_EOF),
-    });
+    Parser p = parseString("func () = 123");
 
-    Parser p = newParser(tokens);
     List* errorList = newList();
     parse(&p, &errorList);
     ASSERT_EQ(1, errorList->count, "There should be 1 error");
@@ -151,16 +102,8 @@ TEST(testParseFuncDeclStatement_errorNoIdent, {
 })
 
 TEST(testParseFuncDeclStatement_errorNoLParen, {
-    Token** tokens = ((Token* []) {
-        makeToken("func", TOKEN_FUNC),
-        makeToken("myFunc", TOKEN_IDENT),
-        makeToken(")", TOKEN_RPAREN),
-        makeToken("=", TOKEN_EQ),
-        makeToken("123", TOKEN_NUMBER),
-        makeToken("", TOKEN_EOF),
-    });
+    Parser p = parseString("func myFunc) = 123");
 
-    Parser p = newParser(tokens);
     List* errorList = newList();
     parse(&p, &errorList);
     ASSERT_EQ(1, errorList->count, "There should be 1 error");
@@ -171,16 +114,8 @@ TEST(testParseFuncDeclStatement_errorNoLParen, {
 })
 
 TEST(testParseFuncDeclStatement_noParams_errorNoIdentOrRParen, {
-    Token** tokens = ((Token* []) {
-        makeToken("func", TOKEN_FUNC),
-        makeToken("myFunc", TOKEN_IDENT),
-        makeToken("(", TOKEN_LPAREN),
-        makeToken("=", TOKEN_EQ),
-        makeToken("123", TOKEN_NUMBER),
-        makeToken("", TOKEN_EOF),
-    });
+    Parser p = parseString("func myFunc( = 123");
 
-    Parser p = newParser(tokens);
     List* errorList = newList();
     parse(&p, &errorList);
     ASSERT_EQ(1, errorList->count, "There should be 1 error");
@@ -192,17 +127,8 @@ TEST(testParseFuncDeclStatement_noParams_errorNoIdentOrRParen, {
 })
 
 TEST(testParseFuncDeclStatement_1Param_errorNoCommaOrRParen, {
-    Token** tokens = ((Token* []) {
-        makeToken("func", TOKEN_FUNC),
-        makeToken("myFunc", TOKEN_IDENT),
-        makeToken("(", TOKEN_LPAREN),
-        makeToken("a", TOKEN_IDENT),
-        makeToken("=", TOKEN_EQ),
-        makeToken("123", TOKEN_NUMBER),
-        makeToken("", TOKEN_EOF),
-    });
+    Parser p = parseString("func myFunc(a = 123");
 
-    Parser p = newParser(tokens);
     List* errorList = newList();
     parse(&p, &errorList);
     ASSERT_EQ(1, errorList->count, "There should be 1 error");
@@ -214,18 +140,8 @@ TEST(testParseFuncDeclStatement_1Param_errorNoCommaOrRParen, {
 })
 
 TEST(testParseFuncDeclStatement_1ParamWithComma_errorNoRParen, {
-    Token** tokens = ((Token* []) {
-        makeToken("func", TOKEN_FUNC),
-        makeToken("myFunc", TOKEN_IDENT),
-        makeToken("(", TOKEN_LPAREN),
-        makeToken("a", TOKEN_IDENT),
-        makeToken(",", TOKEN_COMMA),
-        makeToken("=", TOKEN_EQ),
-        makeToken("123", TOKEN_NUMBER),
-        makeToken("", TOKEN_EOF),
-    });
+    Parser p = parseString("func myFunc(a, = 123");
 
-    Parser p = newParser(tokens);
     List* errorList = newList();
     parse(&p, &errorList);
     ASSERT_EQ(1, errorList->count, "There should be 1 error");
@@ -237,17 +153,8 @@ TEST(testParseFuncDeclStatement_1ParamWithComma_errorNoRParen, {
 })
 
 TEST(testParseFuncDeclStatement_errorNoEqOrLBrace, {
-    Token** tokens = ((Token* []) {
-        makeToken("func", TOKEN_FUNC),
-        makeToken("myFunc", TOKEN_IDENT),
-        makeToken("(", TOKEN_LPAREN),
-        makeToken("a", TOKEN_IDENT),
-        makeToken(")", TOKEN_RPAREN),
-        makeToken("123", TOKEN_NUMBER),
-        makeToken("", TOKEN_EOF),
-    });
+    Parser p = parseString("func myFunc(a) 123");
 
-    Parser p = newParser(tokens);
     List* errorList = newList();
     parse(&p, &errorList);
     ASSERT_EQ(1, errorList->count, "There should be 1 error");

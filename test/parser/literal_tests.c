@@ -4,15 +4,11 @@
 #include "parser/ast.h"
 #include "parser/ast.h"
 #include "parser/parser.h"
-#include "parser/utils.h"
+#include "test_utils.h"
 
 TEST(testParseIntLiteral, {
-    Token** tokens = ((Token* []) {
-        makeToken("1", TOKEN_NUMBER),
-        makeToken("", TOKEN_EOF),
-    });
+    Parser p = parseString("1");
 
-    Parser p = newParser(tokens);
     List* errorList = newList();
     List* nodes = parse(&p, &errorList);
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
@@ -21,12 +17,8 @@ TEST(testParseIntLiteral, {
 })
 
 TEST(testParseDoubleLiteral, {
-    Token** tokens = ((Token* []) {
-        makeToken("1.23", TOKEN_NUMBER),
-        makeToken("", TOKEN_EOF),
-    });
+    Parser p = parseString("1.23");
 
-    Parser p = newParser(tokens);
     List* errorList = newList();
     List* nodes = parse(&p, &errorList);
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
@@ -35,13 +27,8 @@ TEST(testParseDoubleLiteral, {
 })
 
 TEST(testParseBoolLiterals, {
-    Token** tokens = ((Token* []) {
-        makeToken("true", TOKEN_TRUE),
-        makeToken("false", TOKEN_FALSE),
-        makeToken("", TOKEN_EOF),
-    });
+    Parser p = parseString("true false");
 
-    Parser p = newParser(tokens);
     List* errorList = newList();
     List* nodes = parse(&p, &errorList);
     ASSERT_EQ(2, nodes->count, "There should be 2 elements in the list");
@@ -52,12 +39,8 @@ TEST(testParseBoolLiterals, {
 })
 
 TEST(testParseStringLiteral, {
-    Token** tokens = ((Token* []) {
-        makeToken("\"some string\"", TOKEN_STRING),
-        makeToken("", TOKEN_EOF),
-    });
+    Parser p = parseString("\"some string\"");
 
-    Parser p = newParser(tokens);
     List* errorList = newList();
     List* nodes = parse(&p, &errorList);
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
@@ -68,12 +51,8 @@ TEST(testParseStringLiteral, {
 })
 
 TEST(testParseNilLiteral, {
-    Token** tokens = ((Token* []) {
-        makeToken("nil", TOKEN_NIL),
-        makeToken("", TOKEN_EOF),
-    });
+    Parser p = parseString("nil");
 
-    Parser p = newParser(tokens);
     List* errorList = newList();
     List* nodes = parse(&p, &errorList);
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
@@ -82,12 +61,8 @@ TEST(testParseNilLiteral, {
 })
 
 TEST(testParseIdentifier, {
-    Token** tokens = ((Token* []) {
-        makeToken("abc", TOKEN_IDENT),
-        makeToken("", TOKEN_EOF),
-    });
+    Parser p = parseString("abc");
 
-    Parser p = newParser(tokens);
     List* errorList = newList();
     List* nodes = parse(&p, &errorList);
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");

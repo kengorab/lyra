@@ -4,8 +4,11 @@
 #include "test.h"
 #include "lexer/lexer.h"
 #include "parser/ast.h"
+#include "parser/parser.h"
 
 Token* makeToken(const char* contents, TokenType type);
+
+Parser parseString(char* sourceStr);
 
 TestResult assertIdentNode(const char* testName, Node* n, const char* name);
 

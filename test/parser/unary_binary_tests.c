@@ -1,19 +1,15 @@
 #include <string.h>
 
 #include "unary_binary_tests.h"
+#include "common/strings.h"
 #include "parser/ast.h"
 #include "parser/ast.h"
 #include "parser/parser.h"
-#include "parser/utils.h"
+#include "test_utils.h"
 
 TEST(testUnaryExpression_minus, {
-    Token** tokens = ((Token* []) {
-        makeToken("-", TOKEN_MINUS),
-        makeToken("1.23", TOKEN_NUMBER),
-        makeToken("", TOKEN_EOF),
-    });
+    Parser p = parseString("-1.23");
 
-    Parser p = newParser(tokens);
     List* errorList = newList();
     List* nodes = parse(&p, &errorList);
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
@@ -22,18 +18,13 @@ TEST(testUnaryExpression_minus, {
     ASSERT_EQ_STR("NODE_TYPE_UNARY", astNodeTypes[n->type], "The node should have type NODE_TYPE_UNARY");
     UnaryNode* unary = n->as.unaryNode;
 
-    ASSERT_EQ_STR("-", unary->token->start, "The token should be a minus");
+    ASSERT_EQ_STR("-", substring(unary->token->start, 1), "The token should be a minus"); // TODO: #21
     return assertLiteralNode(testName, unary->expr, LITERAL_NODE_DOUBLE, 1.23);
 })
 
 TEST(testUnaryExpression_negate, {
-    Token** tokens = ((Token* []) {
-        makeToken("!", TOKEN_BANG),
-        makeToken("true", TOKEN_TRUE),
-        makeToken("", TOKEN_EOF),
-    });
+    Parser p = parseString("!true");
 
-    Parser p = newParser(tokens);
     List* errorList = newList();
     List* nodes = parse(&p, &errorList);
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
@@ -42,19 +33,13 @@ TEST(testUnaryExpression_negate, {
     ASSERT_EQ_STR("NODE_TYPE_UNARY", astNodeTypes[n->type], "The node should have type NODE_TYPE_UNARY");
     UnaryNode* unary = n->as.unaryNode;
 
-    ASSERT_EQ_STR("!", unary->token->start, "The token should be a bang");
+    ASSERT_EQ_STR("!", substring(unary->token->start, 1), "The token should be a bang"); // TODO: #21
     return assertLiteralNode(testName, unary->expr, LITERAL_NODE_BOOL, true);
 })
 
 TEST(testBinaryExpression, {
-    Token** tokens = ((Token* []) {
-        makeToken("1", TOKEN_NUMBER),
-        makeToken("+", TOKEN_PLUS),
-        makeToken("2", TOKEN_NUMBER),
-        makeToken("", TOKEN_EOF),
-    });
+    Parser p = parseString("1 + 2");
 
-    Parser p = newParser(tokens);
     List* errorList = newList();
     List* nodes = parse(&p, &errorList);
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
@@ -66,29 +51,14 @@ TEST(testBinaryExpression, {
     TestResult res = assertLiteralNode(testName, binary->lExpr, LITERAL_NODE_INT, 1);
     if (!res.pass) return res;
 
-    ASSERT_EQ_STR("+", binary->token->start, "The token should be a +");
+    ASSERT_EQ_STR("+", substring(binary->token->start, 1), "The token should be a +"); // TODO: #21
     return assertLiteralNode(testName, binary->rExpr, LITERAL_NODE_INT, 2);
 })
 
 TEST(testBinaryExpression_precedences, {
-    // 1 + 2 * 3 >= 4 && false == true
     // (((1 + (2 * 3)) >= 4) && (false == true))
-    Token** tokens = ((Token* []) {
-        makeToken("1", TOKEN_NUMBER),
-        makeToken("+", TOKEN_PLUS),
-        makeToken("2", TOKEN_NUMBER),
-        makeToken("*", TOKEN_STAR),
-        makeToken("3", TOKEN_NUMBER),
-        makeToken(">=", TOKEN_GTE),
-        makeToken("4", TOKEN_NUMBER),
-        makeToken("&&", TOKEN_AND),
-        makeToken("false", TOKEN_FALSE),
-        makeToken("==", TOKEN_EQ_EQ),
-        makeToken("true", TOKEN_TRUE),
-        makeToken("", TOKEN_EOF),
-    });
+    Parser p = parseString("1 + 2 * 3 >= 4 && false == true");
 
-    Parser p = newParser(tokens);
     List* errorList = newList();
     List* nodes = parse(&p, &errorList);
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
@@ -98,11 +68,11 @@ TEST(testBinaryExpression_precedences, {
 
     // The && expr
     BinaryNode* binary = n->as.binaryNode;
-    ASSERT_EQ_STR("&&", binary->token->start, "The operator should be &&");
+    ASSERT_EQ_STR("&&", substring(binary->token->start, 2), "The operator should be &&"); // TODO: #21
 
     // The == expr
     BinaryNode* rhs = binary->rExpr->as.binaryNode;
-    ASSERT_EQ_STR("==", rhs->token->start, "The operator should be ==");
+    ASSERT_EQ_STR("==", substring(rhs->token->start, 2), "The operator should be =="); // TODO: #21
     TestResult res = assertLiteralNode(testName, rhs->lExpr, LITERAL_NODE_BOOL, false);
     if (!res.pass) return res;
     res = assertLiteralNode(testName, rhs->rExpr, LITERAL_NODE_BOOL, true);
@@ -110,19 +80,19 @@ TEST(testBinaryExpression_precedences, {
 
     // The >= expr
     binary = binary->lExpr->as.binaryNode;
-    ASSERT_EQ_STR(">=", binary->token->start, "The operator should be >=");
+    ASSERT_EQ_STR(">=", substring(binary->token->start, 2), "The operator should be >="); // TODO: #21
     res = assertLiteralNode(testName, binary->rExpr, LITERAL_NODE_INT, 4);
     if (!res.pass) return res;
 
     // The + expr
     binary = binary->lExpr->as.binaryNode;
-    ASSERT_EQ_STR("+", binary->token->start, "The operator should be +");
+    ASSERT_EQ_STR("+", substring(binary->token->start, 1), "The operator should be +"); // TODO: #21
     res = assertLiteralNode(testName, binary->lExpr, LITERAL_NODE_INT, 1);
     if (!res.pass) return res;
 
     // The * expr
     binary = binary->rExpr->as.binaryNode;
-    ASSERT_EQ_STR("*", binary->token->start, "The operator should be *");
+    ASSERT_EQ_STR("*", substring(binary->token->start, 1), "The operator should be *"); // TODO: #21
     res = assertLiteralNode(testName, binary->lExpr, LITERAL_NODE_INT, 2);
     if (!res.pass) return res;
     return assertLiteralNode(testName, binary->rExpr, LITERAL_NODE_INT, 3);

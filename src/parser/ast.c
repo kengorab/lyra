@@ -66,7 +66,7 @@ Node* newIdentifierNode(Token* token) {
 
     IdentifierNode* ident = malloc(sizeof(IdentifierNode));
     ident->token = token;
-    ident->name = token->start;
+    ident->name = token->start; // TODO: #21
 
     n->as.identifierNode = ident;
     return n;
@@ -167,6 +167,20 @@ Node* newBlockNode(Token* token, Node** exprs, int numExprs) {
     block->numExprs = numExprs;
 
     n->as.blockNode = block;
+    return n;
+}
+
+Node* newInvocationNode(Token* token, Node* target, int numArgs, Node** arguments) {
+    Node* n = malloc(sizeof(Node));
+    n->type = NODE_TYPE_INVOCATION;
+
+    InvocationNode* invocation = malloc(sizeof(InvocationNode));
+    invocation->token = token;
+    invocation->target = target;
+    invocation->numArgs = numArgs;
+    invocation->arguments = arguments;
+
+    n->as.invocationNode = invocation;
     return n;
 }
 

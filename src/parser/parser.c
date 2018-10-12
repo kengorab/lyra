@@ -149,6 +149,8 @@ static Node* parseUnary(Parser* parser, Token** token, ParseError** outErr);
 
 static Node* parseBinary(Parser* parser, Token** opToken, Node** lExpr, ParseError** outErr);
 
+static Node* parseInvocation(Parser* parser, Token** lParenToken, Node** lExpr, ParseError** outErr);
+
 static Node* parseLiteral(Parser* parser, Token** token, ParseError** outErr);
 
 static Node* parseIdentifier(Parser* parser, Token** token, ParseError** outErr);
@@ -181,7 +183,7 @@ ParseRule parseRules[] = { // These rules NEED to stay in Token order
     {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_RBRACK
     {.infixFn = NULL, .prefixFn = handleParseLBrace, .precedence = PREC_NONE},        // TOKEN_LBRACE
     {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_RBRACE
-    {.infixFn = NULL, .prefixFn = parseGrouping, .precedence = PREC_NONE},            // TOKEN_LPAREN
+    {.infixFn = parseInvocation, .prefixFn = parseGrouping, .precedence = PREC_CALL}, // TOKEN_LPAREN
     {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_RPAREN
     {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_DOT
     {.infixFn = NULL, .prefixFn = NULL, .precedence = PREC_NONE},                     // TOKEN_COMMA
@@ -288,6 +290,23 @@ static Node* parseBinary(Parser* parser, Token** opToken, Node** lExpr, ParseErr
 
     Node* rExpr = parsePrecedence(parser, prec, outErr);
     return newBinaryNode(*opToken, *lExpr, rExpr);
+}
+
+static Node* parseInvocation(Parser* parser, Token** lParenToken, Node** targetExpr, ParseError** outErr) {
+    List* args = newList();
+    while (PEEK(parser)->type != TOKEN_RPAREN && !IS_AT_END(parser)) {
+        Node* elem = parsePrecedence(parser, PREC_CALL, outErr);
+        listAdd(args, (void**) &elem);
+        if (PEEK(parser)->type == TOKEN_COMMA)
+            advance(parser); // Consume the ","
+        else if (PEEK(parser)->type != TOKEN_RPAREN) {
+            *outErr = newParseError(PEEK(parser), 2, TOKEN_COMMA, TOKEN_RPAREN);
+            return NULL;
+        }
+    }
+    advance(parser); // Consume the ")"
+
+    return newInvocationNode(*lParenToken, *targetExpr, args->count, (Node**) args->values);
 }
 
 static Node* parseArray(Parser* parser, Token** token, ParseError** outErr) {
