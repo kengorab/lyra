@@ -1,7 +1,9 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <common/strings.h>
 
 #include "parser/parser.h"
+#include "ast.h"
 
 /* Functions/macros for moving the cursor around */
 #define PEEK(parser) (*parser->current)
@@ -294,7 +296,19 @@ static Node* parseBinary(Parser* parser, Token** opToken, Node** lExpr, ParseErr
 
 static Node* parseInvocation(Parser* parser, Token** lParenToken, Node** targetExpr, ParseError** outErr) {
     List* args = newList();
+    List* argNames = newList();
     while (PEEK(parser)->type != TOKEN_RPAREN && !IS_AT_END(parser)) {
+        char* argName;
+        if (PEEK(parser)->type == TOKEN_IDENT && PEEK_NEXT(parser)->type == TOKEN_COLON) {
+            Token* argNameToken = advance(parser); // Consume arg name
+            IdentifierNode* argNameIdent = parseIdentifier(parser, &argNameToken, outErr)->as.identifierNode;
+            advance(parser); // Consume ':'
+            argName = substring(argNameIdent->name, (size_t) argNameIdent->token->length); // TODO: #21
+        } else {
+            argName = "";
+        }
+        listAdd(argNames, (void**) &argName);
+
         Node* elem = parsePrecedence(parser, PREC_CALL, outErr);
         listAdd(args, (void**) &elem);
         if (PEEK(parser)->type == TOKEN_COMMA)
@@ -306,7 +320,7 @@ static Node* parseInvocation(Parser* parser, Token** lParenToken, Node** targetE
     }
     advance(parser); // Consume the ")"
 
-    return newInvocationNode(*lParenToken, *targetExpr, args->count, (Node**) args->values);
+    return newInvocationNode(*lParenToken, *targetExpr, args->count, (Node**) args->values, (char**) argNames->values);
 }
 
 static Node* parseArray(Parser* parser, Token** token, ParseError** outErr) {

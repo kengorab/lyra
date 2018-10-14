@@ -170,7 +170,7 @@ Node* newBlockNode(Token* token, Node** exprs, int numExprs) {
     return n;
 }
 
-Node* newInvocationNode(Token* token, Node* target, int numArgs, Node** arguments) {
+Node* newInvocationNode(Token* token, Node* target, int numArgs, Node** arguments, char** argNames) {
     Node* n = malloc(sizeof(Node));
     n->type = NODE_TYPE_INVOCATION;
 
@@ -179,6 +179,7 @@ Node* newInvocationNode(Token* token, Node* target, int numArgs, Node** argument
     invocation->target = target;
     invocation->numArgs = numArgs;
     invocation->arguments = arguments;
+    invocation->argNames = argNames;
 
     n->as.invocationNode = invocation;
     return n;

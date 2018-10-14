@@ -8,7 +8,7 @@
 #include "common/list.h"
 
 int main(int argc, char** argv) {
-    char* source = "a + b(1, 2)(3)";
+    char* source = "abc(a: a(1, c: 4), b: 3)";
     if (argc == 2) {
         source = argv[1];
     }
