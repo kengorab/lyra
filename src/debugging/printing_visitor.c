@@ -76,11 +76,17 @@ static void visitInvocationNode(InvocationNode* node) {
     visit(node->target);
     printf("(");
     for (int i = 0; i < node->numArgs - 1; ++i) {
+        if (strlen(node->argNames[i]) != 0) {
+            printf("%s: ", node->argNames[i]);
+        }
         visit(node->arguments[i]);
         printf(", ");
     }
 
     if (node->numArgs >= 1) {
+        if (strlen(node->argNames[node->numArgs - 1]) != 0) {
+            printf("%s: ", node->argNames[node->numArgs - 1]);
+        }
         visit(node->arguments[node->numArgs - 1]);
     }
     printf(")");

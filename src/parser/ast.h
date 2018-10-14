@@ -130,6 +130,7 @@ typedef struct {
     Node* target;
     int numArgs;
     Node** arguments;
+    char** argNames;
 } InvocationNode;
 
 // ------------------------------------
@@ -193,7 +194,7 @@ Node* newIfElseNode(Token* token, Node* condExpr, Node* thenExpr, Node* elseExpr
 
 Node* newBlockNode(Token* token, Node** exprs, int numExprs);
 
-Node* newInvocationNode(Token* token, Node* target, int numArgs, Node** arguments);
+Node* newInvocationNode(Token* token, Node* target, int numArgs, Node** arguments, char** argNames);
 
 Node* newValDeclStmtNode(Token* token, Node* identNode, Node* assignment, bool isMutable);
 
