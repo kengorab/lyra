@@ -1,7 +1,6 @@
 #include <string.h>
 
 #include "unary_binary_tests.h"
-#include "common/strings.h"
 #include "parser/ast.h"
 #include "parser/ast.h"
 #include "parser/parser.h"
@@ -18,7 +17,7 @@ TEST(testUnaryExpression_minus, {
     ASSERT_EQ_STR("NODE_TYPE_UNARY", astNodeTypes[n->type], "The node should have type NODE_TYPE_UNARY");
     UnaryNode* unary = n->as.unaryNode;
 
-    ASSERT_EQ_STR("-", substring(unary->token->start, 1), "The token should be a minus"); // TODO: #21
+    ASSERT_EQ_STR("-", tokenGetValue(unary->token), "The token should be a minus");
     return assertLiteralNode(testName, unary->expr, LITERAL_NODE_DOUBLE, 1.23);
 })
 
@@ -33,7 +32,7 @@ TEST(testUnaryExpression_negate, {
     ASSERT_EQ_STR("NODE_TYPE_UNARY", astNodeTypes[n->type], "The node should have type NODE_TYPE_UNARY");
     UnaryNode* unary = n->as.unaryNode;
 
-    ASSERT_EQ_STR("!", substring(unary->token->start, 1), "The token should be a bang"); // TODO: #21
+    ASSERT_EQ_STR("!", tokenGetValue(unary->token), "The token should be a bang");
     return assertLiteralNode(testName, unary->expr, LITERAL_NODE_BOOL, true);
 })
 
@@ -51,7 +50,7 @@ TEST(testBinaryExpression, {
     TestResult res = assertLiteralNode(testName, binary->lExpr, LITERAL_NODE_INT, 1);
     if (!res.pass) return res;
 
-    ASSERT_EQ_STR("+", substring(binary->token->start, 1), "The token should be a +"); // TODO: #21
+    ASSERT_EQ_STR("+", tokenGetValue(binary->token), "The token should be a +");
     return assertLiteralNode(testName, binary->rExpr, LITERAL_NODE_INT, 2);
 })
 
@@ -68,11 +67,11 @@ TEST(testBinaryExpression_precedences, {
 
     // The && expr
     BinaryNode* binary = n->as.binaryNode;
-    ASSERT_EQ_STR("&&", substring(binary->token->start, 2), "The operator should be &&"); // TODO: #21
+    ASSERT_EQ_STR("&&", tokenGetValue(binary->token), "The operator should be &&");
 
     // The == expr
     BinaryNode* rhs = binary->rExpr->as.binaryNode;
-    ASSERT_EQ_STR("==", substring(rhs->token->start, 2), "The operator should be =="); // TODO: #21
+    ASSERT_EQ_STR("==", tokenGetValue(rhs->token), "The operator should be ==");
     TestResult res = assertLiteralNode(testName, rhs->lExpr, LITERAL_NODE_BOOL, false);
     if (!res.pass) return res;
     res = assertLiteralNode(testName, rhs->rExpr, LITERAL_NODE_BOOL, true);
@@ -80,19 +79,19 @@ TEST(testBinaryExpression_precedences, {
 
     // The >= expr
     binary = binary->lExpr->as.binaryNode;
-    ASSERT_EQ_STR(">=", substring(binary->token->start, 2), "The operator should be >="); // TODO: #21
+    ASSERT_EQ_STR(">=", tokenGetValue(binary->token), "The operator should be >=");
     res = assertLiteralNode(testName, binary->rExpr, LITERAL_NODE_INT, 4);
     if (!res.pass) return res;
 
     // The + expr
     binary = binary->lExpr->as.binaryNode;
-    ASSERT_EQ_STR("+", substring(binary->token->start, 1), "The operator should be +"); // TODO: #21
+    ASSERT_EQ_STR("+", tokenGetValue(binary->token), "The operator should be +");
     res = assertLiteralNode(testName, binary->lExpr, LITERAL_NODE_INT, 1);
     if (!res.pass) return res;
 
     // The * expr
     binary = binary->rExpr->as.binaryNode;
-    ASSERT_EQ_STR("*", substring(binary->token->start, 1), "The operator should be *"); // TODO: #21
+    ASSERT_EQ_STR("*", tokenGetValue(binary->token), "The operator should be *");
     res = assertLiteralNode(testName, binary->lExpr, LITERAL_NODE_INT, 2);
     if (!res.pass) return res;
     return assertLiteralNode(testName, binary->rExpr, LITERAL_NODE_INT, 3);

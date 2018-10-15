@@ -42,7 +42,7 @@ static void visitBinaryNode(BinaryNode* node) {
 }
 
 static void visitIdentifierNode(IdentifierNode* identifierNode) {
-    printf("%.*s", identifierNode->token->length, identifierNode->name);
+    printf("%s", identifierNode->name);
 }
 
 static void visitIfElseNode(IfElseNode* ifElseNode) {

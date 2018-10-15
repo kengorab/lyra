@@ -1,7 +1,6 @@
 #include <string.h>
 
 #include "object_tests.h"
-#include "common/strings.h"
 #include "parser/ast.h"
 #include "parser/ast.h"
 #include "parser/parser.h"
@@ -22,12 +21,12 @@ TEST(testObjectLiteralExpression, {
     ASSERT_EQ(2, obj->size, "There should be 2 entries in the object");
 
     ObjectLiteralEntry* entry = obj->entries[0];
-    ASSERT_EQ_STR("key1", substring(entry->ident->as.identifierNode->name, 4), "The first key should be key1"); // TODO: #21
+    ASSERT_EQ_STR("key1", entry->ident->as.identifierNode->name, "The first key should be key1");
     TestResult res = assertLiteralNode(testName, entry->value, LITERAL_NODE_INT, 1);
     if (!res.pass) return res;
 
     entry = obj->entries[1];
-    ASSERT_EQ_STR("key2", substring(entry->ident->as.identifierNode->name, 4), "The second key should be key2"); // TODO: #21
+    ASSERT_EQ_STR("key2", entry->ident->as.identifierNode->name, "The second key should be key2");
     return assertLiteralNode(testName, entry->value, LITERAL_NODE_STRING, "\"hello\"", 7);
 })
 
@@ -44,16 +43,16 @@ TEST(testObjectLiteralExpression_trailingCommas, {
     ObjectLiteralNode* obj = n->as.objectLiteralNode;
 
     ASSERT_EQ(2, obj->size, "There should be 2 entries in the object");
-    ASSERT_EQ_STR("key1", substring(obj->keys[0]->as.identifierNode->name, 4), "The first key should be key1");
-    ASSERT_EQ_STR("key2", substring(obj->keys[1]->as.identifierNode->name, 4), "The second key should be key2");
+    ASSERT_EQ_STR("key1", obj->keys[0]->as.identifierNode->name, "The first key should be key1");
+    ASSERT_EQ_STR("key2", obj->keys[1]->as.identifierNode->name, "The second key should be key2");
 
     ObjectLiteralEntry* entry = obj->entries[0];
-    ASSERT_EQ_STR("key1", substring(entry->ident->as.identifierNode->name, 4), "The first key should be key1");
+    ASSERT_EQ_STR("key1", entry->ident->as.identifierNode->name, "The first key should be key1");
     TestResult res = assertLiteralNode(testName, entry->value, LITERAL_NODE_INT, 1);
     if (!res.pass) return res;
 
     entry = obj->entries[1];
-    ASSERT_EQ_STR("key2", substring(entry->ident->as.identifierNode->name, 4), "The second key should be key2");
+    ASSERT_EQ_STR("key2", entry->ident->as.identifierNode->name, "The second key should be key2");
     return assertLiteralNode(testName, entry->value, LITERAL_NODE_STRING, "\"hello\"", 7);
 })
 

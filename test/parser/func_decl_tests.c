@@ -1,7 +1,6 @@
 #include <string.h>
 
 #include "func_decl_tests.h"
-#include "common/strings.h"
 #include "parser/ast.h"
 #include "parser/ast.h"
 #include "parser/parser.h"
@@ -19,7 +18,7 @@ TEST(testParseFuncDeclStatement_noParams, {
                   "The node should have type NODE_TYPE_FUNC_DECL_STATEMENT");
 
     FuncDeclStmt* funcDeclStmt = n->as.funcDeclStmt;
-    ASSERT_EQ_STR("myFunc", substring(funcDeclStmt->name->name, 6), "The ident should be myFunc"); // TODO: #21
+    ASSERT_EQ_STR("myFunc", funcDeclStmt->name->name, "The ident should be myFunc");
     ASSERT_TRUE(funcDeclStmt->numParams == 0, "There should be no params for the function");
 
     return assertLiteralNode(testName, funcDeclStmt->body, LITERAL_NODE_INT, 123);
@@ -37,7 +36,7 @@ TEST(testParseFuncDeclStatement_with1Param, {
                   "The node should have type NODE_TYPE_FUNC_DECL_STATEMENT");
 
     FuncDeclStmt* funcDeclStmt = n->as.funcDeclStmt;
-    ASSERT_EQ_STR("myFunc", substring(funcDeclStmt->name->name, 6), "The ident should be abc"); // TODO: #21
+    ASSERT_EQ_STR("myFunc", funcDeclStmt->name->name, "The ident should be abc");
     ASSERT_TRUE(funcDeclStmt->numParams == 1, "There should be 1 param for the function");
     TestResult res = assertIdentNode(testName, funcDeclStmt->params[0], "a");
     if (!res.pass) return res;
@@ -57,7 +56,7 @@ TEST(testParseFuncDeclStatement_with2Params_trailingComma, {
                   "The node should have type NODE_TYPE_FUNC_DECL_STATEMENT");
 
     FuncDeclStmt* funcDeclStmt = n->as.funcDeclStmt;
-    ASSERT_EQ_STR("myFunc", substring(funcDeclStmt->name->name, 6), "The ident should be abc"); // TODO: #21
+    ASSERT_EQ_STR("myFunc", funcDeclStmt->name->name, "The ident should be abc");
     ASSERT_TRUE(funcDeclStmt->numParams == 2, "There should be 2 params for the function");
     TestResult res = assertIdentNode(testName, funcDeclStmt->params[0], "a");
     if (!res.pass) return res;
@@ -79,7 +78,7 @@ TEST(testParseFuncDeclStatement_blockAsBody, {
                   "The node should have type NODE_TYPE_FUNC_DECL_STATEMENT");
 
     FuncDeclStmt* funcDeclStmt = n->as.funcDeclStmt;
-    ASSERT_EQ_STR("myFunc", substring(funcDeclStmt->name->name, 6), "The ident should be abc"); // TODO: #21
+    ASSERT_EQ_STR("myFunc", funcDeclStmt->name->name, "The ident should be abc");
     ASSERT_TRUE(funcDeclStmt->numParams == 0, "There should be no params for the function");
 
     ASSERT_EQ_STR("NODE_TYPE_BLOCK", astNodeTypes[funcDeclStmt->body->type],

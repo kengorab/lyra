@@ -66,7 +66,7 @@ Node* newIdentifierNode(Token* token) {
 
     IdentifierNode* ident = malloc(sizeof(IdentifierNode));
     ident->token = token;
-    ident->name = token->start; // TODO: #21
+    ident->name = tokenGetValue(token);
 
     n->as.identifierNode = ident;
     return n;
