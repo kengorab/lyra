@@ -56,7 +56,7 @@ TEST(testBlockExpression_statementsAndExpressions, {
                   "The node should have type NODE_TYPE_VAL_DECL_STATEMENT");
 
     ValDeclStmt* valDeclStmt = firstStmt->as.valDeclStmt;
-    ASSERT_EQ_STR("a", substring(valDeclStmt->ident->name, 1), "The ident should be 'a'"); // TODO: #21
+    ASSERT_EQ_STR("a", valDeclStmt->ident->name, "The ident should be 'a'");
     ASSERT_FALSE(valDeclStmt->isMutable, "The binding should be declared as immutable");
     TestResult res = assertLiteralNode(testName, valDeclStmt->assignment, LITERAL_NODE_STRING, "\"expression!\"", 13);
     if (!res.pass) return res;
@@ -73,7 +73,7 @@ TEST(testBlockExpression_assignmentToVal, {
     Node* n = nodes->values[0];
     ASSERT_EQ_STR("NODE_TYPE_VAL_DECL_STATEMENT", astNodeTypes[n->type],
                   "The node should have type NODE_TYPE_VAL_DECL_STATEMENT");
-    ASSERT_EQ_STR("a", substring(n->as.valDeclStmt->ident->name, 1), "The ident should be 'a'"); // TODO: #21
+    ASSERT_EQ_STR("a", n->as.valDeclStmt->ident->name, "The ident should be 'a'");
 
     BlockNode* blockNode = n->as.valDeclStmt->assignment->as.blockNode;
     ASSERT_EQ(1, blockNode->numExprs, "There should be 1 expression-statement within the block node");

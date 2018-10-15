@@ -1,7 +1,6 @@
 #include <string.h>
 
 #include "val_decl_tests.h"
-#include "common/strings.h"
 #include "parser/ast.h"
 #include "parser/ast.h"
 #include "parser/parser.h"
@@ -19,7 +18,7 @@ TEST(testParseValDeclStatement, {
                   "The node should have type NODE_TYPE_VAL_DECL_STATEMENT");
 
     ValDeclStmt* valDeclStmt = n->as.valDeclStmt;
-    ASSERT_EQ_STR("someValue", substring(valDeclStmt->ident->name, 9), "The ident should be someValue"); // TODO: #21
+    ASSERT_EQ_STR("someValue", valDeclStmt->ident->name, "The ident should be someValue");
     ASSERT_FALSE(valDeclStmt->isMutable, "The binding should be declared as immutable");
     return assertLiteralNode(testName, valDeclStmt->assignment, LITERAL_NODE_INT, 123);
 })
@@ -37,7 +36,7 @@ TEST(testParseValDeclStatements, {
                   "The node should have type NODE_TYPE_VAL_DECL_STATEMENT");
 
     ValDeclStmt* valDeclStmt = n->as.valDeclStmt;
-    ASSERT_EQ_STR("someValue", substring(valDeclStmt->ident->name, 9), "The ident should be someValue"); // TODO: #21
+    ASSERT_EQ_STR("someValue", valDeclStmt->ident->name, "The ident should be someValue");
     ASSERT_FALSE(valDeclStmt->isMutable, "The binding should be declared as immutable");
     TestResult res = assertLiteralNode(testName, valDeclStmt->assignment, LITERAL_NODE_INT, 123);
     if (!res.pass) return res;
@@ -47,7 +46,7 @@ TEST(testParseValDeclStatements, {
                   "The node should have type NODE_TYPE_VAL_DECL_STATEMENT");
 
     valDeclStmt = n->as.valDeclStmt;
-    ASSERT_EQ_STR("someValue2", substring(valDeclStmt->ident->name, 10), "The ident should be someValue2"); // TODO: #21
+    ASSERT_EQ_STR("someValue2", valDeclStmt->ident->name, "The ident should be someValue2");
     ASSERT_FALSE(valDeclStmt->isMutable, "The binding should be declared as immutable");
     return assertLiteralNode(testName, valDeclStmt->assignment, LITERAL_NODE_STRING, "\"hello!\"", 8);
 })
@@ -100,7 +99,7 @@ TEST(testParseVarDeclStatement_noAssignment, {
                   "The node should have type NODE_TYPE_VAL_DECL_STATEMENT");
 
     ValDeclStmt* valDeclStmt = n->as.valDeclStmt;
-    ASSERT_EQ_STR("someValue", substring(valDeclStmt->ident->name, 9), "The ident should be someValue"); // TODO: #21
+    ASSERT_EQ_STR("someValue", valDeclStmt->ident->name, "The ident should be someValue");
     ASSERT_TRUE(valDeclStmt->isMutable, "The binding should be declared as mutable");
     ASSERT_TRUE(valDeclStmt->assignment == NULL, "The binding shouldn't have an assignment");
 })
@@ -117,7 +116,7 @@ TEST(testParseVarDeclStatement_withAssignment, {
                   "The node should have type NODE_TYPE_VAL_DECL_STATEMENT");
 
     ValDeclStmt* valDeclStmt = n->as.valDeclStmt;
-    ASSERT_EQ_STR("someValue", substring(valDeclStmt->ident->name, 9), "The ident should be someValue"); // TODO: #21
+    ASSERT_EQ_STR("someValue", valDeclStmt->ident->name, "The ident should be someValue");
     ASSERT_TRUE(valDeclStmt->isMutable, "The binding should be declared as mutable");
     return assertLiteralNode(testName, valDeclStmt->assignment, LITERAL_NODE_INT, 123);
 })

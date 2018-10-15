@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <common/strings.h>
 
 #include "parser/parser.h"
 #include "ast.h"
@@ -151,7 +150,7 @@ static Node* parseUnary(Parser* parser, Token** token, ParseError** outErr);
 
 static Node* parseBinary(Parser* parser, Token** opToken, Node** lExpr, ParseError** outErr);
 
-static Node* parseInvocation(Parser* parser, Token** lParenToken, Node** lExpr, ParseError** outErr);
+static Node* parseInvocation(Parser* parser, Token** lParenToken, Node** targetExpr, ParseError** outErr);
 
 static Node* parseLiteral(Parser* parser, Token** token, ParseError** outErr);
 
@@ -298,12 +297,12 @@ static Node* parseInvocation(Parser* parser, Token** lParenToken, Node** targetE
     List* args = newList();
     List* argNames = newList();
     while (PEEK(parser)->type != TOKEN_RPAREN && !IS_AT_END(parser)) {
-        char* argName;
+        const char* argName;
         if (PEEK(parser)->type == TOKEN_IDENT && PEEK_NEXT(parser)->type == TOKEN_COLON) {
             Token* argNameToken = advance(parser); // Consume arg name
             IdentifierNode* argNameIdent = parseIdentifier(parser, &argNameToken, outErr)->as.identifierNode;
             advance(parser); // Consume ':'
-            argName = substring(argNameIdent->name, (size_t) argNameIdent->token->length); // TODO: #21
+            argName = argNameIdent->name;
         } else {
             argName = "";
         }

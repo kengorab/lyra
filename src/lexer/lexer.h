@@ -65,6 +65,8 @@ typedef struct {
     int col;
 } Token;
 
+const char* tokenGetValue(Token* token);
+
 #define PRINT_TOKEN(pToken) \
     printf("Token { type: %s, line: %d, col: %d, contents: \"%.*s\" }\n",\
            tokenTypes[pToken->type], pToken->line, pToken->col, pToken->length, pToken->start)

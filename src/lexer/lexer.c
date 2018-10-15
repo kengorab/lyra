@@ -4,6 +4,7 @@
 #include <stdbool.h>
 
 #include "lexer/lexer.h"
+#include "common/strings.h"
 
 /* Functions/macros for moving the cursor around */
 #define PEEK(lexer) *lexer->current
@@ -21,6 +22,10 @@ static char advance(Lexer* lexer) {
 #define IS_ALPHA(ch) ('a' <= ch && ch <= 'z' || 'A' <= ch && ch <= 'Z')
 
 const char* tokenTypes[] = {TOKEN_TYPES};
+
+const char* tokenGetValue(Token* token) {
+    return substring(token->start, (size_t) token->length);
+}
 
 Lexer newLexer(char* source) {
     Lexer l = {
