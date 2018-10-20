@@ -8,7 +8,8 @@
 #include "common/list.h"
 
 int main(int argc, char** argv) {
-    char* source = "abc(a: a(1, c: 4), b: 3)";
+    char* source = "type Opt[T] = Some[T] | None\n"
+                   "type Names = List[{ name: [Opt[String], String] }]";
     if (argc == 2) {
         source = argv[1];
     }

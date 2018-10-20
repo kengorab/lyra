@@ -12,6 +12,7 @@
 #include "val_decl_tests.h"
 #include "func_decl_tests.h"
 #include "invocation_tests.h"
+#include "type_decl_tests.h"
 
 void runParserTests(Tester* tester) {
     tester->startSuite("Parser");
@@ -37,9 +38,12 @@ void runParserTests(Tester* tester) {
     tester->startSubsuite("Parser", "Val+Var");
     runValDeclTests(tester);
 
-    tester->startSubsuite("Parser", "Func");
+    tester->startSubsuite("Parser", "Func-Declaration");
     runFuncDeclTests(tester);
 
     tester->startSubsuite("Parser", "Invocation");
     runInvocationTests(tester);
+
+    tester->startSubsuite("Parser", "Type-Declaration");
+    runTypeDeclTests(tester);
 }

@@ -22,6 +22,8 @@ Parser newParser(Token** tokens) {
     return p;
 }
 
+static TypeExpr* parseTypeExpr(Parser* parser, ParseError** outErr);
+
 static Node* parseExpression(Parser* parser, ParseError** outErr);
 
 static Node* parseBlock(Parser* parser, Token** token, ParseError** outErr);
@@ -128,12 +130,56 @@ static Node* parseFuncDeclStmt(Parser* parser, ParseError** outErr) {
     return newFuncDeclStmtNode(funcToken, newIdentifierNode(identTok), params->count, (Node**) params->values, body);
 }
 
+static Node* parseTypeDeclStmt(Parser* parser, ParseError** outErr) {
+    Token* typeToken = advance(parser); // Consume "type" token
+    if (PEEK(parser)->type != TOKEN_IDENT) {
+        *outErr = newParseError(PEEK(parser), 1, TOKEN_IDENT);
+        return NULL;
+    }
+    Token* identTok = advance(parser);
+    IdentifierNode* name = newIdentifierNode(identTok)->as.identifierNode;
+
+    List* typeArgs = newList();
+    if (PEEK(parser)->type == TOKEN_LBRACK) {
+        advance(parser); // Consume '['
+        while (PEEK(parser)->type != TOKEN_RBRACK && !IS_AT_END(parser)) {
+            if (PEEK(parser)->type != TOKEN_IDENT) {
+                *outErr = newParseError(PEEK(parser), 2, TOKEN_IDENT, TOKEN_RBRACK);
+                return NULL;
+            }
+
+            Token* paramTok = advance(parser);
+            IdentifierNode* typeArg = newIdentifierNode(paramTok)->as.identifierNode;
+            listAdd(typeArgs, (void**) &typeArg);
+
+            if (PEEK(parser)->type == TOKEN_COMMA)
+                advance(parser); // Consume the ","
+            else if (PEEK(parser)->type != TOKEN_RBRACK) {
+                *outErr = newParseError(PEEK(parser), 2, TOKEN_COMMA, TOKEN_RBRACK);
+                return NULL;
+            }
+        }
+        advance(parser); // Consume "]"
+    }
+
+    if (PEEK(parser)->type != TOKEN_EQ) {
+        *outErr = newParseError(PEEK(parser), 1, TOKEN_EQ);
+        return NULL;
+    }
+    advance(parser); // Consume "="
+
+    TypeExpr* typeExpr = parseTypeExpr(parser, outErr);
+
+    return newTypeDeclStmtNode(typeToken, name, typeExpr, typeArgs->count, (IdentifierNode**) typeArgs->values);
+}
+
 static Node* parseStatement(Parser* parser, ParseError** outErr) {
     Token* token = PEEK(parser);
     switch (token->type) {
         case TOKEN_VAL: return parseValDeclStmt(parser, outErr);
         case TOKEN_VAR: return parseVarDeclStmt(parser, outErr);
         case TOKEN_FUNC: return parseFuncDeclStmt(parser, outErr);
+        case TOKEN_TYPE: return parseTypeDeclStmt(parser, outErr);
         default: return parseExpression(parser, outErr);
     }
 }
@@ -459,6 +505,128 @@ static Node* parseIfElseExpr(Parser* parser, Token** token, ParseError** outErr)
 static Node* parseExpression(Parser* parser, ParseError** outErr) {
     return parsePrecedence(parser, PREC_ASSIGNMENT, outErr); // Start with lowest precedence
 }
+
+// ------------------------------------
+//             Type Exprs
+// ------------------------------------
+
+static TypeExpr* parseStructTypeExpr(Parser* parser, ParseError** outErr) {
+    Token* lBrace = advance(parser); // Consume '{'
+
+    List* keys = newList();
+    List* fields = newList();
+    while (!IS_AT_END(parser) && PEEK(parser)->type != TOKEN_RBRACE) {
+        if (PEEK(parser)->type != TOKEN_IDENT) {
+            *outErr = newParseError(PEEK(parser), 1, TOKEN_IDENT);
+            return NULL;
+        }
+        Token* keyToken = advance(parser);
+        Node* key = parseIdentifier(parser, &keyToken, outErr);
+        listAdd(keys, (void**) &key);
+
+        if (PEEK(parser)->type != TOKEN_COLON) {
+            *outErr = newParseError(PEEK(parser), 1, TOKEN_COLON);
+            return NULL;
+        }
+        advance(parser); // Consume ":"
+
+        TypeExpr* field = parseTypeExpr(parser, outErr);
+        if (field == NULL) {
+            if (*outErr == NULL)
+                *outErr = newParseError(PEEK(parser), 0, "type expression");
+            return NULL;
+        }
+
+        if (PEEK(parser)->type == TOKEN_COMMA)
+            advance(parser); // Consume the ","
+        else if (PEEK(parser)->type != TOKEN_RBRACE) {
+            if (*outErr == NULL)
+                *outErr = newParseError(PEEK(parser), 2, TOKEN_COMMA, TOKEN_RBRACE);
+            return NULL;
+        }
+
+        listAdd(fields, (void**) &field);
+    }
+    advance(parser); // Consume "}"
+
+    return newStructTypeExpr(lBrace, keys->count, (Node**) keys->values, (TypeExpr**) fields->values);
+}
+
+static TypeExpr* parseTupleTypeExpr(Parser* parser, ParseError** outErr) {
+    Token* lBrack = advance(parser); // Consume '['
+
+    List* typeArgs = newList();
+    while (!IS_AT_END(parser) && PEEK(parser)->type != TOKEN_RBRACK) {
+        TypeExpr* typeArg = parseTypeExpr(parser, outErr);
+        if (*outErr != NULL) {
+            return NULL;
+        }
+
+        if (PEEK(parser)->type == TOKEN_COMMA)
+            advance(parser); // Consume the ","
+        else if (PEEK(parser)->type != TOKEN_RBRACK) {
+            if (*outErr == NULL)
+                *outErr = newParseError(PEEK(parser), 2, TOKEN_COMMA, TOKEN_RBRACK);
+            return NULL;
+        }
+
+        listAdd(typeArgs, (void**) &typeArg);
+    }
+    advance(parser); // Consume "]"
+
+    return newTupleTypeExpr(lBrack, typeArgs->count, (TypeExpr**) typeArgs->values);
+}
+
+static TypeExpr* parseBasicTypeExpr(Parser* parser, ParseError** outErr) {
+    if (PEEK(parser)->type != TOKEN_IDENT) {
+        if (*outErr == NULL)
+            *outErr = newParseError(PEEK(parser), 1, TOKEN_IDENT);
+        return NULL;
+    }
+
+    Token* identToken = advance(parser);
+    IdentifierNode* ident = newIdentifierNode(identToken)->as.identifierNode;
+    if (PEEK(parser)->type == TOKEN_LBRACK) {
+        TypeExpr* typeArgs = parseTupleTypeExpr(parser, outErr);
+        return newBasicTypeExpr(identToken, ident, typeArgs->numArgs, typeArgs->typeArgs);
+    }
+    return newBasicTypeExpr(identToken, ident, 0, NULL);
+}
+
+static TypeExpr* parseTypeExpr(Parser* parser, ParseError** outErr) {
+    if (PEEK(parser)->type == TOKEN_LBRACE) {
+        return parseStructTypeExpr(parser, outErr);
+    }
+
+    if (PEEK(parser)->type == TOKEN_LBRACK) {
+        return parseTupleTypeExpr(parser, outErr);
+    }
+
+    TypeExpr* basicType = parseBasicTypeExpr(parser, outErr);
+    if (*outErr != NULL) {
+        return NULL;
+    }
+
+    if (PEEK(parser)->type == TOKEN_PIPE) {
+        List* enumOpts = newList();
+        listAdd(enumOpts, (void**) &basicType);
+
+        while (!IS_AT_END(parser) && PEEK(parser)->type == TOKEN_PIPE) {
+            advance(parser); // Consume '|'
+
+            TypeExpr* enumOpt = parseBasicTypeExpr(parser, outErr);
+            listAdd(enumOpts, (void**) &enumOpt);
+        }
+
+        return newEnumTypeExpr(basicType->token, enumOpts->count, (TypeExpr**)enumOpts->values);
+    }
+
+    return basicType;
+}
+
+// ------------------------------------
+//             Entrypoint
+// ------------------------------------
 
 static void skipToNextSafeZone(Parser* parser) {
     while (!IS_AT_END(parser) && PEEK(parser)->type != TOKEN_VAL)
