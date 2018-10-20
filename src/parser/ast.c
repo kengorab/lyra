@@ -8,6 +8,8 @@ const char* astNodeTypes[] = {AST_NODE_TYPES};
 
 const char* literalNodeTypes[] = {LITERAL_NODE_TYPES};
 
+const char* typeExprTypes[] = {TYPE_EXPR_TYPES};
+
 // ------------------------------------
 //             Expressions
 // ------------------------------------
@@ -186,6 +188,55 @@ Node* newInvocationNode(Token* token, Node* target, int numArgs, Node** argument
 }
 
 // ------------------------------------
+//             Type Exprs
+// ------------------------------------
+
+TypeExpr* newBasicTypeExpr(Token* token, IdentifierNode* name, int numArgs, TypeExpr** typeArgs) {
+    TypeExpr* expr = malloc(sizeof(TypeExpr));
+    expr->token = token;
+    expr->type = TYPE_BASIC_TYPE;
+    expr->numArgs = numArgs;
+    expr->typeArgs = typeArgs;
+
+    expr->as.basicType.name = name;
+
+    return expr;
+}
+
+TypeExpr* newTupleTypeExpr(Token* token, int numArgs, TypeExpr** typeArgs) {
+    TypeExpr* expr = malloc(sizeof(TypeExpr));
+    expr->token = token;
+    expr->type = TYPE_TUPLE_TYPE;
+    expr->numArgs = numArgs;
+    expr->typeArgs = typeArgs;
+
+    return expr;
+}
+
+TypeExpr* newStructTypeExpr(Token* token, int numFields, Node** keys, TypeExpr** fields) {
+    TypeExpr* expr = malloc(sizeof(TypeExpr));
+    expr->token = token;
+    expr->type = TYPE_STRUCT_TYPE;
+
+    expr->as.structType.numFields = numFields;
+    expr->as.structType.keys = keys;
+    expr->as.structType.fields = fields;
+
+    return expr;
+}
+
+TypeExpr* newEnumTypeExpr(Token* token, int numOptions, TypeExpr** options) {
+    TypeExpr* expr = malloc(sizeof(TypeExpr));
+    expr->token = token;
+    expr->type = TYPE_ENUM_TYPE;
+
+    expr->as.enumType.numOptions = numOptions;
+    expr->as.enumType.options = options;
+
+    return expr;
+}
+
+// ------------------------------------
 //             Statements
 // ------------------------------------
 
@@ -218,3 +269,17 @@ Node* newFuncDeclStmtNode(Token* token, Node* nameNode, int numParams, Node** pa
     return n;
 }
 
+Node* newTypeDeclStmtNode(Token* token, IdentifierNode* name, TypeExpr* typeExpr, int numArgs, IdentifierNode** typeArgs) {
+    Node* n = malloc(sizeof(Node));
+    n->type = NODE_TYPE_TYPE_DECL_STATEMENT;
+
+    TypeDeclStmt* typeDeclStmt = malloc(sizeof(TypeDeclStmt));
+    typeDeclStmt->token = token;
+    typeDeclStmt->name = name;
+    typeDeclStmt->typeExpr = typeExpr;
+    typeDeclStmt->numArgs = numArgs;
+    typeDeclStmt->typeArgs = typeArgs;
+
+    n->as.typeDeclStmt = typeDeclStmt;
+    return n;
+}

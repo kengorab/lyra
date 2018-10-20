@@ -119,6 +119,97 @@ static void visitFuncDeclStmtNode(FuncDeclStmt* stmt) {
     visit(stmt->body);
 }
 
+static void visitTypeExpr(TypeExpr* typeExpr) {
+    switch (typeExpr->type) {
+        case TYPE_STRUCT_TYPE: {
+            printf("{ ");
+
+            for (int i = 0; i < typeExpr->as.structType.numFields - 1; ++i) {
+                visit(typeExpr->as.structType.keys[i]);
+                printf(": ");
+                visitTypeExpr(typeExpr->as.structType.fields[i]);
+                printf(", ");
+            }
+
+            if (typeExpr->as.structType.numFields >= 1) {
+                visit(typeExpr->as.structType.keys[typeExpr->as.structType.numFields - 1]);
+                printf(": ");
+                visitTypeExpr(typeExpr->as.structType.fields[typeExpr->as.structType.numFields - 1]);
+            }
+
+            printf(" }");
+            return;
+        }
+        case TYPE_TUPLE_TYPE: {
+            printf("[");
+            for (int i = 0; i < typeExpr->numArgs - 1; ++i) {
+                visitTypeExpr(typeExpr->typeArgs[i]);
+                printf(", ");
+            }
+
+            if (typeExpr->numArgs >= 1) {
+                visitTypeExpr(typeExpr->typeArgs[typeExpr->numArgs - 1]);
+            }
+
+            printf("]");
+            return;
+        }
+        case TYPE_BASIC_TYPE: {
+            visitIdentifierNode(typeExpr->as.basicType.name);
+            if (typeExpr->numArgs != 0) {
+                printf("[");
+                for (int i = 0; i < typeExpr->numArgs - 1; ++i) {
+                    visitTypeExpr(typeExpr->typeArgs[i]);
+                    printf(", ");
+                }
+
+                if (typeExpr->numArgs >= 1) {
+                    visitTypeExpr(typeExpr->typeArgs[typeExpr->numArgs - 1]);
+                }
+
+                printf("]");
+            }
+            return;
+        }
+        case TYPE_ENUM_TYPE: {
+            for (int i = 0; i < typeExpr->as.enumType.numOptions - 1; ++i) {
+                visitTypeExpr(typeExpr->as.enumType.options[i]);
+                printf(" | ");
+            }
+
+            if (typeExpr->as.enumType.numOptions >= 1) {
+                visitTypeExpr(typeExpr->as.enumType.options[typeExpr->as.enumType.numOptions - 1]);
+            }
+        }
+        default: {
+            // Invalid state
+            return;
+        }
+    }
+}
+
+static void visitTypeDeclStmtNode(TypeDeclStmt* typeDeclStmt) {
+    printf("type ");
+    visitIdentifierNode(typeDeclStmt->name);
+    if (typeDeclStmt->numArgs != 0) {
+        printf("[");
+        for (int i = 0; i < typeDeclStmt->numArgs - 1; ++i) {
+            visitIdentifierNode(typeDeclStmt->typeArgs[i]);
+            printf(", ");
+        }
+
+        if (typeDeclStmt->numArgs >= 1) {
+            visitIdentifierNode(typeDeclStmt->typeArgs[typeDeclStmt->numArgs - 1]);
+        }
+        printf("]");
+    }
+
+    printf(" = ");
+
+    TypeExpr* typeExpr = typeDeclStmt->typeExpr;
+    visitTypeExpr(typeExpr);
+}
+
 static void visitArrayLiteralNode(ArrayLiteralNode* node) {
     printf("[");
     for (int i = 0; i < node->size - 1; ++i) {
@@ -193,6 +284,10 @@ static void visit(Node* node) {
         }
         case NODE_TYPE_FUNC_DECL_STATEMENT: {
             visitFuncDeclStmtNode(node->as.funcDeclStmt);
+            break;
+        }
+        case NODE_TYPE_TYPE_DECL_STATEMENT: {
+            visitTypeDeclStmtNode(node->as.typeDeclStmt);
             break;
         }
         case NODE_TYPE_IF_ELSE: {

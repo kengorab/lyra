@@ -21,7 +21,8 @@
     C(NODE_TYPE_BLOCK) \
     C(NODE_TYPE_INVOCATION) \
     C(NODE_TYPE_VAL_DECL_STATEMENT) \
-    C(NODE_TYPE_FUNC_DECL_STATEMENT)
+    C(NODE_TYPE_FUNC_DECL_STATEMENT) \
+    C(NODE_TYPE_TYPE_DECL_STATEMENT)
 
 typedef enum {
     AST_NODE_TYPES
@@ -152,6 +153,67 @@ typedef struct {
     Node* body;
 } FuncDeclStmt;
 
+typedef struct TypeExpr TypeExpr;
+
+typedef struct {
+    Token* token;
+    IdentifierNode* name;
+    TypeExpr* typeExpr;
+    int numArgs;
+    IdentifierNode** typeArgs;
+} TypeDeclStmt;
+
+// ------------------------------------
+//             Type Node
+// ------------------------------------
+
+#undef C
+#define C(ENUM_VAL) ENUM_VAL,
+#define TYPE_EXPR_TYPES \
+    C(TYPE_BASIC_TYPE) \
+    C(TYPE_TUPLE_TYPE) \
+    C(TYPE_STRUCT_TYPE) \
+    C(TYPE_ENUM_TYPE)
+
+typedef enum {
+    TYPE_EXPR_TYPES
+} TypeExprType;
+
+#undef C
+#define C(ENUM_VAL) #ENUM_VAL,
+
+// Ignore warning; initialized statically
+const char* typeExprTypes[];
+
+struct TypeExpr {
+    Token* token;
+    TypeExprType type;
+    int numArgs;
+    TypeExpr** typeArgs;
+    union {
+        struct {
+            IdentifierNode* name;
+        } basicType;
+        struct {
+            int numFields;
+            Node** keys;
+            TypeExpr** fields;
+        } structType;
+        struct {
+            int numOptions;
+            TypeExpr** options;
+        } enumType;
+    } as;
+};
+
+TypeExpr* newBasicTypeExpr(Token* token, IdentifierNode* name, int numArgs, TypeExpr** typeArgs);
+
+TypeExpr* newTupleTypeExpr(Token* token, int numArgs, TypeExpr** typeArgs);
+
+TypeExpr* newStructTypeExpr(Token* token, int numFields, Node** keys, TypeExpr** fields);
+
+TypeExpr* newEnumTypeExpr(Token* token, int numOptions, TypeExpr** options);
+
 // ------------------------------------
 //             Base Node
 // ------------------------------------
@@ -161,6 +223,7 @@ struct Node {
     union {
         ValDeclStmt* valDeclStmt;
         FuncDeclStmt* funcDeclStmt;
+        TypeDeclStmt* typeDeclStmt;
         LiteralNode* literalNode;
         ArrayLiteralNode* arrayLiteralNode;
         ObjectLiteralNode* objectLiteralNode;
@@ -199,5 +262,7 @@ Node* newInvocationNode(Token* token, Node* target, int numArgs, Node** argument
 Node* newValDeclStmtNode(Token* token, Node* identNode, Node* assignment, bool isMutable);
 
 Node* newFuncDeclStmtNode(Token* token, Node* nameNode, int numParams, Node** params, Node* body);
+
+Node* newTypeDeclStmtNode(Token* token, IdentifierNode* name, TypeExpr* typeExpr, int numArgs, IdentifierNode** typeArgs);
 
 #endif //CLYRA_AST_H
