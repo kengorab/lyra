@@ -1,4 +1,5 @@
 #include <string.h>
+#include <parser/ast.h>
 
 #include "val_decl_tests.h"
 #include "parser/ast.h"
@@ -18,6 +19,26 @@ TEST(testParseValDeclStatement, {
                   "The node should have type NODE_TYPE_VAL_DECL_STATEMENT");
 
     ValDeclStmt* valDeclStmt = n->as.valDeclStmt;
+    ASSERT_EQ(NULL, valDeclStmt->typeAnnotation, "The binding should have no type annotation");
+    ASSERT_EQ_STR("someValue", valDeclStmt->ident->name, "The ident should be someValue");
+    ASSERT_FALSE(valDeclStmt->isMutable, "The binding should be declared as immutable");
+    return assertLiteralNode(testName, valDeclStmt->assignment, LITERAL_NODE_INT, 123);
+})
+
+TEST(testParseValDeclStatement_typeAnnotation, {
+    Parser p = parseString("val someValue: Int = 123");
+
+    List* errorList = newList();
+    List* nodes = parse(&p, &errorList);
+    ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
+
+    Node* n = nodes->values[0];
+    ASSERT_EQ_STR("NODE_TYPE_VAL_DECL_STATEMENT", astNodeTypes[n->type],
+                  "The node should have type NODE_TYPE_VAL_DECL_STATEMENT");
+
+    ValDeclStmt* valDeclStmt = n->as.valDeclStmt;
+    ASSERT_EQ("Int", valDeclStmt->typeAnnotation->as.basicType.name->name,
+              "The binding should have a type annotation of 'Int'");
     ASSERT_EQ_STR("someValue", valDeclStmt->ident->name, "The ident should be someValue");
     ASSERT_FALSE(valDeclStmt->isMutable, "The binding should be declared as immutable");
     return assertLiteralNode(testName, valDeclStmt->assignment, LITERAL_NODE_INT, 123);
@@ -87,6 +108,30 @@ TEST(testParseValDeclStatement_errorNoExpr, {
     ASSERT_EQ_STR("TOKEN_EOF", tokenTypes[error->actual->type], "The actual token should be TOKEN_EOF");
 })
 
+TEST(testParseValDeclStatement_errorNoTypeExprAfterColon, {
+    Parser p = parseString("val abc: = 123");
+
+    List* errorList = newList();
+    parse(&p, &errorList);
+    ASSERT_EQ(1, errorList->count, "There should be 1 error");
+
+    ParseError* error = errorList->values[0];
+    ASSERT_EQ_STR("TOKEN_IDENT", tokenTypes[error->expected[0]], "The expected token should be TOKEN_IDENT");
+    ASSERT_EQ_STR("TOKEN_EQ", tokenTypes[error->actual->type], "The actual token should be TOKEN_EQ");
+})
+
+TEST(testParseValDeclStatement_errorInvalidTypeExpr, {
+    Parser p = parseString("val abc: 1 + 2 = 123");
+
+    List* errorList = newList();
+    parse(&p, &errorList);
+    ASSERT_EQ(1, errorList->count, "There should be 1 error");
+
+    ParseError* error = errorList->values[0];
+    ASSERT_EQ_STR("TOKEN_IDENT", tokenTypes[error->expected[0]], "The expected token should be TOKEN_IDENT");
+    ASSERT_EQ_STR("TOKEN_NUMBER", tokenTypes[error->actual->type], "The actual token should be TOKEN_NUMBER");
+})
+
 TEST(testParseVarDeclStatement_noAssignment, {
     Parser p = parseString("var someValue");
 
@@ -127,6 +172,8 @@ void runValDeclTests(Tester* tester) {
     tester->run(testParseValDeclStatement_errorNoIdent);
     tester->run(testParseValDeclStatement_errorNoEq);
     tester->run(testParseValDeclStatement_errorNoExpr);
+    tester->run(testParseValDeclStatement_errorNoTypeExprAfterColon);
+    tester->run(testParseValDeclStatement_errorInvalidTypeExpr);
     tester->run(testParseVarDeclStatement_noAssignment);
     tester->run(testParseVarDeclStatement_withAssignment);
 }

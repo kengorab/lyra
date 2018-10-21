@@ -138,9 +138,12 @@ typedef struct {
 //             Statements
 // ------------------------------------
 
+typedef struct TypeExpr TypeExpr;
+
 typedef struct {
     Token* token;
     IdentifierNode* ident;
+    TypeExpr* typeAnnotation;
     Node* assignment;
     bool isMutable;
 } ValDeclStmt;
@@ -150,10 +153,10 @@ typedef struct {
     IdentifierNode* name;
     int numParams;
     Node** params;
+    TypeExpr** paramTypeAnnotations;
     Node* body;
+    TypeExpr* returnTypeAnnotation;
 } FuncDeclStmt;
-
-typedef struct TypeExpr TypeExpr;
 
 typedef struct {
     Token* token;
@@ -259,9 +262,9 @@ Node* newBlockNode(Token* token, Node** exprs, int numExprs);
 
 Node* newInvocationNode(Token* token, Node* target, int numArgs, Node** arguments, char** argNames);
 
-Node* newValDeclStmtNode(Token* token, Node* identNode, Node* assignment, bool isMutable);
+Node* newValDeclStmtNode(Token* token, Node* identNode, TypeExpr* typeAnnot, Node* assignment, bool isMutable);
 
-Node* newFuncDeclStmtNode(Token* token, Node* nameNode, int numParams, Node** params, Node* body);
+Node* newFuncDeclStmtNode(Token* token, Node* nameNode, int numParams, Node** params, TypeExpr** paramTypeAnnots, Node* body, TypeExpr* optRetTypeAnnot);
 
 Node* newTypeDeclStmtNode(Token* token, IdentifierNode* name, TypeExpr* typeExpr, int numArgs, IdentifierNode** typeArgs);
 

@@ -240,7 +240,7 @@ TypeExpr* newEnumTypeExpr(Token* token, int numOptions, TypeExpr** options) {
 //             Statements
 // ------------------------------------
 
-Node* newValDeclStmtNode(Token* token, Node* identNode, Node* assignment, bool isMutable) {
+Node* newValDeclStmtNode(Token* token, Node* identNode, TypeExpr* typeAnnot, Node* assignment, bool isMutable) {
     Node* n = malloc(sizeof(Node));
     n->type = NODE_TYPE_VAL_DECL_STATEMENT;
 
@@ -248,13 +248,14 @@ Node* newValDeclStmtNode(Token* token, Node* identNode, Node* assignment, bool i
     valDeclStmt->token = token;
     valDeclStmt->assignment = assignment;
     valDeclStmt->ident = identNode->as.identifierNode;
+    valDeclStmt->typeAnnotation = typeAnnot;
     valDeclStmt->isMutable = isMutable;
 
     n->as.valDeclStmt = valDeclStmt;
     return n;
 }
 
-Node* newFuncDeclStmtNode(Token* token, Node* nameNode, int numParams, Node** params, Node* body) {
+Node* newFuncDeclStmtNode(Token* token, Node* nameNode, int numParams, Node** params, TypeExpr** paramTypeAnnots, Node* body, TypeExpr* optRetTypeAnnot) {
     Node* n = malloc(sizeof(Node));
     n->type = NODE_TYPE_FUNC_DECL_STATEMENT;
 
@@ -263,7 +264,9 @@ Node* newFuncDeclStmtNode(Token* token, Node* nameNode, int numParams, Node** pa
     funcDeclStmt->name = nameNode->as.identifierNode;
     funcDeclStmt->numParams = numParams;
     funcDeclStmt->params = params;
+    funcDeclStmt->paramTypeAnnotations = paramTypeAnnots;
     funcDeclStmt->body = body;
+    funcDeclStmt->returnTypeAnnotation = optRetTypeAnnot;
 
     n->as.funcDeclStmt = funcDeclStmt;
     return n;

@@ -40,6 +40,15 @@ static Node* parseValDeclStmt(Parser* parser, ParseError** outErr) {
     }
     Token* identTok = advance(parser);
 
+    TypeExpr* typeAnnot = NULL;
+    if (PEEK(parser)->type == TOKEN_COLON) {
+        advance(parser); // Consume ':'
+        typeAnnot = parseTypeExpr(parser, outErr);
+        if (*outErr != NULL) {
+            return NULL;
+        }
+    }
+
     if (PEEK(parser)->type != TOKEN_EQ) {
         *outErr = newParseError(PEEK(parser), 1, TOKEN_EQ);
         return NULL;
@@ -53,7 +62,7 @@ static Node* parseValDeclStmt(Parser* parser, ParseError** outErr) {
         return NULL;
     }
 
-    return newValDeclStmtNode(valToken, newIdentifierNode(identTok), rhs, false);
+    return newValDeclStmtNode(valToken, newIdentifierNode(identTok), typeAnnot, rhs, false);
 }
 
 static Node* parseVarDeclStmt(Parser* parser, ParseError** outErr) {
@@ -64,9 +73,18 @@ static Node* parseVarDeclStmt(Parser* parser, ParseError** outErr) {
     }
     Token* identTok = advance(parser);
 
+    TypeExpr* typeAnnot = NULL;
+    if (PEEK(parser)->type == TOKEN_COLON) {
+        advance(parser); // Consume ':'
+        typeAnnot = parseTypeExpr(parser, outErr);
+        if (*outErr != NULL) {
+            return NULL;
+        }
+    }
+
     // Var declaration statements don't require an assignment
     if (PEEK(parser)->type != TOKEN_EQ) {
-        return newValDeclStmtNode(varToken, newIdentifierNode(identTok), NULL, true);
+        return newValDeclStmtNode(varToken, newIdentifierNode(identTok), typeAnnot, NULL, true);
     }
 
     advance(parser); // Skip "="
@@ -78,7 +96,7 @@ static Node* parseVarDeclStmt(Parser* parser, ParseError** outErr) {
         return NULL;
     }
 
-    return newValDeclStmtNode(varToken, newIdentifierNode(identTok), rhs, true);
+    return newValDeclStmtNode(varToken, newIdentifierNode(identTok), NULL, rhs, true);
 }
 
 static Node* parseFuncDeclStmt(Parser* parser, ParseError** outErr) {
@@ -96,6 +114,7 @@ static Node* parseFuncDeclStmt(Parser* parser, ParseError** outErr) {
     advance(parser); // Consume "("
 
     List* params = newList();
+    List* paramTypeAnnots = newList();
     while (PEEK(parser)->type != TOKEN_RPAREN && !IS_AT_END(parser)) {
         if (PEEK(parser)->type != TOKEN_IDENT) {
             *outErr = newParseError(PEEK(parser), 2, TOKEN_IDENT, TOKEN_RPAREN);
@@ -106,6 +125,17 @@ static Node* parseFuncDeclStmt(Parser* parser, ParseError** outErr) {
         Node* param = newIdentifierNode(paramTok);
         listAdd(params, (void**) &param);
 
+        if (PEEK(parser)->type != TOKEN_COLON) {
+            *outErr = newParseError(PEEK(parser), 1, TOKEN_COLON);
+            return NULL;
+        }
+        advance(parser); // Consume ':'
+        TypeExpr* paramTypeAnnot = parseTypeExpr(parser, outErr);
+        if (*outErr != NULL) {
+            return NULL;
+        }
+        listAdd(paramTypeAnnots, (void**) &paramTypeAnnot);
+
         if (PEEK(parser)->type == TOKEN_COMMA)
             advance(parser); // Consume the ","
         else if (PEEK(parser)->type != TOKEN_RPAREN) {
@@ -114,6 +144,15 @@ static Node* parseFuncDeclStmt(Parser* parser, ParseError** outErr) {
         }
     }
     advance(parser); // Consume ")"
+
+    TypeExpr* optRetTypeAnnot = NULL;
+    if (PEEK(parser)->type == TOKEN_COLON) {
+        advance(parser); // Consume ':'
+        optRetTypeAnnot = parseTypeExpr(parser, outErr);
+        if (*outErr != NULL) {
+            return NULL;
+        }
+    }
 
     Node* body;
     if (PEEK(parser)->type == TOKEN_LBRACE) {
@@ -127,7 +166,10 @@ static Node* parseFuncDeclStmt(Parser* parser, ParseError** outErr) {
         return NULL;
     }
 
-    return newFuncDeclStmtNode(funcToken, newIdentifierNode(identTok), params->count, (Node**) params->values, body);
+    return newFuncDeclStmtNode(
+        funcToken, newIdentifierNode(identTok),
+        params->count, (Node**) params->values, (TypeExpr**) paramTypeAnnots->values,
+        body, optRetTypeAnnot);
 }
 
 static Node* parseTypeDeclStmt(Parser* parser, ParseError** outErr) {
@@ -258,7 +300,6 @@ static Node* parsePrecedence(Parser* parser, Precedence precedence, ParseError**
 
     ParseRule* rule = GET_RULE(prefixToken->type);
     if (rule == NULL || rule->prefixFn == NULL) {
-//        printf("Error, no prefix rule for tokenType: %s\n", tokenTypes[prefixToken->type]);
         return NULL;
     }
 
@@ -272,7 +313,6 @@ static Node* parsePrecedence(Parser* parser, Precedence precedence, ParseError**
         advance(parser); // See comment above for prefix token
         rule = GET_RULE(infixToken->type);
         if (rule == NULL || rule->infixFn == NULL) {
-//            printf("Error, no infix rule for tokenType: %s\n", tokenTypes[infixToken->type]);
             return NULL;
         }
 
@@ -618,7 +658,7 @@ static TypeExpr* parseTypeExpr(Parser* parser, ParseError** outErr) {
             listAdd(enumOpts, (void**) &enumOpt);
         }
 
-        return newEnumTypeExpr(basicType->token, enumOpts->count, (TypeExpr**)enumOpts->values);
+        return newEnumTypeExpr(basicType->token, enumOpts->count, (TypeExpr**) enumOpts->values);
     }
 
     return basicType;
