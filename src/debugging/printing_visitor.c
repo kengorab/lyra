@@ -92,9 +92,21 @@ static void visitInvocationNode(InvocationNode* node) {
     printf(")");
 }
 
+static void visitTypeExpr(TypeExpr* typeExpr);
+
 static void visitValDeclStmtNode(ValDeclStmt* stmt) {
-    printf("val ");
+    if (stmt->isMutable) {
+        printf("var ");
+    } else {
+        printf("val ");
+    }
+
     visitIdentifierNode(stmt->ident);
+    if (stmt->typeAnnotation != NULL) {
+        printf(": ");
+        visitTypeExpr(stmt->typeAnnotation);
+    }
+
     printf(" = ");
     visit(stmt->assignment);
 }
@@ -105,13 +117,26 @@ static void visitFuncDeclStmtNode(FuncDeclStmt* stmt) {
     printf("(");
     for (int i = 0; i < stmt->numParams - 1; ++i) {
         visitIdentifierNode(stmt->params[i]->as.identifierNode);
+        if (stmt->paramTypeAnnotations[i] != NULL) {
+            printf(": ");
+            visitTypeExpr(stmt->paramTypeAnnotations[i]);
+        }
         printf(", ");
     }
 
     if (stmt->numParams >= 1) {
         visitIdentifierNode(stmt->params[stmt->numParams - 1]->as.identifierNode);
+        if (stmt->paramTypeAnnotations[stmt->numParams - 1] != NULL) {
+            printf(": ");
+            visitTypeExpr(stmt->paramTypeAnnotations[stmt->numParams - 1]);
+        }
     }
-    printf(") ");
+    printf(")");
+    if (stmt->returnTypeAnnotation != NULL) {
+        printf(": ");
+        visitTypeExpr(stmt->returnTypeAnnotation);
+    }
+    printf(" ");
 
     if (stmt->body->type != NODE_TYPE_BLOCK) {
         printf("= ");
