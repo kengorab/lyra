@@ -173,10 +173,10 @@ typedef struct {
 #undef C
 #define C(ENUM_VAL) ENUM_VAL,
 #define TYPE_EXPR_TYPES \
-    C(TYPE_BASIC_TYPE) \
-    C(TYPE_TUPLE_TYPE) \
-    C(TYPE_STRUCT_TYPE) \
-    C(TYPE_ENUM_TYPE)
+    C(TYPE_EXPR_BASIC_TYPE) \
+    C(TYPE_EXPR_TUPLE_TYPE) \
+    C(TYPE_EXPR_STRUCT_TYPE) \
+    C(TYPE_EXPR_ENUM_TYPE)
 
 typedef enum {
     TYPE_EXPR_TYPES

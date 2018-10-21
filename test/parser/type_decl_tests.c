@@ -24,8 +24,8 @@ TEST(testParseTypeDeclStatement_basicTypeNoTypeArgs, {
     ASSERT_TRUE(typeDeclStmt->numArgs == 0, "There should be no type args for the type");
 
     TypeExpr* typeExpr = typeDeclStmt->typeExpr;
-    ASSERT_EQ_STR("TYPE_BASIC_TYPE", typeExprTypes[typeExpr->type],
-                  "The type expression should have type TYPE_BASIC_TYPE");
+    ASSERT_EQ_STR("TYPE_EXPR_BASIC_TYPE", typeExprTypes[typeExpr->type],
+                  "The type expression should have type TYPE_EXPR_BASIC_TYPE");
     ASSERT_EQ_STR("Int", typeExpr->as.basicType.name->name, "The name of the basic type should be Int");
 })
 
@@ -46,8 +46,8 @@ TEST(testParseTypeDeclStatement_basicTypeTypeArgsRight, {
     ASSERT_TRUE(typeDeclStmt->numArgs == 0, "There should be no type args for the type");
 
     TypeExpr* typeExpr = typeDeclStmt->typeExpr;
-    ASSERT_EQ_STR("TYPE_BASIC_TYPE", typeExprTypes[typeExpr->type],
-                  "The type expression should have type TYPE_BASIC_TYPE");
+    ASSERT_EQ_STR("TYPE_EXPR_BASIC_TYPE", typeExprTypes[typeExpr->type],
+                  "The type expression should have type TYPE_EXPR_BASIC_TYPE");
     ASSERT_EQ_STR("List", typeExpr->as.basicType.name->name, "The name of the basic type should be List");
     ASSERT_EQ(1, typeExpr->numArgs, "There should be 1 type arg for the basic type");
     ASSERT_EQ_STR("Int", typeExpr->typeArgs[0]->as.basicType.name->name,
@@ -72,8 +72,8 @@ TEST(testParseTypeDeclStatement_basicTypeTypeArgsLeftAndRight, {
     ASSERT_EQ_STR("T", typeDeclStmt->typeArgs[0]->name, "The name of the basic type's type arg should be T");
 
     TypeExpr* typeExpr = typeDeclStmt->typeExpr;
-    ASSERT_EQ_STR("TYPE_BASIC_TYPE", typeExprTypes[typeExpr->type],
-                  "The type expression should have type TYPE_BASIC_TYPE");
+    ASSERT_EQ_STR("TYPE_EXPR_BASIC_TYPE", typeExprTypes[typeExpr->type],
+                  "The type expression should have type TYPE_EXPR_BASIC_TYPE");
     ASSERT_EQ_STR("List", typeExpr->as.basicType.name->name, "The name of the basic type should be List");
     ASSERT_EQ(1, typeExpr->numArgs, "There should be 1 type arg for the basic type");
     ASSERT_EQ_STR("T", typeExpr->typeArgs[0]->as.basicType.name->name,
@@ -97,8 +97,8 @@ TEST(testParseTypeDeclStatement_tupleType, {
     ASSERT_TRUE(typeDeclStmt->numArgs == 0, "There should be 0 type args for the type");
 
     TypeExpr* typeExpr = typeDeclStmt->typeExpr;
-    ASSERT_EQ_STR("TYPE_TUPLE_TYPE", typeExprTypes[typeExpr->type],
-                  "The type expression should have type TYPE_TUPLE_TYPE");
+    ASSERT_EQ_STR("TYPE_EXPR_TUPLE_TYPE", typeExprTypes[typeExpr->type],
+                  "The type expression should have type TYPE_EXPR_TUPLE_TYPE");
     ASSERT_TRUE(typeExpr->numArgs == 3, "There should be 3 type args for the type");
     ASSERT_EQ_STR("Int", typeExpr->typeArgs[0]->as.basicType.name->name, "The first tuple type arg should be Int");
     ASSERT_EQ_STR("Float", typeExpr->typeArgs[1]->as.basicType.name->name, "The second tuple type arg should be Float");
@@ -118,8 +118,8 @@ TEST(testParseTypeDeclStatement_tupleTypeWithNestedTypes, {
                   "The node should have type NODE_TYPE_TYPE_DECL_STATEMENT");
 
     TypeDeclStmt* typeDeclStmt = n->as.typeDeclStmt;
-    ASSERT_EQ_STR("TYPE_TUPLE_TYPE", typeExprTypes[typeDeclStmt->typeExpr->type],
-                  "The type expression should have type TYPE_TUPLE_TYPE");
+    ASSERT_EQ_STR("TYPE_EXPR_TUPLE_TYPE", typeExprTypes[typeDeclStmt->typeExpr->type],
+                  "The type expression should have type TYPE_EXPR_TUPLE_TYPE");
 
     ASSERT_EQ_STR("Something", typeDeclStmt->name->name, "The name of the type should be Something");
     ASSERT_TRUE(typeDeclStmt->numArgs == 0, "There should be 0 type args for the type");
@@ -153,8 +153,8 @@ TEST(testParseTypeDeclStatement_enumType, {
     ASSERT_TRUE(typeDeclStmt->numArgs == 0, "There should be 0 type args for the type");
 
     TypeExpr* typeExpr = typeDeclStmt->typeExpr;
-    ASSERT_EQ_STR("TYPE_ENUM_TYPE", typeExprTypes[typeExpr->type],
-                  "The type expression should have type TYPE_ENUM_TYPE");
+    ASSERT_EQ_STR("TYPE_EXPR_ENUM_TYPE", typeExprTypes[typeExpr->type],
+                  "The type expression should have type TYPE_EXPR_ENUM_TYPE");
     ASSERT_TRUE(typeExpr->numArgs == 0, "There should be 0 type args for the type");
 
     ASSERT_TRUE(typeExpr->as.enumType.numOptions == 3, "There are 3 options for the enum type");
@@ -184,8 +184,8 @@ TEST(testParseTypeDeclStatement_enumTypeWithTypeArg, {
     ASSERT_EQ_STR("T", typeDeclStmt->typeArgs[0]->name, "The name of the type should be T");
 
     TypeExpr* typeExpr = typeDeclStmt->typeExpr;
-    ASSERT_EQ_STR("TYPE_ENUM_TYPE", typeExprTypes[typeExpr->type],
-                  "The type expression should have type TYPE_ENUM_TYPE");
+    ASSERT_EQ_STR("TYPE_EXPR_ENUM_TYPE", typeExprTypes[typeExpr->type],
+                  "The type expression should have type TYPE_EXPR_ENUM_TYPE");
     ASSERT_TRUE(typeExpr->numArgs == 0, "There should be 0 type args for the type");
 
     ASSERT_TRUE(typeExpr->as.enumType.numOptions == 2, "There are 2 options for the enum type");
@@ -214,8 +214,8 @@ TEST(testParseTypeDeclStatement_structType, {
     ASSERT_TRUE(typeDeclStmt->numArgs == 0, "There should be 0 type args for the type");
 
     TypeExpr* typeExpr = typeDeclStmt->typeExpr;
-    ASSERT_EQ_STR("TYPE_STRUCT_TYPE", typeExprTypes[typeExpr->type],
-                  "The type expression should have type TYPE_STRUCT_TYPE");
+    ASSERT_EQ_STR("TYPE_EXPR_STRUCT_TYPE", typeExprTypes[typeExpr->type],
+                  "The type expression should have type TYPE_EXPR_STRUCT_TYPE");
     ASSERT_TRUE(typeExpr->numArgs == 0, "There should be 0 type args for the type");
 
     ASSERT_EQ(2, typeExpr->as.structType.numFields, "There should be 2 fields for the Person type");
@@ -247,16 +247,16 @@ TEST(testParseTypeDeclStatement_structTypeWithNested, {
     ASSERT_TRUE(typeDeclStmt->numArgs == 0, "There should be 0 type args for the type");
 
     TypeExpr* typeExpr = typeDeclStmt->typeExpr;
-    ASSERT_EQ_STR("TYPE_STRUCT_TYPE", typeExprTypes[typeExpr->type],
-                  "The type expression should have type TYPE_STRUCT_TYPE");
+    ASSERT_EQ_STR("TYPE_EXPR_STRUCT_TYPE", typeExprTypes[typeExpr->type],
+                  "The type expression should have type TYPE_EXPR_STRUCT_TYPE");
     ASSERT_TRUE(typeExpr->numArgs == 0, "There should be 0 type args for the type");
 
     ASSERT_EQ(2, typeExpr->as.structType.numFields, "There should be 2 fields for the Person type");
     ASSERT_EQ_STR("name", typeExpr->as.structType.keys[0]->as.identifierNode->name,
                   "The first key should be 'name'");
     TypeExpr* nameFieldTypeExpr = typeExpr->as.structType.fields[0];
-    ASSERT_EQ_STR("TYPE_STRUCT_TYPE", typeExprTypes[nameFieldTypeExpr->type],
-                  "The type expression should have type TYPE_STRUCT_TYPE");
+    ASSERT_EQ_STR("TYPE_EXPR_STRUCT_TYPE", typeExprTypes[nameFieldTypeExpr->type],
+                  "The type expression should have type TYPE_EXPR_STRUCT_TYPE");
     ASSERT_EQ_STR("first", nameFieldTypeExpr->as.structType.keys[0]->as.identifierNode->name,
                   "The first key should be 'first'");
     ASSERT_EQ_STR("String", nameFieldTypeExpr->as.structType.fields[0]->as.basicType.name->name,

@@ -146,7 +146,7 @@ static void visitFuncDeclStmtNode(FuncDeclStmt* stmt) {
 
 static void visitTypeExpr(TypeExpr* typeExpr) {
     switch (typeExpr->type) {
-        case TYPE_STRUCT_TYPE: {
+        case TYPE_EXPR_STRUCT_TYPE: {
             printf("{ ");
 
             for (int i = 0; i < typeExpr->as.structType.numFields - 1; ++i) {
@@ -165,7 +165,7 @@ static void visitTypeExpr(TypeExpr* typeExpr) {
             printf(" }");
             return;
         }
-        case TYPE_TUPLE_TYPE: {
+        case TYPE_EXPR_TUPLE_TYPE: {
             printf("[");
             for (int i = 0; i < typeExpr->numArgs - 1; ++i) {
                 visitTypeExpr(typeExpr->typeArgs[i]);
@@ -179,7 +179,7 @@ static void visitTypeExpr(TypeExpr* typeExpr) {
             printf("]");
             return;
         }
-        case TYPE_BASIC_TYPE: {
+        case TYPE_EXPR_BASIC_TYPE: {
             visitIdentifierNode(typeExpr->as.basicType.name);
             if (typeExpr->numArgs != 0) {
                 printf("[");
@@ -196,7 +196,7 @@ static void visitTypeExpr(TypeExpr* typeExpr) {
             }
             return;
         }
-        case TYPE_ENUM_TYPE: {
+        case TYPE_EXPR_ENUM_TYPE: {
             for (int i = 0; i < typeExpr->as.enumType.numOptions - 1; ++i) {
                 visitTypeExpr(typeExpr->as.enumType.options[i]);
                 printf(" | ");

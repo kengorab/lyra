@@ -194,7 +194,7 @@ Node* newInvocationNode(Token* token, Node* target, int numArgs, Node** argument
 TypeExpr* newBasicTypeExpr(Token* token, IdentifierNode* name, int numArgs, TypeExpr** typeArgs) {
     TypeExpr* expr = malloc(sizeof(TypeExpr));
     expr->token = token;
-    expr->type = TYPE_BASIC_TYPE;
+    expr->type = TYPE_EXPR_BASIC_TYPE;
     expr->numArgs = numArgs;
     expr->typeArgs = typeArgs;
 
@@ -206,7 +206,7 @@ TypeExpr* newBasicTypeExpr(Token* token, IdentifierNode* name, int numArgs, Type
 TypeExpr* newTupleTypeExpr(Token* token, int numArgs, TypeExpr** typeArgs) {
     TypeExpr* expr = malloc(sizeof(TypeExpr));
     expr->token = token;
-    expr->type = TYPE_TUPLE_TYPE;
+    expr->type = TYPE_EXPR_TUPLE_TYPE;
     expr->numArgs = numArgs;
     expr->typeArgs = typeArgs;
 
@@ -216,7 +216,7 @@ TypeExpr* newTupleTypeExpr(Token* token, int numArgs, TypeExpr** typeArgs) {
 TypeExpr* newStructTypeExpr(Token* token, int numFields, Node** keys, TypeExpr** fields) {
     TypeExpr* expr = malloc(sizeof(TypeExpr));
     expr->token = token;
-    expr->type = TYPE_STRUCT_TYPE;
+    expr->type = TYPE_EXPR_STRUCT_TYPE;
 
     expr->as.structType.numFields = numFields;
     expr->as.structType.keys = keys;
@@ -228,7 +228,7 @@ TypeExpr* newStructTypeExpr(Token* token, int numFields, Node** keys, TypeExpr**
 TypeExpr* newEnumTypeExpr(Token* token, int numOptions, TypeExpr** options) {
     TypeExpr* expr = malloc(sizeof(TypeExpr));
     expr->token = token;
-    expr->type = TYPE_ENUM_TYPE;
+    expr->type = TYPE_EXPR_ENUM_TYPE;
 
     expr->as.enumType.numOptions = numOptions;
     expr->as.enumType.options = options;
