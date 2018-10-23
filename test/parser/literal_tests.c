@@ -68,7 +68,7 @@ TEST(testParseIdentifier, {
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
 
     Node* n = nodes->values[0];
-    ASSERT_EQ_STR("NODE_TYPE_IDENT", astNodeTypes[n->type], "The node type should be NODE_TYPE_IDENT");
+    ASSERT_EQ_STR("NODE_TYPE_IDENT", astNodeTypes[n->nodeType], "The node type should be NODE_TYPE_IDENT");
 })
 
 void runLiteralTests(Tester* tester) {

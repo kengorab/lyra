@@ -138,7 +138,7 @@ static void visitFuncDeclStmtNode(FuncDeclStmt* stmt) {
     }
     printf(" ");
 
-    if (stmt->body->type != NODE_TYPE_BLOCK) {
+    if (stmt->body->nodeType != NODE_TYPE_BLOCK) {
         printf("= ");
     }
     visit(stmt->body);
@@ -274,7 +274,7 @@ static void visitGroupingNodeNode(GroupingNode* node) {
 }
 
 static void visit(Node* node) {
-    switch (node->type) {
+    switch (node->nodeType) {
         case NODE_TYPE_IDENT: {
             visitIdentifierNode(node->as.identifierNode);
             break;

@@ -15,7 +15,7 @@ TEST(testInvocationExpression_noArgs, {
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
 
     Node* n = nodes->values[0];
-    ASSERT_EQ_STR("NODE_TYPE_INVOCATION", astNodeTypes[n->type], "The node should have type NODE_TYPE_INVOCATION");
+    ASSERT_EQ_STR("NODE_TYPE_INVOCATION", astNodeTypes[n->nodeType], "The node should have type NODE_TYPE_INVOCATION");
     InvocationNode* invocation = n->as.invocationNode;
 
     ASSERT_TRUE(invocation->numArgs == 0, "There should be no arguments to this invocation");
@@ -29,7 +29,7 @@ TEST(testInvocationExpression_2ArgsUnnamed, {
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
 
     Node* n = nodes->values[0];
-    ASSERT_EQ_STR("NODE_TYPE_INVOCATION", astNodeTypes[n->type], "The node should have type NODE_TYPE_INVOCATION");
+    ASSERT_EQ_STR("NODE_TYPE_INVOCATION", astNodeTypes[n->nodeType], "The node should have type NODE_TYPE_INVOCATION");
     InvocationNode* invocation = n->as.invocationNode;
 
     ASSERT_TRUE(invocation->numArgs == 2, "There should be 2 arguments to this invocation");
@@ -54,7 +54,7 @@ TEST(testInvocationExpression_nestedInvocations, {
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
 
     Node* n = nodes->values[0];
-    ASSERT_EQ_STR("NODE_TYPE_INVOCATION", astNodeTypes[n->type], "The node should have type NODE_TYPE_INVOCATION");
+    ASSERT_EQ_STR("NODE_TYPE_INVOCATION", astNodeTypes[n->nodeType], "The node should have type NODE_TYPE_INVOCATION");
     InvocationNode* invocation = n->as.invocationNode;
 
     ASSERT_TRUE(invocation->numArgs == 2, "There should be 2 arguments to this invocation");
@@ -62,7 +62,7 @@ TEST(testInvocationExpression_nestedInvocations, {
     if (!res.pass) return res;
 
     Node* arg = invocation->arguments[0];
-    ASSERT_EQ_STR("NODE_TYPE_INVOCATION", astNodeTypes[arg->type],
+    ASSERT_EQ_STR("NODE_TYPE_INVOCATION", astNodeTypes[arg->nodeType],
                   "The first arg should have type NODE_TYPE_INVOCATION");
     ASSERT_TRUE(arg->as.invocationNode->numArgs == 1, "There should be 1 argument to this invocation");
     res = assertIdentNode(testName, arg->as.invocationNode->target, "b");
@@ -92,7 +92,7 @@ TEST(testInvocationExpression_2ArgsNamed, {
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
 
     Node* n = nodes->values[0];
-    ASSERT_EQ_STR("NODE_TYPE_INVOCATION", astNodeTypes[n->type], "The node should have type NODE_TYPE_INVOCATION");
+    ASSERT_EQ_STR("NODE_TYPE_INVOCATION", astNodeTypes[n->nodeType], "The node should have type NODE_TYPE_INVOCATION");
     InvocationNode* invocation = n->as.invocationNode;
 
     ASSERT_TRUE(invocation->numArgs == 2, "There should be 2 arguments to this invocation");
@@ -117,7 +117,7 @@ TEST(testInvocationExpression_namedAndUnnamed, {
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
 
     Node* n = nodes->values[0];
-    ASSERT_EQ_STR("NODE_TYPE_INVOCATION", astNodeTypes[n->type], "The node should have type NODE_TYPE_INVOCATION");
+    ASSERT_EQ_STR("NODE_TYPE_INVOCATION", astNodeTypes[n->nodeType], "The node should have type NODE_TYPE_INVOCATION");
     InvocationNode* invocation = n->as.invocationNode;
 
     ASSERT_TRUE(invocation->numArgs == 2, "There should be 2 arguments to this invocation");

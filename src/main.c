@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <typechecker/typechecker.h>
 
 #include "lexer/lexer.h"
 #include "parser/parser.h"
@@ -8,7 +9,11 @@
 #include "common/list.h"
 
 int main(int argc, char** argv) {
-    char* source = "func add(a: Int, b: Int): Int = a + b";
+    char* source = "func add(a: Int, b: Int): Int = a + b\n"
+                   "val a = 1\n"
+                   "val b = 3 + 5\n"
+                   "if (a == 1) add(a, b)\n"
+                   "else add(add(b, 1), a)";
     if (argc == 2) {
         source = argv[1];
     }
@@ -37,5 +42,6 @@ int main(int argc, char** argv) {
     }
 
     printing_visit(nodes);
+    typecheck(nodes);
     return 0;
 }

@@ -2,6 +2,7 @@
 #define CLYRA_AST_H
 
 #include <stdbool.h>
+#include <typechecker/types.h>
 
 #include "lexer/lexer.h"
 
@@ -222,7 +223,7 @@ TypeExpr* newEnumTypeExpr(Token* token, int numOptions, TypeExpr** options);
 // ------------------------------------
 
 struct Node {
-    AstNodeType type;
+    AstNodeType nodeType;
     union {
         ValDeclStmt* valDeclStmt;
         FuncDeclStmt* funcDeclStmt;

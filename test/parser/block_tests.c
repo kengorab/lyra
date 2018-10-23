@@ -14,7 +14,7 @@ TEST(testBlockExpression_singleExpr, {
     List* nodes = parse(&p, &errorList);
 
     Node* n = nodes->values[0];
-    ASSERT_EQ_STR("NODE_TYPE_BLOCK", astNodeTypes[n->type], "The node should have type NODE_TYPE_BLOCK");
+    ASSERT_EQ_STR("NODE_TYPE_BLOCK", astNodeTypes[n->nodeType], "The node should have type NODE_TYPE_BLOCK");
 
     BlockNode* blockNode = n->as.blockNode;
     ASSERT_EQ(1, blockNode->numExprs, "There should be 1 expression-statement within the block node");
@@ -29,7 +29,7 @@ TEST(testBlockExpression_multipleExprs, {
     List* nodes = parse(&p, &errorList);
 
     Node* n = nodes->values[0];
-    ASSERT_EQ_STR("NODE_TYPE_BLOCK", astNodeTypes[n->type], "The node should have type NODE_TYPE_BLOCK");
+    ASSERT_EQ_STR("NODE_TYPE_BLOCK", astNodeTypes[n->nodeType], "The node should have type NODE_TYPE_BLOCK");
 
     BlockNode* blockNode = n->as.blockNode;
     ASSERT_EQ(2, blockNode->numExprs, "There should be 2 expression-statements within the block node");
@@ -46,13 +46,13 @@ TEST(testBlockExpression_statementsAndExpressions, {
     List* nodes = parse(&p, &errorList);
 
     Node* n = nodes->values[0];
-    ASSERT_EQ_STR("NODE_TYPE_BLOCK", astNodeTypes[n->type], "The node should have type NODE_TYPE_BLOCK");
+    ASSERT_EQ_STR("NODE_TYPE_BLOCK", astNodeTypes[n->nodeType], "The node should have type NODE_TYPE_BLOCK");
 
     BlockNode* blockNode = n->as.blockNode;
     ASSERT_EQ(2, blockNode->numExprs, "There should be 2 expression-statements within the block node");
 
     Node* firstStmt = blockNode->exprs[0];
-    ASSERT_EQ_STR("NODE_TYPE_VAL_DECL_STATEMENT", astNodeTypes[firstStmt->type],
+    ASSERT_EQ_STR("NODE_TYPE_VAL_DECL_STATEMENT", astNodeTypes[firstStmt->nodeType],
                   "The node should have type NODE_TYPE_VAL_DECL_STATEMENT");
 
     ValDeclStmt* valDeclStmt = firstStmt->as.valDeclStmt;
@@ -71,7 +71,7 @@ TEST(testBlockExpression_assignmentToVal, {
     List* nodes = parse(&p, &errorList);
 
     Node* n = nodes->values[0];
-    ASSERT_EQ_STR("NODE_TYPE_VAL_DECL_STATEMENT", astNodeTypes[n->type],
+    ASSERT_EQ_STR("NODE_TYPE_VAL_DECL_STATEMENT", astNodeTypes[n->nodeType],
                   "The node should have type NODE_TYPE_VAL_DECL_STATEMENT");
     ASSERT_EQ_STR("a", n->as.valDeclStmt->ident->name, "The ident should be 'a'");
 

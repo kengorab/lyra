@@ -26,7 +26,7 @@ add_executable(
         src/main.c
         src/common/strings.c
         src/common/strings.h
-        src/typechecker/typechecker.c src/typechecker/typechecker.h)
+        src/typechecker/typechecker.c src/typechecker/typechecker.h src/typechecker/types.c src/typechecker/types.h)
 
 enable_testing()
 add_executable(

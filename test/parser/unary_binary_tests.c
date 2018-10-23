@@ -14,7 +14,7 @@ TEST(testUnaryExpression_minus, {
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
 
     Node* n = nodes->values[0];
-    ASSERT_EQ_STR("NODE_TYPE_UNARY", astNodeTypes[n->type], "The node should have type NODE_TYPE_UNARY");
+    ASSERT_EQ_STR("NODE_TYPE_UNARY", astNodeTypes[n->nodeType], "The node should have type NODE_TYPE_UNARY");
     UnaryNode* unary = n->as.unaryNode;
 
     ASSERT_EQ_STR("-", tokenGetValue(unary->token), "The token should be a minus");
@@ -29,7 +29,7 @@ TEST(testUnaryExpression_negate, {
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
 
     Node* n = nodes->values[0];
-    ASSERT_EQ_STR("NODE_TYPE_UNARY", astNodeTypes[n->type], "The node should have type NODE_TYPE_UNARY");
+    ASSERT_EQ_STR("NODE_TYPE_UNARY", astNodeTypes[n->nodeType], "The node should have type NODE_TYPE_UNARY");
     UnaryNode* unary = n->as.unaryNode;
 
     ASSERT_EQ_STR("!", tokenGetValue(unary->token), "The token should be a bang");
@@ -44,7 +44,7 @@ TEST(testBinaryExpression, {
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
 
     Node* n = nodes->values[0];
-    ASSERT_EQ_STR("NODE_TYPE_BINARY", astNodeTypes[n->type], "The node should have type NODE_TYPE_BINARY");
+    ASSERT_EQ_STR("NODE_TYPE_BINARY", astNodeTypes[n->nodeType], "The node should have type NODE_TYPE_BINARY");
     BinaryNode* binary = n->as.binaryNode;
 
     TestResult res = assertLiteralNode(testName, binary->lExpr, LITERAL_NODE_INT, 1);
@@ -63,7 +63,7 @@ TEST(testBinaryExpression_precedences, {
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
 
     Node* n = nodes->values[0];
-    ASSERT_EQ_STR("NODE_TYPE_BINARY", astNodeTypes[n->type], "The node should have type NODE_TYPE_BINARY");
+    ASSERT_EQ_STR("NODE_TYPE_BINARY", astNodeTypes[n->nodeType], "The node should have type NODE_TYPE_BINARY");
 
     // The && expr
     BinaryNode* binary = n->as.binaryNode;

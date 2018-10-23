@@ -15,7 +15,7 @@ TEST(testParseTypeDeclStatement_basicTypeNoTypeArgs, {
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
 
     Node* n = nodes->values[0];
-    ASSERT_EQ_STR("NODE_TYPE_TYPE_DECL_STATEMENT", astNodeTypes[n->type],
+    ASSERT_EQ_STR("NODE_TYPE_TYPE_DECL_STATEMENT", astNodeTypes[n->nodeType],
                   "The node should have type NODE_TYPE_TYPE_DECL_STATEMENT");
 
     TypeDeclStmt* typeDeclStmt = n->as.typeDeclStmt;
@@ -37,7 +37,7 @@ TEST(testParseTypeDeclStatement_basicTypeTypeArgsRight, {
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
 
     Node* n = nodes->values[0];
-    ASSERT_EQ_STR("NODE_TYPE_TYPE_DECL_STATEMENT", astNodeTypes[n->type],
+    ASSERT_EQ_STR("NODE_TYPE_TYPE_DECL_STATEMENT", astNodeTypes[n->nodeType],
                   "The node should have type NODE_TYPE_TYPE_DECL_STATEMENT");
 
     TypeDeclStmt* typeDeclStmt = n->as.typeDeclStmt;
@@ -62,7 +62,7 @@ TEST(testParseTypeDeclStatement_basicTypeTypeArgsLeftAndRight, {
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
 
     Node* n = nodes->values[0];
-    ASSERT_EQ_STR("NODE_TYPE_TYPE_DECL_STATEMENT", astNodeTypes[n->type],
+    ASSERT_EQ_STR("NODE_TYPE_TYPE_DECL_STATEMENT", astNodeTypes[n->nodeType],
                   "The node should have type NODE_TYPE_TYPE_DECL_STATEMENT");
 
     TypeDeclStmt* typeDeclStmt = n->as.typeDeclStmt;
@@ -88,7 +88,7 @@ TEST(testParseTypeDeclStatement_tupleType, {
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
 
     Node* n = nodes->values[0];
-    ASSERT_EQ_STR("NODE_TYPE_TYPE_DECL_STATEMENT", astNodeTypes[n->type],
+    ASSERT_EQ_STR("NODE_TYPE_TYPE_DECL_STATEMENT", astNodeTypes[n->nodeType],
                   "The node should have type NODE_TYPE_TYPE_DECL_STATEMENT");
 
     TypeDeclStmt* typeDeclStmt = n->as.typeDeclStmt;
@@ -114,7 +114,7 @@ TEST(testParseTypeDeclStatement_tupleTypeWithNestedTypes, {
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
 
     Node* n = nodes->values[0];
-    ASSERT_EQ_STR("NODE_TYPE_TYPE_DECL_STATEMENT", astNodeTypes[n->type],
+    ASSERT_EQ_STR("NODE_TYPE_TYPE_DECL_STATEMENT", astNodeTypes[n->nodeType],
                   "The node should have type NODE_TYPE_TYPE_DECL_STATEMENT");
 
     TypeDeclStmt* typeDeclStmt = n->as.typeDeclStmt;
@@ -144,7 +144,7 @@ TEST(testParseTypeDeclStatement_enumType, {
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
 
     Node* n = nodes->values[0];
-    ASSERT_EQ_STR("NODE_TYPE_TYPE_DECL_STATEMENT", astNodeTypes[n->type],
+    ASSERT_EQ_STR("NODE_TYPE_TYPE_DECL_STATEMENT", astNodeTypes[n->nodeType],
                   "The node should have type NODE_TYPE_TYPE_DECL_STATEMENT");
 
     TypeDeclStmt* typeDeclStmt = n->as.typeDeclStmt;
@@ -174,7 +174,7 @@ TEST(testParseTypeDeclStatement_enumTypeWithTypeArg, {
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
 
     Node* n = nodes->values[0];
-    ASSERT_EQ_STR("NODE_TYPE_TYPE_DECL_STATEMENT", astNodeTypes[n->type],
+    ASSERT_EQ_STR("NODE_TYPE_TYPE_DECL_STATEMENT", astNodeTypes[n->nodeType],
                   "The node should have type NODE_TYPE_TYPE_DECL_STATEMENT");
 
     TypeDeclStmt* typeDeclStmt = n->as.typeDeclStmt;
@@ -205,7 +205,7 @@ TEST(testParseTypeDeclStatement_structType, {
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
 
     Node* n = nodes->values[0];
-    ASSERT_EQ_STR("NODE_TYPE_TYPE_DECL_STATEMENT", astNodeTypes[n->type],
+    ASSERT_EQ_STR("NODE_TYPE_TYPE_DECL_STATEMENT", astNodeTypes[n->nodeType],
                   "The node should have type NODE_TYPE_TYPE_DECL_STATEMENT");
 
     TypeDeclStmt* typeDeclStmt = n->as.typeDeclStmt;
@@ -238,7 +238,7 @@ TEST(testParseTypeDeclStatement_structTypeWithNested, {
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
 
     Node* n = nodes->values[0];
-    ASSERT_EQ_STR("NODE_TYPE_TYPE_DECL_STATEMENT", astNodeTypes[n->type],
+    ASSERT_EQ_STR("NODE_TYPE_TYPE_DECL_STATEMENT", astNodeTypes[n->nodeType],
                   "The node should have type NODE_TYPE_TYPE_DECL_STATEMENT");
 
     TypeDeclStmt* typeDeclStmt = n->as.typeDeclStmt;

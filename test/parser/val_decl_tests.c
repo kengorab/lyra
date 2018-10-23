@@ -15,7 +15,7 @@ TEST(testParseValDeclStatement, {
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
 
     Node* n = nodes->values[0];
-    ASSERT_EQ_STR("NODE_TYPE_VAL_DECL_STATEMENT", astNodeTypes[n->type],
+    ASSERT_EQ_STR("NODE_TYPE_VAL_DECL_STATEMENT", astNodeTypes[n->nodeType],
                   "The node should have type NODE_TYPE_VAL_DECL_STATEMENT");
 
     ValDeclStmt* valDeclStmt = n->as.valDeclStmt;
@@ -33,7 +33,7 @@ TEST(testParseValDeclStatement_typeAnnotation, {
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
 
     Node* n = nodes->values[0];
-    ASSERT_EQ_STR("NODE_TYPE_VAL_DECL_STATEMENT", astNodeTypes[n->type],
+    ASSERT_EQ_STR("NODE_TYPE_VAL_DECL_STATEMENT", astNodeTypes[n->nodeType],
                   "The node should have type NODE_TYPE_VAL_DECL_STATEMENT");
 
     ValDeclStmt* valDeclStmt = n->as.valDeclStmt;
@@ -53,7 +53,7 @@ TEST(testParseValDeclStatements, {
     ASSERT_EQ(2, nodes->count, "There should be 2 elements in the list");
 
     Node* n = nodes->values[0];
-    ASSERT_EQ_STR("NODE_TYPE_VAL_DECL_STATEMENT", astNodeTypes[n->type],
+    ASSERT_EQ_STR("NODE_TYPE_VAL_DECL_STATEMENT", astNodeTypes[n->nodeType],
                   "The node should have type NODE_TYPE_VAL_DECL_STATEMENT");
 
     ValDeclStmt* valDeclStmt = n->as.valDeclStmt;
@@ -63,7 +63,7 @@ TEST(testParseValDeclStatements, {
     if (!res.pass) return res;
 
     n = nodes->values[1];
-    ASSERT_EQ_STR("NODE_TYPE_VAL_DECL_STATEMENT", astNodeTypes[n->type],
+    ASSERT_EQ_STR("NODE_TYPE_VAL_DECL_STATEMENT", astNodeTypes[n->nodeType],
                   "The node should have type NODE_TYPE_VAL_DECL_STATEMENT");
 
     valDeclStmt = n->as.valDeclStmt;
@@ -140,7 +140,7 @@ TEST(testParseVarDeclStatement_noAssignment, {
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
 
     Node* n = nodes->values[0];
-    ASSERT_EQ_STR("NODE_TYPE_VAL_DECL_STATEMENT", astNodeTypes[n->type],
+    ASSERT_EQ_STR("NODE_TYPE_VAL_DECL_STATEMENT", astNodeTypes[n->nodeType],
                   "The node should have type NODE_TYPE_VAL_DECL_STATEMENT");
 
     ValDeclStmt* valDeclStmt = n->as.valDeclStmt;
@@ -157,7 +157,7 @@ TEST(testParseVarDeclStatement_withAssignment, {
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
 
     Node* n = nodes->values[0];
-    ASSERT_EQ_STR("NODE_TYPE_VAL_DECL_STATEMENT", astNodeTypes[n->type],
+    ASSERT_EQ_STR("NODE_TYPE_VAL_DECL_STATEMENT", astNodeTypes[n->nodeType],
                   "The node should have type NODE_TYPE_VAL_DECL_STATEMENT");
 
     ValDeclStmt* valDeclStmt = n->as.valDeclStmt;
