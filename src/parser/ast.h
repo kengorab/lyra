@@ -224,6 +224,7 @@ TypeExpr* newEnumTypeExpr(Token* token, int numOptions, TypeExpr** options);
 
 struct Node {
     AstNodeType nodeType;
+    Type type;
     union {
         ValDeclStmt* valDeclStmt;
         FuncDeclStmt* funcDeclStmt;

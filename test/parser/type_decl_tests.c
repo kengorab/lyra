@@ -2,9 +2,6 @@
 #include <parser/ast.h>
 
 #include "type_decl_tests.h"
-#include "parser/ast.h"
-#include "parser/ast.h"
-#include "parser/parser.h"
 #include "test_utils.h"
 
 TEST(testParseTypeDeclStatement_basicTypeNoTypeArgs, {

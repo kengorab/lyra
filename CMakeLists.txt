@@ -26,13 +26,19 @@ add_executable(
         src/main.c
         src/common/strings.c
         src/common/strings.h
-        src/typechecker/typechecker.c src/typechecker/typechecker.h src/typechecker/types.c src/typechecker/types.h)
+        src/typechecker/typechecker.c
+        src/typechecker/typechecker.h
+        src/typechecker/types.c
+        src/typechecker/types.h
+)
 
 enable_testing()
 add_executable(
         clyra_tests
         src/common/list.c
         src/common/list.h
+        src/common/strings.c
+        src/common/strings.h
         src/lexer/lexer.c
         src/lexer/lexer.h
         src/parser/ast.h
@@ -41,6 +47,10 @@ add_executable(
         src/parser/parser.h
         src/parser/parser_error.c
         src/parser/parser_error.h
+        src/typechecker/typechecker.c
+        src/typechecker/typechecker.h
+        src/typechecker/types.c
+        src/typechecker/types.h
         test/common/list_test.c
         test/common/list_test.h
         test/lexer/lexer_test.c
@@ -61,19 +71,26 @@ add_executable(
         test/parser/parser_test.h
         test/parser/type_decl_tests.c
         test/parser/type_decl_tests.h
-        test/main.c
-        test/test.h
         test/parser/literal_tests.c
         test/parser/literal_tests.h
         test/parser/object_tests.c
         test/parser/object_tests.h
         test/parser/unary_binary_tests.c
         test/parser/unary_binary_tests.h
-        test/test_utils.c
-        test/test_utils.h
         test/parser/val_decl_tests.c
         test/parser/val_decl_tests.h
-        src/common/strings.c
-        src/common/strings.h
-)
+        test/typechecker/binary_tests.c
+        test/typechecker/binary_tests.h
+        test/typechecker/literal_tests.c
+        test/typechecker/literal_tests.h
+        test/typechecker/typechecker_tests.c
+        test/typechecker/typechecker_tests.h
+        test/typechecker/unary_tests.c
+        test/typechecker/unary_tests.h
+        test/main.c
+        test/test.h
+        test/test_utils.c
+        test/test_utils.h
+        test/typechecker/typechecker_test_utils.h)
+
 add_test(clyra_tests clyra_tests)
