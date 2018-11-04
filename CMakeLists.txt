@@ -10,8 +10,16 @@ include_directories(test)
 
 add_executable(
         clyra
+        src/common/depth_map.c
+        src/common/depth_map.h
+        src/common/hashmap.c
+        src/common/hashmap.h
         src/common/list.c
         src/common/list.h
+        src/common/stack.c
+        src/common/stack.h
+        src/common/strings.c
+        src/common/strings.h
         src/debugging/mem_checks.h
         src/debugging/printing_visitor.c
         src/debugging/printing_visitor.h
@@ -24,8 +32,6 @@ add_executable(
         src/parser/parser_error.c
         src/parser/parser_error.h
         src/main.c
-        src/common/strings.c
-        src/common/strings.h
         src/typechecker/typechecker.c
         src/typechecker/typechecker.h
         src/typechecker/types.c
@@ -35,8 +41,14 @@ add_executable(
 enable_testing()
 add_executable(
         clyra_tests
+        src/common/depth_map.c
+        src/common/depth_map.h
+        src/common/hashmap.c
+        src/common/hashmap.h
         src/common/list.c
         src/common/list.h
+        src/common/stack.c
+        src/common/stack.h
         src/common/strings.c
         src/common/strings.h
         src/lexer/lexer.c
@@ -87,10 +99,11 @@ add_executable(
         test/typechecker/typechecker_tests.h
         test/typechecker/unary_tests.c
         test/typechecker/unary_tests.h
+        test/typechecker/typechecker_test_utils.h
         test/main.c
         test/test.h
         test/test_utils.c
         test/test_utils.h
-        test/typechecker/typechecker_test_utils.h)
+)
 
 add_test(clyra_tests clyra_tests)

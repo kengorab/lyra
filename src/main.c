@@ -1,12 +1,12 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
-#include <typechecker/typechecker.h>
 
+#include "common/list.h"
 #include "lexer/lexer.h"
 #include "parser/parser.h"
 #include "debugging/printing_visitor.h"
-#include "common/list.h"
+#include "typechecker/typechecker.h"
 
 int main(int argc, char** argv) {
     char* source = "val a = (1 + 3) <= 5 == true";
@@ -39,7 +39,8 @@ int main(int argc, char** argv) {
 
     printing_visit(nodes);
 
-    List* typecheckErrors = typecheck(nodes);
+    Typechecker* tc = newTypechecker(nodes);
+    int numTypecheckErrors = typecheck(tc);
     // TODO: Handle errors
 
     return 0;

@@ -3,12 +3,18 @@
 
 #include "parser/ast.h"
 #include "typechecker.h"
+#include "common/stack.h"
+#include "common/hashmap.h"
 
-static TypecheckError* visit(Node* node);
+void beginScope(Typechecker* tc);
 
-static TypecheckError* visitTypeExpr(TypeExpr* typeExpr);
+void endScope(Typechecker* tc);
 
-static TypecheckError* visitLiteralNode(Node* node) {
+static TypecheckError* visit(Typechecker* tc, Node* node);
+
+static TypecheckError* visitTypeExpr(Typechecker* tc, TypeExpr* typeExpr);
+
+static TypecheckError* visitLiteralNode(Typechecker* tc, Node* node) {
     LiteralNode* literalNode = node->as.literalNode;
     switch (literalNode->type) {
         case LITERAL_NODE_STRING: {
@@ -36,9 +42,9 @@ static TypecheckError* visitLiteralNode(Node* node) {
     return NULL;
 }
 
-static TypecheckError* visitUnaryNode(Node* node) {
+static TypecheckError* visitUnaryNode(Typechecker* tc, Node* node) {
     UnaryNode* unaryNode = node->as.unaryNode;
-    TypecheckError* err = visit(unaryNode->expr);
+    TypecheckError* err = visit(tc, unaryNode->expr);
     if (err != NULL) return err;
 
     switch (unaryNode->token->type) {
@@ -65,12 +71,12 @@ static TypecheckError* visitUnaryNode(Node* node) {
     return NULL;
 }
 
-static TypecheckError* visitBinaryNode(Node* node) {
+static TypecheckError* visitBinaryNode(Typechecker* tc, Node* node) {
     BinaryNode* binaryNode = node->as.binaryNode;
-    TypecheckError* err = visit(binaryNode->lExpr);
+    TypecheckError* err = visit(tc, binaryNode->lExpr);
     if (err != NULL) return err;
 
-    err = visit(binaryNode->rExpr);
+    err = visit(tc, binaryNode->rExpr);
     if (err != NULL) return err;
 
     switch (binaryNode->token->type) {
@@ -140,88 +146,88 @@ static TypecheckError* visitBinaryNode(Node* node) {
     }
 }
 
-static TypecheckError* visitIdentifierNode(Node* node) {
+static TypecheckError* visitIdentifierNode(Typechecker* tc, Node* node) {
     IdentifierNode* identifierNode = node->as.identifierNode;
     return NULL;
 }
 
-static TypecheckError* visitIfElseNode(Node* node) {
+static TypecheckError* visitIfElseNode(Typechecker* tc, Node* node) {
     IfElseNode* ifElseNode = node->as.ifElseNode;
     printf("%s\n", "visitIfElseNode");
-    visit(ifElseNode->conditionExpr);
-    visit(ifElseNode->thenExpr);
+    visit(tc, ifElseNode->conditionExpr);
+    visit(tc, ifElseNode->thenExpr);
     if (ifElseNode->elseExpr != NULL) {
-        visit(ifElseNode->elseExpr);
+        visit(tc, ifElseNode->elseExpr);
     }
     return NULL;
 }
 
-static TypecheckError* visitBlockNode(Node* node) {
+static TypecheckError* visitBlockNode(Typechecker* tc, Node* node) {
     BlockNode* blockNode = node->as.blockNode;
     printf("%s\n", "visitBlockNode");
     for (int i = 0; i < blockNode->numExprs; ++i) {
-        visit(blockNode->exprs[i]);
+        visit(tc, blockNode->exprs[i]);
     }
     return NULL;
 }
 
-static TypecheckError* visitInvocationNode(Node* node) {
+static TypecheckError* visitInvocationNode(Typechecker* tc, Node* node) {
     InvocationNode* invocationNode = node->as.invocationNode;
     printf("%s\n", "visitInvocationNode");
-    visit(invocationNode->target);
+    visit(tc, invocationNode->target);
     for (int i = 0; i < invocationNode->numArgs; ++i) {
-        visit(invocationNode->arguments[i]);
+        visit(tc, invocationNode->arguments[i]);
     }
     return NULL;
 }
 
-static TypecheckError* visitValDeclStmtNode(Node* node) {
+static TypecheckError* visitValDeclStmtNode(Typechecker* tc, Node* node) {
     ValDeclStmt* valDeclStmt = node->as.valDeclStmt;
     printf("%s\n", "visitValDeclStmtNode");
-    visit(valDeclStmt->assignment);
+    visit(tc, valDeclStmt->assignment);
     return NULL;
 }
 
-static TypecheckError* visitFuncDeclStmtNode(Node* node) {
+static TypecheckError* visitFuncDeclStmtNode(Typechecker* tc, Node* node) {
     FuncDeclStmt* funcDeclStmt = node->as.funcDeclStmt;
     printf("%s\n", "visitFuncDeclStmtNode");
-    visit(funcDeclStmt->body);
+    visit(tc, funcDeclStmt->body);
     return NULL;
 }
 
-static TypecheckError* visitTypeExpr(TypeExpr* typeExpr) {
+static TypecheckError* visitTypeExpr(Typechecker* tc, TypeExpr* typeExpr) {
     printf("%s\n", "visitTypeExpr");
     return NULL;
 }
 
-static TypecheckError* visitTypeDeclStmtNode(Node* node) {
+static TypecheckError* visitTypeDeclStmtNode(Typechecker* tc, Node* node) {
     TypeDeclStmt* typeDeclStmt = node->as.typeDeclStmt;
     printf("%s\n", "visitTypeDeclStmtNode");
-    visitTypeExpr(typeDeclStmt->typeExpr);
+    visitTypeExpr(tc, typeDeclStmt->typeExpr);
     return NULL;
 }
 
-static TypecheckError* visitArrayLiteralNode(Node* node) {
+static TypecheckError* visitArrayLiteralNode(Typechecker* tc, Node* node) {
     ArrayLiteralNode* arrayLiteralNode = node->as.arrayLiteralNode;
     printf("%s\n", "visitArrayLiteralNode");
     for (int i = 0; i < arrayLiteralNode->size; ++i) {
-        visit(arrayLiteralNode->elements[i]);
+        visit(tc, arrayLiteralNode->elements[i]);
     }
     return NULL;
 }
 
-static TypecheckError* visitObjectLiteralNode(Node* node) {
+static TypecheckError* visitObjectLiteralNode(Typechecker* tc, Node* node) {
     ObjectLiteralNode* objectLiteralNode = node->as.objectLiteralNode;
     printf("%s\n", "visitObjectLiteralNode");
     for (int i = 0; i < objectLiteralNode->size; ++i) {
-        visit(objectLiteralNode->entries[i]->value);
+        visit(tc, objectLiteralNode->entries[i]->value);
     }
     return NULL;
 }
 
-static TypecheckError* visitGroupingNodeNode(Node* node) {
+static TypecheckError* visitGroupingNodeNode(Typechecker* tc, Node* node) {
     GroupingNode* groupingNode = node->as.groupingNode;
-    visit(groupingNode->expr);
+    visit(tc, groupingNode->expr);
     node->type = groupingNode->expr->type;
     return NULL;
 }
@@ -243,27 +249,56 @@ TypecheckRule rules[] = {
     {NODE_TYPE_TYPE_DECL_STATEMENT, visitTypeDeclStmtNode}
 };
 
-static TypecheckError* visit(Node* node) {
+static TypecheckError* visit(Typechecker* tc, Node* node) {
     TypecheckFn fn = rules[node->nodeType].fn;
-    return fn(node);
+    return fn(tc, node);
 }
 
-List* typecheck(List* nodes) {
-    List* errors = newList();
-    if (nodes->count == 0) {
+int typecheck(Typechecker* tc) {
+    if (tc->nodes->count == 0) {
         fprintf(stdout, "No nodes, nothing to do!\n");
-        return errors;
+        return 0;
     }
 
-    for (int i = 0; i < nodes->count; ++i) {
-        Node* node = (Node*) nodes->values[i];
-        TypecheckError* err = visit(node);
+    for (int i = 0; i < tc->nodes->count; ++i) {
+        Node* node = (Node*) tc->nodes->values[i];
+        TypecheckError* err = visit(tc, node);
         if (err != NULL) {
-            listAdd(errors, (void**) &err);
+            listAdd(tc->errors, (void**) &err);
         }
     }
 
-    return errors;
+    return tc->errors->count;
+}
+
+void initTypechecker(Typechecker* tc);
+
+Typechecker* newTypechecker(List* nodes) {
+    Typechecker* tc = malloc(sizeof(Typechecker));
+    tc->depthMap = newNodeDepthMap();
+    tc->errors = newList();
+    tc->nodes = nodes;
+    tc->scopes = stack_new();
+
+    initTypechecker(tc);
+
+    return tc;
+}
+
+void initTypechecker(Typechecker* tc) {
+    map_t scope = hashmap_new();
+    stack_push(tc->scopes, &scope);
+}
+
+void beginScope(Typechecker* tc) {
+    map_t scope = hashmap_new();
+    stack_push(tc->scopes, &scope);
+}
+
+void endScope(Typechecker* tc) {
+    map_t oldScope;
+    stack_pop(tc->scopes, &oldScope);
+    hashmap_free(oldScope);
 }
 
 TypecheckError* newTypecheckError(Token* token, Type actualType, int numExpected, ...) {

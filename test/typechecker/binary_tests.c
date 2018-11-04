@@ -71,32 +71,32 @@ TEST(testTypecheckBinaryNode_arithmetic_leftIsDoubleRightIsDouble, {
 })
 
 TEST(testTypecheckBinaryNode_arithmetic_errorNonNumeric, {
-    List* errs = PARSE_SINGLE_EXPR_GET_ERRS("1 + true", 1);
-    TypecheckError* err = (TypecheckError*) errs->values[0];
+    Typechecker* tc = PARSE_SINGLE_EXPR_GET_TC("1 + true", 1);
+    TypecheckError* err = (TypecheckError*) tc->errors->values[0];
     ASSERT_TOKEN_POSITION(err->token, 1, 3);
     ASSERT_TYPE_EQ(err->actualType, PRIMITIVE_TYPE_BOOL, "Bool");
     ASSERT_EQ(2, err->numExpected, "The error should include 2 expected types");
     ASSERT_TYPE_EQ(err->expectedTypes[0], PRIMITIVE_TYPE_INT, "Int");
     ASSERT_TYPE_EQ(err->expectedTypes[1], PRIMITIVE_TYPE_DOUBLE, "Double");
 
-    errs = PARSE_SINGLE_EXPR_GET_ERRS("true - false", 1);
-    err = (TypecheckError*) errs->values[0];
+    tc = PARSE_SINGLE_EXPR_GET_TC("true - false", 1);
+    err = (TypecheckError*) tc->errors->values[0];
     ASSERT_TOKEN_POSITION(err->token, 1, 6);
     ASSERT_TYPE_EQ(err->actualType, PRIMITIVE_TYPE_BOOL, "Bool");
     ASSERT_EQ(2, err->numExpected, "The error should include 2 expected types");
     ASSERT_TYPE_EQ(err->expectedTypes[0], PRIMITIVE_TYPE_INT, "Int");
     ASSERT_TYPE_EQ(err->expectedTypes[1], PRIMITIVE_TYPE_DOUBLE, "Double");
 
-    errs = PARSE_SINGLE_EXPR_GET_ERRS("false * 1.2", 1);
-    err = (TypecheckError*) errs->values[0];
+    tc = PARSE_SINGLE_EXPR_GET_TC("false * 1.2", 1);
+    err = (TypecheckError*) tc->errors->values[0];
     ASSERT_TOKEN_POSITION(err->token, 1, 7);
     ASSERT_TYPE_EQ(err->actualType, PRIMITIVE_TYPE_BOOL, "Bool");
     ASSERT_EQ(2, err->numExpected, "The error should include 2 expected types");
     ASSERT_TYPE_EQ(err->expectedTypes[0], PRIMITIVE_TYPE_INT, "Int");
     ASSERT_TYPE_EQ(err->expectedTypes[1], PRIMITIVE_TYPE_DOUBLE, "Double");
 
-    errs = PARSE_SINGLE_EXPR_GET_ERRS("1.2 / 'hello'", 1);
-    err = (TypecheckError*) errs->values[0];
+    tc = PARSE_SINGLE_EXPR_GET_TC("1.2 / 'hello'", 1);
+    err = (TypecheckError*) tc->errors->values[0];
     ASSERT_TOKEN_POSITION(err->token, 1, 5);
     ASSERT_TYPE_EQ(err->actualType, PRIMITIVE_TYPE_STRING, "String");
     ASSERT_EQ(2, err->numExpected, "The error should include 2 expected types");
@@ -121,32 +121,32 @@ TEST(testTypecheckBinaryNode_comparators_leftIsNumericRightIsNumeric, {
 })
 
 TEST(testTypecheckBinaryNode_comparators_errorNonNumeric, {
-    List* errs = PARSE_SINGLE_EXPR_GET_ERRS("true < 3.4", 1);
-    TypecheckError* err = (TypecheckError*) errs->values[0];
+    Typechecker* tc = PARSE_SINGLE_EXPR_GET_TC("true < 3.4", 1);
+    TypecheckError* err = (TypecheckError*) tc->errors->values[0];
     ASSERT_TOKEN_POSITION(err->token, 1, 6);
     ASSERT_TYPE_EQ(err->actualType, PRIMITIVE_TYPE_BOOL, "Bool");
     ASSERT_EQ(2, err->numExpected, "The error should include 2 expected types");
     ASSERT_TYPE_EQ(err->expectedTypes[0], PRIMITIVE_TYPE_INT, "Int");
     ASSERT_TYPE_EQ(err->expectedTypes[1], PRIMITIVE_TYPE_DOUBLE, "Double");
 
-    errs = PARSE_SINGLE_EXPR_GET_ERRS("3.4 <= false", 1);
-    err = (TypecheckError*) errs->values[0];
+    tc = PARSE_SINGLE_EXPR_GET_TC("3.4 <= false", 1);
+    err = (TypecheckError*) tc->errors->values[0];
     ASSERT_TOKEN_POSITION(err->token, 1, 5);
     ASSERT_TYPE_EQ(err->actualType, PRIMITIVE_TYPE_BOOL, "Bool");
     ASSERT_EQ(2, err->numExpected, "The error should include 2 expected types");
     ASSERT_TYPE_EQ(err->expectedTypes[0], PRIMITIVE_TYPE_INT, "Int");
     ASSERT_TYPE_EQ(err->expectedTypes[1], PRIMITIVE_TYPE_DOUBLE, "Double");
 
-    errs = PARSE_SINGLE_EXPR_GET_ERRS("3 > 'false'", 1);
-    err = (TypecheckError*) errs->values[0];
+    tc = PARSE_SINGLE_EXPR_GET_TC("3 > 'false'", 1);
+    err = (TypecheckError*) tc->errors->values[0];
     ASSERT_TOKEN_POSITION(err->token, 1, 3);
     ASSERT_TYPE_EQ(err->actualType, PRIMITIVE_TYPE_STRING, "String");
     ASSERT_EQ(2, err->numExpected, "The error should include 2 expected types");
     ASSERT_TYPE_EQ(err->expectedTypes[0], PRIMITIVE_TYPE_INT, "Int");
     ASSERT_TYPE_EQ(err->expectedTypes[1], PRIMITIVE_TYPE_DOUBLE, "Double");
 
-    errs = PARSE_SINGLE_EXPR_GET_ERRS("'abcd' >= 4", 1);
-    err = (TypecheckError*) errs->values[0];
+    tc = PARSE_SINGLE_EXPR_GET_TC("'abcd' >= 4", 1);
+    err = (TypecheckError*) tc->errors->values[0];
     ASSERT_TOKEN_POSITION(err->token, 1, 8);
     ASSERT_TYPE_EQ(err->actualType, PRIMITIVE_TYPE_STRING, "String");
     ASSERT_EQ(2, err->numExpected, "The error should include 2 expected types");
@@ -177,29 +177,29 @@ TEST(testTypecheckBinaryNode_or_leftIsBoolRightIsBool, {
 })
 
 TEST(testTypecheckBinaryNode_andOr_errorNonBoolean, {
-    List* errs = PARSE_SINGLE_EXPR_GET_ERRS("true && 3.4", 1);
-    TypecheckError* err = (TypecheckError*) errs->values[0];
+    Typechecker* tc = PARSE_SINGLE_EXPR_GET_TC("true && 3.4", 1);
+    TypecheckError* err = (TypecheckError*) tc->errors->values[0];
     ASSERT_TOKEN_POSITION(err->token, 1, 6);
     ASSERT_TYPE_EQ(err->actualType, PRIMITIVE_TYPE_DOUBLE, "Double");
     ASSERT_EQ(1, err->numExpected, "The error should include 1 expected type");
     ASSERT_TYPE_EQ(err->expectedTypes[0], PRIMITIVE_TYPE_BOOL, "Bool");
 
-    errs = PARSE_SINGLE_EXPR_GET_ERRS("'qwer' && false", 1);
-    err = (TypecheckError*) errs->values[0];
+    tc = PARSE_SINGLE_EXPR_GET_TC("'qwer' && false", 1);
+    err = (TypecheckError*) tc->errors->values[0];
     ASSERT_TOKEN_POSITION(err->token, 1, 8);
     ASSERT_TYPE_EQ(err->actualType, PRIMITIVE_TYPE_STRING, "String");
     ASSERT_EQ(1, err->numExpected, "The error should include 1 expected type");
     ASSERT_TYPE_EQ(err->expectedTypes[0], PRIMITIVE_TYPE_BOOL, "Bool");
 
-    errs = PARSE_SINGLE_EXPR_GET_ERRS("true || 3.4", 1);
-    err = (TypecheckError*) errs->values[0];
+    tc = PARSE_SINGLE_EXPR_GET_TC("true || 3.4", 1);
+    err = (TypecheckError*) tc->errors->values[0];
     ASSERT_TOKEN_POSITION(err->token, 1, 6);
     ASSERT_TYPE_EQ(err->actualType, PRIMITIVE_TYPE_DOUBLE, "Double");
     ASSERT_EQ(1, err->numExpected, "The error should include 1 expected type");
     ASSERT_TYPE_EQ(err->expectedTypes[0], PRIMITIVE_TYPE_BOOL, "Bool");
 
-    errs = PARSE_SINGLE_EXPR_GET_ERRS("'qwer' || false", 1);
-    err = (TypecheckError*) errs->values[0];
+    tc = PARSE_SINGLE_EXPR_GET_TC("'qwer' || false", 1);
+    err = (TypecheckError*) tc->errors->values[0];
     ASSERT_TOKEN_POSITION(err->token, 1, 8);
     ASSERT_TYPE_EQ(err->actualType, PRIMITIVE_TYPE_STRING, "String");
     ASSERT_EQ(1, err->numExpected, "The error should include 1 expected type");

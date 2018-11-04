@@ -2,6 +2,7 @@
 #define CLYRA_UNARY_TESTS_H
 
 #include "test.h"
+#include "typechecker_test_utils.h"
 
 void runUnaryTypecheckerTests(Tester* tester);
 

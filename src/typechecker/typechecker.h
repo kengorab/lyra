@@ -3,8 +3,19 @@
 
 #include <stdarg.h>
 
-#include "common/list.h"
 #include "parser/ast.h"
+#include "common/list.h"
+#include "common/depth_map.h"
+#include "common/stack.h"
+
+typedef struct {
+    List* nodes;
+    List* errors;
+    NodeDepthMap* depthMap;
+    lyra_stack_t* scopes;
+} Typechecker;
+
+Typechecker* newTypechecker(List* nodes);
 
 typedef struct {
     Token* token;
@@ -13,10 +24,9 @@ typedef struct {
     Type* expectedTypes;
 } TypecheckError;
 
-//TypecheckError* newTypecheckError(Token* token, const char* message);
 TypecheckError* newTypecheckError(Token* token, Type actualType, int numExpected, ...);
 
-typedef TypecheckError* (* TypecheckFn)(Node*);
+typedef TypecheckError* (* TypecheckFn)(Typechecker*, Node*);
 
 typedef struct {
     AstNodeType nodeType;
@@ -24,8 +34,8 @@ typedef struct {
 } TypecheckRule;
 
 /**
- * Returns a List of TypecheckErrors
+ * Returns the count of TypecheckErrors
  */
-List* typecheck(List* nodes);
+int typecheck(Typechecker* tc);
 
 #endif //CLYRA_TYPECHECKER_H
