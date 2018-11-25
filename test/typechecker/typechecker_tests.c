@@ -7,6 +7,7 @@
 #include "literal_tests.h"
 #include "unary_tests.h"
 #include "binary_tests.h"
+#include "ifelse_tests.h"
 
 void runTypecheckerTests(Tester* tester) {
     tester->startSuite("Typechecker");
@@ -19,4 +20,7 @@ void runTypecheckerTests(Tester* tester) {
 
     tester->startSubsuite("Typechecker", "Binary");
     runBinaryTypecheckerTests(tester);
+
+    tester->startSubsuite("Typechecker", "If-Else");
+    runIfElseTypecheckerTests(tester);
 }

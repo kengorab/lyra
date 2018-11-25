@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <parser/ast.h>
 
 #include "parser/ast.h"
 #include "typechecker.h"
@@ -153,12 +154,23 @@ static TypecheckError* visitIdentifierNode(Typechecker* tc, Node* node) {
 
 static TypecheckError* visitIfElseNode(Typechecker* tc, Node* node) {
     IfElseNode* ifElseNode = node->as.ifElseNode;
-    printf("%s\n", "visitIfElseNode");
     visit(tc, ifElseNode->conditionExpr);
+    if (!NODE_IS_BOOL(ifElseNode->conditionExpr)) {
+        // HACK, this only works because the first field in all of the union structs is Token*
+        Token* token = ifElseNode->conditionExpr->as.literalNode->token;
+        return newTypecheckError(token, ifElseNode->conditionExpr->type, 1, typeBool);
+    }
+
     visit(tc, ifElseNode->thenExpr);
     if (ifElseNode->elseExpr != NULL) {
         visit(tc, ifElseNode->elseExpr);
+
+        if (ifElseNode->thenExpr->type.type == ifElseNode->elseExpr->type.type) {
+            node->type = ifElseNode->thenExpr->type;
+        }
     }
+    // TODO: If there is no else, the type of the Node should be Opt[THEN_TYPE]
+    // TODO: If the then and else branches don't match, the type of the Node should be an Either[THEN_TYPE, ELSE_TYPE]
     return NULL;
 }
 
