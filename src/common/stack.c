@@ -3,7 +3,7 @@
 #include "stack.h"
 
 lyra_stack_t* stack_new() {
-    lyra_stack_t* s = malloc(sizeof(stack_t));
+    lyra_stack_t* s = malloc(sizeof(lyra_stack_t));
     s->items = malloc(sizeof(void*) & STACK_MAX_SIZE);
     s->top = -1;
     s->size = 0;
