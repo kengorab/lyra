@@ -17,14 +17,37 @@ typedef struct {
 
 Typechecker* newTypechecker(List* nodes);
 
+#ifdef C
+#undef C
+#endif
+#define C(ENUM_VAL) ENUM_VAL,
+#define TYPE_ERROR_TYPES \
+    C(TYPE_ERROR_MISMATCH)
+
+typedef enum {
+    TYPE_ERROR_TYPES
+} TypeErrorType;
+
+#undef C
+#define C(ENUM_VAL) #ENUM_VAL,
+
+// Ignore warning; initialized statically
+const char* typeErrorTypes[];
+
 typedef struct {
-    Token* token;
-    Type* actualType;
-    int numExpected;
-    Type** expectedTypes;
+    TypeErrorType kind;
+
+    union {
+        struct {
+            Token* token;
+            Type* actualType;
+            int numExpected;
+            Type** expectedTypes;
+        } mismatch;
+    };
 } TypecheckError;
 
-TypecheckError* newTypecheckError(Token* token, Type* actualType, int numExpected, ...);
+TypecheckError* newTypeMismatchError(Token* token, Type* actualType, int numExpected, ...);
 
 typedef TypecheckError* (* TypecheckFn)(Typechecker*, Node*);
 

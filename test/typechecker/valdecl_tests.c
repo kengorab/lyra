@@ -42,10 +42,11 @@ TEST(testTypecheckValDeclNode_errorTypeAnnotationNotMatchingType_bindingSavedWit
     Typechecker* tc = PARSE_SINGLE_EXPR_GET_TC("val a: String = 123", 1);
 
     TypecheckError* err = (TypecheckError*) tc->errors->values[0];
-    ASSERT_TOKEN_POSITION(err->token, 1, 17);
-    ASSERT_TYPE_EQ(err->actualType, PRIMITIVE_TYPE_INT, "Int");
-    ASSERT_EQ(1, err->numExpected, "The error should include 1 expected type");
-    ASSERT_TYPE_EQ(err->expectedTypes[0], PRIMITIVE_TYPE_STRING, "String");
+    ASSERT_EQ(TYPE_ERROR_MISMATCH, err->kind, "The error should be a Type Mismatch error");
+    ASSERT_TOKEN_POSITION(err->mismatch.token, 1, 17);
+    ASSERT_TYPE_EQ(err->mismatch.actualType, PRIMITIVE_TYPE_INT, "Int");
+    ASSERT_EQ(1, err->mismatch.numExpected, "The error should include 1 expected type");
+    ASSERT_TYPE_EQ(err->mismatch.expectedTypes[0], PRIMITIVE_TYPE_STRING, "String");
 
     map_t scope;
     stack_peek(tc->scopes, &scope);

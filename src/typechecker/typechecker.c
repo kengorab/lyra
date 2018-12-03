@@ -53,14 +53,14 @@ static TypecheckError* visitUnaryNode(Typechecker* tc, Node* node) {
     switch (unaryNode->token->type) {
         case TOKEN_MINUS: {
             if (!NODE_IS_NUMERIC(unaryNode->expr)) {
-                return newTypecheckError(unaryNode->token, unaryNode->expr->type, 2, typeInt(), typeDouble());
+                return newTypeMismatchError(unaryNode->token, unaryNode->expr->type, 2, typeInt(), typeDouble());
             }
             node->type = unaryNode->expr->type;
             break;
         }
         case TOKEN_BANG: {
             if (!NODE_IS_BOOL(unaryNode->expr)) {
-                return newTypecheckError(unaryNode->token, unaryNode->expr->type, 1, typeBool());
+                return newTypeMismatchError(unaryNode->token, unaryNode->expr->type, 1, typeBool());
             }
             node->type = typeBool();
             break;
@@ -95,9 +95,9 @@ static TypecheckError* visitBinaryNode(Typechecker* tc, Node* node) {
             }
 
             if (!NODE_IS_NUMERIC(binaryNode->lExpr)) {
-                return newTypecheckError(binaryNode->token, binaryNode->lExpr->type, 2, typeInt(), typeDouble());
+                return newTypeMismatchError(binaryNode->token, binaryNode->lExpr->type, 2, typeInt(), typeDouble());
             } else if (!NODE_IS_NUMERIC(binaryNode->rExpr)) {
-                return newTypecheckError(binaryNode->token, binaryNode->rExpr->type, 2, typeInt(), typeDouble());
+                return newTypeMismatchError(binaryNode->token, binaryNode->rExpr->type, 2, typeInt(), typeDouble());
             }
 
             if (binaryNode->token->type == TOKEN_SLASH) {
@@ -121,9 +121,9 @@ static TypecheckError* visitBinaryNode(Typechecker* tc, Node* node) {
                 node->type = typeBool();
                 return NULL;
             } else if (!NODE_IS_NUMERIC(binaryNode->lExpr)) {
-                return newTypecheckError(binaryNode->token, binaryNode->lExpr->type, 2, typeInt(), typeDouble());
+                return newTypeMismatchError(binaryNode->token, binaryNode->lExpr->type, 2, typeInt(), typeDouble());
             } else if (!NODE_IS_NUMERIC(binaryNode->rExpr)) {
-                return newTypecheckError(binaryNode->token, binaryNode->rExpr->type, 2, typeInt(), typeDouble());
+                return newTypeMismatchError(binaryNode->token, binaryNode->rExpr->type, 2, typeInt(), typeDouble());
             }
         }
         case TOKEN_EQ_EQ:
@@ -137,9 +137,9 @@ static TypecheckError* visitBinaryNode(Typechecker* tc, Node* node) {
                 node->type = typeBool();
                 return NULL;
             } else if (!NODE_IS_BOOL(binaryNode->lExpr)) {
-                return newTypecheckError(binaryNode->token, binaryNode->lExpr->type, 1, typeBool());
+                return newTypeMismatchError(binaryNode->token, binaryNode->lExpr->type, 1, typeBool());
             } else if (!NODE_IS_BOOL(binaryNode->rExpr)) {
-                return newTypecheckError(binaryNode->token, binaryNode->rExpr->type, 1, typeBool());
+                return newTypeMismatchError(binaryNode->token, binaryNode->rExpr->type, 1, typeBool());
             }
         }
         default: {
@@ -174,7 +174,7 @@ static TypecheckError* visitIfElseNode(Typechecker* tc, Node* node) {
     visit(tc, ifElseNode->conditionExpr);
     if (!NODE_IS_BOOL(ifElseNode->conditionExpr)) {
         Token* token = NODE_GET_TOKEN_HACK(ifElseNode);
-        return newTypecheckError(token, ifElseNode->conditionExpr->type, 1, typeBool());
+        return newTypeMismatchError(token, ifElseNode->conditionExpr->type, 1, typeBool());
     }
 
     visit(tc, ifElseNode->thenExpr);
@@ -244,7 +244,7 @@ static TypecheckError* visitValDeclStmtNode(Typechecker* tc, Node* node) {
 
             if (!typeEq(type, valDeclStmt->assignment->type)) {
                 Token* token = valDeclStmt->assignment->as.literalNode->token;
-                return newTypecheckError(token, valDeclStmt->assignment->type, 1, type);
+                return newTypeMismatchError(token, valDeclStmt->assignment->type, 1, type);
             }
         }
     }
@@ -380,7 +380,7 @@ void define(Typechecker* tc, const char* name, Type* type) {
         DIE("Redefining variable in scope");
         // TODO: Throw a typechecker error when redefining variable in scope
 //        Token* token = NODE_GET_TOKEN_HACK(node);
-//        TypecheckError* err = newTypecheckError(token,)
+//        TypecheckError* err = newTypeMismatchError(token,)
 //        listAdd(tc->errors, (void**) &err);
     }
 
@@ -388,18 +388,21 @@ void define(Typechecker* tc, const char* name, Type* type) {
 #undef DIE
 }
 
-TypecheckError* newTypecheckError(Token* token, Type* actualType, int numExpected, ...) {
+const char* typeErrorTypes[] = {TYPE_ERROR_TYPES};
+
+TypecheckError* newTypeMismatchError(Token* token, Type* actualType, int numExpected, ...) {
     va_list args;
     va_start(args, numExpected);
 
     TypecheckError* err = malloc(sizeof(TypecheckError));
-    err->token = token;
-    err->actualType = actualType;
-    err->numExpected = numExpected;
-    err->expectedTypes = malloc(sizeof(Type*) * numExpected);
+    err->kind = TYPE_ERROR_MISMATCH;
+    err->mismatch.token = token;
+    err->mismatch.actualType = actualType;
+    err->mismatch.numExpected = numExpected;
+    err->mismatch.expectedTypes = malloc(sizeof(Type*) * numExpected);
 
     for (int i = 0; i < numExpected; ++i) {
-        err->expectedTypes[i] = va_arg(args, Type*);
+        err->mismatch.expectedTypes[i] = va_arg(args, Type*);
     }
 
     return err;
