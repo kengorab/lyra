@@ -2,8 +2,8 @@
 #define CLYRA_AST_H
 
 #include <stdbool.h>
-#include <typechecker/types.h>
 
+#include "typechecker/types.h"
 #include "lexer/lexer.h"
 
 #ifdef C
@@ -60,8 +60,11 @@ const char* literalNodeTypes[];
 //             Expressions
 // ------------------------------------
 
+// HACK! This only works because the first field in all of the union structs of Node is Token*
+#define NODE_GET_TOKEN_HACK(node) (node->conditionExpr->as.literalNode->token)
+
 typedef struct {
-    Token* token;
+    Token* token; // See NODE_GET_TOKEN_HACK
     LiteralNodeType type;
     union {
         int iVal;
@@ -75,23 +78,23 @@ typedef struct {
 } LiteralNode;
 
 typedef struct {
-    Token* token;
+    Token* token; // See NODE_GET_TOKEN_HACK
     const char* name;
 } IdentifierNode;
 
 typedef struct {
-    Token* token;
+    Token* token; // See NODE_GET_TOKEN_HACK
     Node* expr;
 } UnaryNode;
 
 typedef struct {
-    Token* token;
+    Token* token; // See NODE_GET_TOKEN_HACK
     Node* lExpr;
     Node* rExpr;
 } BinaryNode;
 
 typedef struct {
-    Token* token;
+    Token* token; // See NODE_GET_TOKEN_HACK
     Node** elements;
     int size;
 } ArrayLiteralNode;
@@ -101,19 +104,19 @@ typedef struct {
     Node* value;
 } ObjectLiteralEntry;
 typedef struct {
-    Token* token;
+    Token* token; // See NODE_GET_TOKEN_HACK
     ObjectLiteralEntry** entries;
     Node** keys;
     int size;
 } ObjectLiteralNode;
 
 typedef struct {
-    Token* token;
+    Token* token; // See NODE_GET_TOKEN_HACK
     Node* expr;
 } GroupingNode;
 
 typedef struct {
-    Token* token;
+    Token* token; // See NODE_GET_TOKEN_HACK
     Node** exprs;
     int numExprs;
 } BlockNode;
@@ -121,14 +124,14 @@ typedef struct {
 // An if-else node can either be a statement or expression
 // If it's an expression the else block is required
 typedef struct {
-    Token* token;
+    Token* token; // See NODE_GET_TOKEN_HACK
     Node* conditionExpr;
     Node* thenExpr;
     Node* elseExpr;
 } IfElseNode;
 
 typedef struct {
-    Token* token;
+    Token* token; // See NODE_GET_TOKEN_HACK
     Node* target;
     int numArgs;
     Node** arguments;
@@ -139,10 +142,10 @@ typedef struct {
 //             Statements
 // ------------------------------------
 
-typedef struct TypeExpr TypeExpr;
+typedef struct TypeExpr TypeExpr; // Ignore warning: harmless redefine from forward-decl in types.h
 
 typedef struct {
-    Token* token;
+    Token* token; // See NODE_GET_TOKEN_HACK
     IdentifierNode* ident;
     TypeExpr* typeAnnotation;
     Node* assignment;
@@ -150,7 +153,7 @@ typedef struct {
 } ValDeclStmt;
 
 typedef struct {
-    Token* token;
+    Token* token; // See NODE_GET_TOKEN_HACK
     IdentifierNode* name;
     int numParams;
     Node** params;
@@ -160,7 +163,7 @@ typedef struct {
 } FuncDeclStmt;
 
 typedef struct {
-    Token* token;
+    Token* token; // See NODE_GET_TOKEN_HACK
     IdentifierNode* name;
     TypeExpr* typeExpr;
     int numArgs;
@@ -224,7 +227,7 @@ TypeExpr* newEnumTypeExpr(Token* token, int numOptions, TypeExpr** options);
 
 struct Node {
     AstNodeType nodeType;
-    Type type;
+    Type* type;
     union {
         ValDeclStmt* valDeclStmt;
         FuncDeclStmt* funcDeclStmt;
@@ -266,8 +269,11 @@ Node* newInvocationNode(Token* token, Node* target, int numArgs, Node** argument
 
 Node* newValDeclStmtNode(Token* token, Node* identNode, TypeExpr* typeAnnot, Node* assignment, bool isMutable);
 
-Node* newFuncDeclStmtNode(Token* token, Node* nameNode, int numParams, Node** params, TypeExpr** paramTypeAnnots, Node* body, TypeExpr* optRetTypeAnnot);
+Node*
+newFuncDeclStmtNode(Token* token, Node* nameNode, int numParams, Node** params, TypeExpr** paramTypeAnnots, Node* body,
+                    TypeExpr* optRetTypeAnnot);
 
-Node* newTypeDeclStmtNode(Token* token, IdentifierNode* name, TypeExpr* typeExpr, int numArgs, IdentifierNode** typeArgs);
+Node*
+newTypeDeclStmtNode(Token* token, IdentifierNode* name, TypeExpr* typeExpr, int numArgs, IdentifierNode** typeArgs);
 
 #endif //CLYRA_AST_H

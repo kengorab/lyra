@@ -93,6 +93,8 @@ add_executable(
         test/parser/val_decl_tests.h
         test/typechecker/binary_tests.c
         test/typechecker/binary_tests.h
+        test/typechecker/block_tests.c
+        test/typechecker/block_tests.h
         test/typechecker/ifelse_tests.c
         test/typechecker/ifelse_tests.h
         test/typechecker/literal_tests.c
@@ -101,6 +103,8 @@ add_executable(
         test/typechecker/typechecker_tests.h
         test/typechecker/unary_tests.c
         test/typechecker/unary_tests.h
+        test/typechecker/valdecl_tests.c
+        test/typechecker/valdecl_tests.h
         test/typechecker/typechecker_test_utils.h
         test/main.c
         test/test.h

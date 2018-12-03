@@ -11,6 +11,8 @@ void beginScope(Typechecker* tc);
 
 void endScope(Typechecker* tc);
 
+void define(Typechecker* tc, const char* name, Type* type);
+
 static TypecheckError* visit(Typechecker* tc, Node* node);
 
 static TypecheckError* visitTypeExpr(Typechecker* tc, TypeExpr* typeExpr);
@@ -19,23 +21,23 @@ static TypecheckError* visitLiteralNode(Typechecker* tc, Node* node) {
     LiteralNode* literalNode = node->as.literalNode;
     switch (literalNode->type) {
         case LITERAL_NODE_STRING: {
-            node->type = typeString;
+            node->type = typeString();
             break;
         }
         case LITERAL_NODE_INT: {
-            node->type = typeInt;
+            node->type = typeInt();
             break;
         }
         case LITERAL_NODE_DOUBLE: {
-            node->type = typeDouble;
+            node->type = typeDouble();
             break;
         }
         case LITERAL_NODE_BOOL: {
-            node->type = typeBool;
+            node->type = typeBool();
             break;
         }
         case LITERAL_NODE_NIL: {
-            node->type = typeNil;
+            node->type = typeNil();
             break;
         }
     }
@@ -51,16 +53,16 @@ static TypecheckError* visitUnaryNode(Typechecker* tc, Node* node) {
     switch (unaryNode->token->type) {
         case TOKEN_MINUS: {
             if (!NODE_IS_NUMERIC(unaryNode->expr)) {
-                return newTypecheckError(unaryNode->token, unaryNode->expr->type, 2, typeInt, typeDouble);
+                return newTypecheckError(unaryNode->token, unaryNode->expr->type, 2, typeInt(), typeDouble());
             }
             node->type = unaryNode->expr->type;
             break;
         }
         case TOKEN_BANG: {
             if (!NODE_IS_BOOL(unaryNode->expr)) {
-                return newTypecheckError(unaryNode->token, unaryNode->expr->type, 1, typeBool);
+                return newTypecheckError(unaryNode->token, unaryNode->expr->type, 1, typeBool());
             }
-            node->type = typeBool;
+            node->type = typeBool();
             break;
         }
         default: {
@@ -87,28 +89,28 @@ static TypecheckError* visitBinaryNode(Typechecker* tc, Node* node) {
         case TOKEN_SLASH: {
             if (binaryNode->token->type == TOKEN_PLUS) {
                 if (NODE_IS_STRING(binaryNode->lExpr) || NODE_IS_STRING(binaryNode->rExpr)) {
-                    node->type = typeString;
+                    node->type = typeString();
                     return NULL;
                 }
             }
 
             if (!NODE_IS_NUMERIC(binaryNode->lExpr)) {
-                return newTypecheckError(binaryNode->token, binaryNode->lExpr->type, 2, typeInt, typeDouble);
+                return newTypecheckError(binaryNode->token, binaryNode->lExpr->type, 2, typeInt(), typeDouble());
             } else if (!NODE_IS_NUMERIC(binaryNode->rExpr)) {
-                return newTypecheckError(binaryNode->token, binaryNode->rExpr->type, 2, typeInt, typeDouble);
+                return newTypecheckError(binaryNode->token, binaryNode->rExpr->type, 2, typeInt(), typeDouble());
             }
 
             if (binaryNode->token->type == TOKEN_SLASH) {
-                node->type = typeDouble;
+                node->type = typeDouble();
                 return NULL;
             }
 
             if (NODE_IS_INT(binaryNode->lExpr) && NODE_IS_INT(binaryNode->rExpr)) {
-                node->type = typeInt;
+                node->type = typeInt();
                 return NULL;
             }
 
-            node->type = typeDouble;
+            node->type = typeDouble();
             return NULL;
         }
         case TOKEN_LT:
@@ -116,28 +118,28 @@ static TypecheckError* visitBinaryNode(Typechecker* tc, Node* node) {
         case TOKEN_GT:
         case TOKEN_GTE: {
             if (NODE_IS_NUMERIC(binaryNode->lExpr) && NODE_IS_NUMERIC(binaryNode->rExpr)) {
-                node->type = typeBool;
+                node->type = typeBool();
                 return NULL;
             } else if (!NODE_IS_NUMERIC(binaryNode->lExpr)) {
-                return newTypecheckError(binaryNode->token, binaryNode->lExpr->type, 2, typeInt, typeDouble);
+                return newTypecheckError(binaryNode->token, binaryNode->lExpr->type, 2, typeInt(), typeDouble());
             } else if (!NODE_IS_NUMERIC(binaryNode->rExpr)) {
-                return newTypecheckError(binaryNode->token, binaryNode->rExpr->type, 2, typeInt, typeDouble);
+                return newTypecheckError(binaryNode->token, binaryNode->rExpr->type, 2, typeInt(), typeDouble());
             }
         }
         case TOKEN_EQ_EQ:
         case TOKEN_BANG_EQ: {
-            node->type = typeBool;
+            node->type = typeBool();
             return NULL;
         }
         case TOKEN_AND:
         case TOKEN_OR: {
             if (NODE_IS_BOOL(binaryNode->lExpr) && NODE_IS_BOOL(binaryNode->rExpr)) {
-                node->type = typeBool;
+                node->type = typeBool();
                 return NULL;
             } else if (!NODE_IS_BOOL(binaryNode->lExpr)) {
-                return newTypecheckError(binaryNode->token, binaryNode->lExpr->type, 1, typeBool);
+                return newTypecheckError(binaryNode->token, binaryNode->lExpr->type, 1, typeBool());
             } else if (!NODE_IS_BOOL(binaryNode->rExpr)) {
-                return newTypecheckError(binaryNode->token, binaryNode->rExpr->type, 1, typeBool);
+                return newTypecheckError(binaryNode->token, binaryNode->rExpr->type, 1, typeBool());
             }
         }
         default: {
@@ -149,6 +151,21 @@ static TypecheckError* visitBinaryNode(Typechecker* tc, Node* node) {
 
 static TypecheckError* visitIdentifierNode(Typechecker* tc, Node* node) {
     IdentifierNode* identifierNode = node->as.identifierNode;
+
+    Type* type = NULL;
+    int i = 0;
+    do {
+        map_t scope;
+        if (stack_peek_n(tc->scopes, &scope, i++) != STACK_OK) {
+            // TODO: Throw typechecker error for missing binding
+            exit(1);
+        }
+
+        hashmap_get(scope, (char*) identifierNode->name, (void**) &type);
+    } while (type == NULL);
+
+    node->type = type;
+
     return NULL;
 }
 
@@ -156,16 +173,15 @@ static TypecheckError* visitIfElseNode(Typechecker* tc, Node* node) {
     IfElseNode* ifElseNode = node->as.ifElseNode;
     visit(tc, ifElseNode->conditionExpr);
     if (!NODE_IS_BOOL(ifElseNode->conditionExpr)) {
-        // HACK, this only works because the first field in all of the union structs is Token*
-        Token* token = ifElseNode->conditionExpr->as.literalNode->token;
-        return newTypecheckError(token, ifElseNode->conditionExpr->type, 1, typeBool);
+        Token* token = NODE_GET_TOKEN_HACK(ifElseNode);
+        return newTypecheckError(token, ifElseNode->conditionExpr->type, 1, typeBool());
     }
 
     visit(tc, ifElseNode->thenExpr);
     if (ifElseNode->elseExpr != NULL) {
         visit(tc, ifElseNode->elseExpr);
 
-        if (ifElseNode->thenExpr->type.type == ifElseNode->elseExpr->type.type) {
+        if (ifElseNode->thenExpr->type->type == ifElseNode->elseExpr->type->type) {
             node->type = ifElseNode->thenExpr->type;
         }
     }
@@ -176,10 +192,18 @@ static TypecheckError* visitIfElseNode(Typechecker* tc, Node* node) {
 
 static TypecheckError* visitBlockNode(Typechecker* tc, Node* node) {
     BlockNode* blockNode = node->as.blockNode;
-    printf("%s\n", "visitBlockNode");
+
+    beginScope(tc);
+
     for (int i = 0; i < blockNode->numExprs; ++i) {
         visit(tc, blockNode->exprs[i]);
+        if (i == blockNode->numExprs - 1) {
+            node->type = blockNode->exprs[i]->type;
+        }
     }
+
+    endScope(tc);
+
     return NULL;
 }
 
@@ -194,9 +218,37 @@ static TypecheckError* visitInvocationNode(Typechecker* tc, Node* node) {
 }
 
 static TypecheckError* visitValDeclStmtNode(Typechecker* tc, Node* node) {
+    node->type = typeUnit();
     ValDeclStmt* valDeclStmt = node->as.valDeclStmt;
-    printf("%s\n", "visitValDeclStmtNode");
-    visit(tc, valDeclStmt->assignment);
+    const char* name = valDeclStmt->ident->name;
+    if (valDeclStmt->assignment == NULL) {
+        if (valDeclStmt->isMutable) { // Assignment is not mandatory for `var` declarations
+            if (valDeclStmt->typeAnnotation == NULL) {
+                // TODO: Throw typechecker error (var declarations without assignment need a type annotation)
+                exit(1);
+            }
+            Type* type = resolveType(valDeclStmt->typeAnnotation);
+            define(tc, name, type);
+        } else {
+            // TODO: Throw typechecker error
+            exit(1);
+        }
+    } else {
+        visit(tc, valDeclStmt->assignment);
+
+        if (valDeclStmt->typeAnnotation == NULL) {
+            define(tc, name, valDeclStmt->assignment->type);
+        } else {
+            Type* type = resolveType(valDeclStmt->typeAnnotation);
+            define(tc, name, type);
+
+            if (!typeEq(type, valDeclStmt->assignment->type)) {
+                Token* token = valDeclStmt->assignment->as.literalNode->token;
+                return newTypecheckError(token, valDeclStmt->assignment->type, 1, type);
+            }
+        }
+    }
+
     return NULL;
 }
 
@@ -287,10 +339,10 @@ void initTypechecker(Typechecker* tc);
 
 Typechecker* newTypechecker(List* nodes) {
     Typechecker* tc = malloc(sizeof(Typechecker));
-    tc->depthMap = newNodeDepthMap();
-    tc->errors = newList();
-    tc->nodes = nodes;
-    tc->scopes = stack_new();
+    tc->depthMap = newNodeDepthMap(); // Map<Node, int>
+    tc->errors = newList(); // List<TypecheckError>
+    tc->nodes = nodes; // List<Node>
+    tc->scopes = stack_new(); // Stack<Map<String, Type>>
 
     initTypechecker(tc);
 
@@ -298,12 +350,11 @@ Typechecker* newTypechecker(List* nodes) {
 }
 
 void initTypechecker(Typechecker* tc) {
-    map_t scope = hashmap_new();
-    stack_push(tc->scopes, &scope);
+    beginScope(tc); // Begin global scope (scope at depth 0 is global)
 }
 
 void beginScope(Typechecker* tc) {
-    map_t scope = hashmap_new();
+    map_t scope = hashmap_new(); // Map<String, Type>
     stack_push(tc->scopes, &scope);
 }
 
@@ -313,7 +364,31 @@ void endScope(Typechecker* tc) {
     hashmap_free(oldScope);
 }
 
-TypecheckError* newTypecheckError(Token* token, Type actualType, int numExpected, ...) {
+void define(Typechecker* tc, const char* name, Type* type) {
+#define DIE(msg) ({\
+    printf(msg); \
+    exit(1); \
+})
+
+    if (stack_is_empty(tc->scopes)) DIE("ERROR! Somehow the scope stack is empty");
+
+    map_t scope;
+    if (stack_peek(tc->scopes, &scope) != STACK_OK) DIE("ERROR! Somehow the scope stack is empty");
+
+    void* _throwaway;
+    if (hashmap_get(scope, name, &_throwaway) == MAP_OK) {
+        DIE("Redefining variable in scope");
+        // TODO: Throw a typechecker error when redefining variable in scope
+//        Token* token = NODE_GET_TOKEN_HACK(node);
+//        TypecheckError* err = newTypecheckError(token,)
+//        listAdd(tc->errors, (void**) &err);
+    }
+
+    hashmap_put(scope, name, type); // TODO: Do I need to pointer-ify all Type instances? Ugh...
+#undef DIE
+}
+
+TypecheckError* newTypecheckError(Token* token, Type* actualType, int numExpected, ...) {
     va_list args;
     va_start(args, numExpected);
 
@@ -321,10 +396,10 @@ TypecheckError* newTypecheckError(Token* token, Type actualType, int numExpected
     err->token = token;
     err->actualType = actualType;
     err->numExpected = numExpected;
-    err->expectedTypes = malloc(sizeof(Type) * numExpected);
+    err->expectedTypes = malloc(sizeof(Type*) * numExpected);
 
     for (int i = 0; i < numExpected; ++i) {
-        err->expectedTypes[i] = va_arg(args, Type);
+        err->expectedTypes[i] = va_arg(args, Type*);
     }
 
     return err;

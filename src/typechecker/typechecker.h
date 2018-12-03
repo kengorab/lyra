@@ -19,12 +19,12 @@ Typechecker* newTypechecker(List* nodes);
 
 typedef struct {
     Token* token;
-    Type actualType;
+    Type* actualType;
     int numExpected;
-    Type* expectedTypes;
+    Type** expectedTypes;
 } TypecheckError;
 
-TypecheckError* newTypecheckError(Token* token, Type actualType, int numExpected, ...);
+TypecheckError* newTypecheckError(Token* token, Type* actualType, int numExpected, ...);
 
 typedef TypecheckError* (* TypecheckFn)(Typechecker*, Node*);
 

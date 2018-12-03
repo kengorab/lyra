@@ -22,8 +22,8 @@
 })
 
 #define ASSERT_TYPE_EQ(_type, typeEnum, typeStr) ({ \
-    ASSERT_EQ(typeEnum, _type.type, "The type's value should be " #typeEnum); \
-    ASSERT_EQ_STR(typeStr, _type.name, "The type's name should be " typeStr); \
+    ASSERT_EQ(typeEnum, _type->type, "The type's value should be " #typeEnum); \
+    ASSERT_EQ_STR(typeStr, _type->name, "The type's name should be " typeStr); \
 })
 
 #define ASSERT_TOKEN_POSITION(token, lineNum, colNum) ({ \

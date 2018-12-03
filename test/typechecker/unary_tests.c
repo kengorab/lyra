@@ -32,7 +32,7 @@ TEST(testTypecheckUnaryNode_errorMinusString, {
     ASSERT_TYPE_EQ(err->expectedTypes[1], PRIMITIVE_TYPE_DOUBLE, "Double");
 
     Node* literal = (Node*) tc->nodes->values[0];
-    ASSERT_EQ(PRIMITIVE_TYPE_UNSET, literal->type.type, "The type's value should be unset");
+    ASSERT_EQ(NULL, literal->type, "The type's value should be unset");
 })
 
 TEST(testTypecheckUnaryNode_bangBoolean, {
@@ -58,7 +58,7 @@ TEST(testTypecheckUnaryNode_errorBangString, {
     ASSERT_TYPE_EQ(err->expectedTypes[0], PRIMITIVE_TYPE_BOOL, "Bool");
 
     Node* literal = (Node*) tc->nodes->values[0];
-    ASSERT_EQ(PRIMITIVE_TYPE_UNSET, literal->type.type, "The type's value should be unset");
+    ASSERT_EQ(NULL, literal->type, "The type's value should be unset");
 })
 
 void runUnaryTypecheckerTests(Tester* tester) {
