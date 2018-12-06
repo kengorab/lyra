@@ -84,18 +84,6 @@ TEST(testParseValDeclStatement_errorNoIdent, {
     ASSERT_EQ_STR("TOKEN_EQ", tokenTypes[error->actual->type], "The actual token should be TOKEN_EQ");
 })
 
-TEST(testParseValDeclStatement_errorNoEq, {
-    Parser p = parseString("val abc 123");
-
-    List* errorList = newList();
-    parse(&p, &errorList);
-    ASSERT_EQ(1, errorList->count, "There should be 1 error");
-
-    ParseError* error = errorList->values[0];
-    ASSERT_EQ_STR("TOKEN_EQ", tokenTypes[error->expected[0]], "The expected token should be TOKEN_EQ");
-    ASSERT_EQ_STR("TOKEN_NUMBER", tokenTypes[error->actual->type], "The actual token should be TOKEN_NUMBER");
-})
-
 TEST(testParseValDeclStatement_errorNoExpr, {
     Parser p = parseString("val abc =");
 
@@ -170,7 +158,6 @@ void runValDeclTests(Tester* tester) {
     tester->run(testParseValDeclStatement);
     tester->run(testParseValDeclStatements);
     tester->run(testParseValDeclStatement_errorNoIdent);
-    tester->run(testParseValDeclStatement_errorNoEq);
     tester->run(testParseValDeclStatement_errorNoExpr);
     tester->run(testParseValDeclStatement_errorNoTypeExprAfterColon);
     tester->run(testParseValDeclStatement_errorInvalidTypeExpr);

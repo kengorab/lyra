@@ -22,7 +22,8 @@ Typechecker* newTypechecker(List* nodes);
 #endif
 #define C(ENUM_VAL) ENUM_VAL,
 #define TYPE_ERROR_TYPES \
-    C(TYPE_ERROR_MISMATCH)
+    C(TYPE_ERROR_MISMATCH) \
+    C(TYPE_ERROR_CUSTOM)
 
 typedef enum {
     TYPE_ERROR_TYPES
@@ -44,10 +45,12 @@ typedef struct {
             int numExpected;
             Type** expectedTypes;
         } mismatch;
+        struct {
+            Token* token;
+            const char* message;
+        } custom;
     };
 } TypecheckError;
-
-TypecheckError* newTypeMismatchError(Token* token, Type* actualType, int numExpected, ...);
 
 typedef TypecheckError* (* TypecheckFn)(Typechecker*, Node*);
 

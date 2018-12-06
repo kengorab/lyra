@@ -56,6 +56,32 @@ TEST(testTypecheckValDeclNode_errorTypeAnnotationNotMatchingType_bindingSavedWit
     ASSERT_TYPE_EQ(type, PRIMITIVE_TYPE_STRING, "String");
 })
 
+TEST(testTypecheckValDeclNode_errorNoAssignment, {
+    Typechecker* tc = PARSE_SINGLE_EXPR_GET_TC("val a: String", 1);
+
+    TypecheckError* err = (TypecheckError*) tc->errors->values[0];
+    ASSERT_EQ(TYPE_ERROR_CUSTOM, err->kind, "The error should be a Custom error");
+    ASSERT_TOKEN_POSITION(err->custom.token, 1, 1);
+    ASSERT_EQ_STR("Missing required assignment for immutable variable a", err->custom.message,
+                  "The error should have the expected message");
+})
+
+TEST(testTypecheckValDeclNode_errorRedeclaringVariable, {
+    Typechecker* tc = PARSE_SINGLE_EXPR_GET_TC(
+        "{\n"
+        "  val a = 1\n"
+        "  val a = 'abc'\n"
+        "}",
+        1
+    );
+
+    TypecheckError* err = (TypecheckError*) tc->errors->values[0];
+    ASSERT_EQ(TYPE_ERROR_CUSTOM, err->kind, "The error should be a Custom error");
+    ASSERT_TOKEN_POSITION(err->custom.token, 3, 3);
+    ASSERT_EQ_STR("Variable a cannot be re-declared in this scope", err->custom.message,
+                  "The error should have the expected message");
+})
+
 TEST(testTypecheckVarDeclNode_typeIsUnitAndRegistersBindingInScope, {
     Typechecker* tc = PARSE_SINGLE_EXPR_GET_TC("var a = 123", 0);
 
@@ -81,12 +107,25 @@ TEST(testTypecheckVarDeclNode_typeAnnotationButNoAssignment, {
     ASSERT_TYPE_EQ(type, PRIMITIVE_TYPE_DOUBLE, "Double");
 })
 
+TEST(testTypecheckVarDeclNode_errorMissingRequiredTypeAnnotation, {
+    Typechecker* tc = PARSE_SINGLE_EXPR_GET_TC("var a", 1);
+
+    TypecheckError* err = (TypecheckError*) tc->errors->values[0];
+    ASSERT_EQ(TYPE_ERROR_CUSTOM, err->kind, "The error should be a Custom error");
+    ASSERT_TOKEN_POSITION(err->custom.token, 1, 1);
+    ASSERT_EQ_STR("Missing required type annotation for mutable variable a", err->custom.message,
+                  "The error should have the expected message");
+})
+
 void runValDeclTypecheckerTests(Tester* tester) {
     tester->run(testTypecheckValDeclNode_typeIsUnitAndRegistersBindingInScope);
     tester->run(testTypecheckValDeclNode_usingBindingInExpr);
     tester->run(testTypecheckValDeclNode_typeAnnotationMatchingType);
     tester->run(testTypecheckValDeclNode_errorTypeAnnotationNotMatchingType_bindingSavedWithAnnotatedType);
+    tester->run(testTypecheckValDeclNode_errorNoAssignment);
+    tester->run(testTypecheckValDeclNode_errorRedeclaringVariable);
 
     tester->run(testTypecheckVarDeclNode_typeIsUnitAndRegistersBindingInScope);
     tester->run(testTypecheckVarDeclNode_typeAnnotationButNoAssignment);
+    tester->run(testTypecheckVarDeclNode_errorMissingRequiredTypeAnnotation);
 }

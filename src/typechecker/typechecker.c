@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include <parser/ast.h>
 
@@ -11,7 +12,11 @@ void beginScope(Typechecker* tc);
 
 void endScope(Typechecker* tc);
 
-void define(Typechecker* tc, const char* name, Type* type);
+static TypecheckError* define(Typechecker* tc, Token* token, const char* name, Type* type);
+
+static TypecheckError* newTypeMismatchError(Token* token, Type* actualType, int numExpected, ...);
+
+static TypecheckError* newCustomError(Token* token, const char* message);
 
 static TypecheckError* visit(Typechecker* tc, Node* node);
 
@@ -151,17 +156,19 @@ static TypecheckError* visitBinaryNode(Typechecker* tc, Node* node) {
 
 static TypecheckError* visitIdentifierNode(Typechecker* tc, Node* node) {
     IdentifierNode* identifierNode = node->as.identifierNode;
+    const char* name = identifierNode->name;
 
     Type* type = NULL;
     int i = 0;
     do {
         map_t scope;
         if (stack_peek_n(tc->scopes, &scope, i++) != STACK_OK) {
-            // TODO: Throw typechecker error for missing binding
-            exit(1);
+            char msg[30 + strlen(name)];
+            snprintf(msg, sizeof(msg), "Binding with name %s not found", name);
+            return newCustomError(identifierNode->token, msg);
         }
 
-        hashmap_get(scope, (char*) identifierNode->name, (void**) &type);
+        hashmap_get(scope, (char*) name, (void**) &type);
     } while (type == NULL);
 
     node->type = type;
@@ -196,7 +203,11 @@ static TypecheckError* visitBlockNode(Typechecker* tc, Node* node) {
     beginScope(tc);
 
     for (int i = 0; i < blockNode->numExprs; ++i) {
-        visit(tc, blockNode->exprs[i]);
+        TypecheckError* err = visit(tc, blockNode->exprs[i]);
+        if (err != NULL) {
+            return err;
+        }
+
         if (i == blockNode->numExprs - 1) {
             node->type = blockNode->exprs[i]->type;
         }
@@ -224,23 +235,29 @@ static TypecheckError* visitValDeclStmtNode(Typechecker* tc, Node* node) {
     if (valDeclStmt->assignment == NULL) {
         if (valDeclStmt->isMutable) { // Assignment is not mandatory for `var` declarations
             if (valDeclStmt->typeAnnotation == NULL) {
-                // TODO: Throw typechecker error (var declarations without assignment need a type annotation)
-                exit(1);
+                char _msg[55 + strlen(name)];
+                snprintf(_msg, sizeof(_msg), "Missing required type annotation for mutable variable %s", name);
+                return newCustomError(valDeclStmt->token, _msg);
             }
+
             Type* type = resolveType(valDeclStmt->typeAnnotation);
-            define(tc, name, type);
+            TypecheckError* err = define(tc, valDeclStmt->token, name, type);
+            if (err != NULL) return err;
         } else {
-            // TODO: Throw typechecker error
-            exit(1);
+            char msg[52 + strlen(name)];
+            snprintf(msg, sizeof(msg), "Missing required assignment for immutable variable %s", name);
+            return newCustomError(valDeclStmt->token, msg);
         }
     } else {
         visit(tc, valDeclStmt->assignment);
 
         if (valDeclStmt->typeAnnotation == NULL) {
-            define(tc, name, valDeclStmt->assignment->type);
+            TypecheckError* err = define(tc, valDeclStmt->token, name, valDeclStmt->assignment->type);
+            if (err != NULL) return err;
         } else {
             Type* type = resolveType(valDeclStmt->typeAnnotation);
-            define(tc, name, type);
+            TypecheckError* err = define(tc, valDeclStmt->token, name, type);
+            if (err != NULL) return err;
 
             if (!typeEq(type, valDeclStmt->assignment->type)) {
                 Token* token = valDeclStmt->assignment->as.literalNode->token;
@@ -364,33 +381,41 @@ void endScope(Typechecker* tc) {
     hashmap_free(oldScope);
 }
 
-void define(Typechecker* tc, const char* name, Type* type) {
-#define DIE(msg) ({\
-    printf(msg); \
-    exit(1); \
-})
-
-    if (stack_is_empty(tc->scopes)) DIE("ERROR! Somehow the scope stack is empty");
+static TypecheckError* define(Typechecker* tc, Token* token, const char* name, Type* type) {
+    if (stack_is_empty(tc->scopes)) {
+        printf("ERROR! Somehow the scope stack is empty");
+        exit(1);
+    }
 
     map_t scope;
-    if (stack_peek(tc->scopes, &scope) != STACK_OK) DIE("ERROR! Somehow the scope stack is empty");
+    if (stack_peek(tc->scopes, &scope) != STACK_OK) {
+        printf("ERROR! Somehow the scope stack is empty");
+        exit(1);
+    }
 
     void* _throwaway;
     if (hashmap_get(scope, name, &_throwaway) == MAP_OK) {
-        DIE("Redefining variable in scope");
-        // TODO: Throw a typechecker error when redefining variable in scope
-//        Token* token = NODE_GET_TOKEN_HACK(node);
-//        TypecheckError* err = newTypeMismatchError(token,)
-//        listAdd(tc->errors, (void**) &err);
+        char msg[46 + strlen(name)];
+        snprintf(msg, sizeof(msg), "Variable %s cannot be re-declared in this scope", name);
+        return newCustomError(token, msg);
     }
 
-    hashmap_put(scope, name, type); // TODO: Do I need to pointer-ify all Type instances? Ugh...
-#undef DIE
+    hashmap_put(scope, name, type);
+    return NULL;
 }
 
 const char* typeErrorTypes[] = {TYPE_ERROR_TYPES};
 
-TypecheckError* newTypeMismatchError(Token* token, Type* actualType, int numExpected, ...) {
+static TypecheckError* newCustomError(Token* token, const char* message) {
+    TypecheckError* err = malloc(sizeof(TypecheckError));
+    err->kind = TYPE_ERROR_CUSTOM;
+    err->custom.token = token;
+    err->custom.message = message;
+
+    return err;
+}
+
+static TypecheckError* newTypeMismatchError(Token* token, Type* actualType, int numExpected, ...) {
     va_list args;
     va_start(args, numExpected);
 

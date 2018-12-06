@@ -32,8 +32,8 @@ static Node* parseBlock(Parser* parser, Token** token, ParseError** outErr);
 //             Statements
 // ------------------------------------
 
-static Node* parseValDeclStmt(Parser* parser, ParseError** outErr) {
-    Token* valToken = advance(parser); // Consume "val" token
+static Node* parseValVarDeclStmt(Parser* parser, ParseError** outErr, bool isMutable) {
+    Token* token = advance(parser); // Consume `val`/`var` token
     if (PEEK(parser)->type != TOKEN_IDENT) {
         *outErr = newParseError(PEEK(parser), 1, TOKEN_IDENT);
         return NULL;
@@ -49,42 +49,10 @@ static Node* parseValDeclStmt(Parser* parser, ParseError** outErr) {
         }
     }
 
+    // Var declaration statements don't require an assignment, but val declarations do;
+    // the error will arise in the Typechecking phase, and should not be handled during parsing
     if (PEEK(parser)->type != TOKEN_EQ) {
-        *outErr = newParseError(PEEK(parser), 1, TOKEN_EQ);
-        return NULL;
-    }
-    advance(parser); // Skip "="
-
-    Node* rhs = parseExpression(parser, outErr);
-    if (rhs == NULL) {
-        if (*outErr == NULL)
-            *outErr = newParseError(PEEK(parser), 0, "expression");
-        return NULL;
-    }
-
-    return newValDeclStmtNode(valToken, newIdentifierNode(identTok), typeAnnot, rhs, false);
-}
-
-static Node* parseVarDeclStmt(Parser* parser, ParseError** outErr) {
-    Token* varToken = advance(parser); // Consume "var" token
-    if (PEEK(parser)->type != TOKEN_IDENT) {
-        *outErr = newParseError(PEEK(parser), 1, TOKEN_IDENT);
-        return NULL;
-    }
-    Token* identTok = advance(parser);
-
-    TypeExpr* typeAnnot = NULL;
-    if (PEEK(parser)->type == TOKEN_COLON) {
-        advance(parser); // Consume ':'
-        typeAnnot = parseTypeExpr(parser, outErr);
-        if (*outErr != NULL) {
-            return NULL;
-        }
-    }
-
-    // Var declaration statements don't require an assignment
-    if (PEEK(parser)->type != TOKEN_EQ) {
-        return newValDeclStmtNode(varToken, newIdentifierNode(identTok), typeAnnot, NULL, true);
+        return newValDeclStmtNode(token, newIdentifierNode(identTok), typeAnnot, NULL, isMutable);
     }
 
     advance(parser); // Skip "="
@@ -96,7 +64,7 @@ static Node* parseVarDeclStmt(Parser* parser, ParseError** outErr) {
         return NULL;
     }
 
-    return newValDeclStmtNode(varToken, newIdentifierNode(identTok), NULL, rhs, true);
+    return newValDeclStmtNode(token, newIdentifierNode(identTok), typeAnnot, rhs, isMutable);
 }
 
 static Node* parseFuncDeclStmt(Parser* parser, ParseError** outErr) {
@@ -218,8 +186,8 @@ static Node* parseTypeDeclStmt(Parser* parser, ParseError** outErr) {
 static Node* parseStatement(Parser* parser, ParseError** outErr) {
     Token* token = PEEK(parser);
     switch (token->type) {
-        case TOKEN_VAL: return parseValDeclStmt(parser, outErr);
-        case TOKEN_VAR: return parseVarDeclStmt(parser, outErr);
+        case TOKEN_VAL: return parseValVarDeclStmt(parser, outErr, false);
+        case TOKEN_VAR: return parseValVarDeclStmt(parser, outErr, true);
         case TOKEN_FUNC: return parseFuncDeclStmt(parser, outErr);
         case TOKEN_TYPE: return parseTypeDeclStmt(parser, outErr);
         default: return parseExpression(parser, outErr);
@@ -518,8 +486,6 @@ static Node* parseIfElseExpr(Parser* parser, Token** token, ParseError** outErr)
         return NULL;
     }
     advance(parser); // Consume ")"
-
-    // TODO: Handle block expressions here
 
     Node* thenExpr = parseExpression(parser, outErr);
     if (thenExpr == NULL) {
