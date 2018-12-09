@@ -7,12 +7,13 @@
 
 const char* primitiveTypes[] = {PRIMITIVE_TYPE_TYPES};
 
-static Type _typeString = {.type = PRIMITIVE_TYPE_STRING, .name = "String"};
-static Type _typeInt = {.type = PRIMITIVE_TYPE_INT, .name = "Int"};
-static Type _typeDouble = {.type = PRIMITIVE_TYPE_DOUBLE, .name = "Double"};
-static Type _typeBool = {.type = PRIMITIVE_TYPE_BOOL, .name = "Bool"};
-static Type _typeNil = {.type = PRIMITIVE_TYPE_NIL, .name = "Nil"};
-static Type _typeUnit = {.type = PRIMITIVE_TYPE_UNIT, .name = "Unit"};
+static Type _typeString = {.type = PRIMITIVE_TYPE_STRING, .name = "String", .numTypeArgs = 0, .typeArgs = NULL};
+static Type _typeInt = {.type = PRIMITIVE_TYPE_INT, .name = "Int", .numTypeArgs = 0, .typeArgs = NULL};
+static Type _typeDouble = {.type = PRIMITIVE_TYPE_DOUBLE, .name = "Double", .numTypeArgs = 0, .typeArgs = NULL};
+static Type _typeBool = {.type = PRIMITIVE_TYPE_BOOL, .name = "Bool", .numTypeArgs = 0, .typeArgs = NULL};
+static Type _typeNil = {.type = PRIMITIVE_TYPE_NIL, .name = "Nil", .numTypeArgs = 0, .typeArgs = NULL};
+static Type _typeAny = {.type = PRIMITIVE_TYPE_ANY, .name = "Any", .numTypeArgs = 0, .typeArgs = NULL};
+static Type _typeUnit = {.type = PRIMITIVE_TYPE_UNIT, .name = "Unit", .numTypeArgs = 0, .typeArgs = NULL};
 
 Type* typeString() { return &_typeString; }
 
@@ -24,7 +25,19 @@ Type* typeBool() { return &_typeBool; }
 
 Type* typeNil() { return &_typeNil; }
 
+Type* typeAny() { return &_typeAny; }
+
 Type* typeUnit() { return &_typeUnit; }
+
+Type* typeList(Type* typeArg) {
+    Type* listType = malloc(sizeof(Type));
+    listType->type = PRIMITIVE_TYPE_NONPRIMITIVE;
+    listType->name = "List";
+    listType->numTypeArgs = 1;
+    listType->typeArgs = malloc(sizeof(Type*) * 1);
+    listType->typeArgs[0] = typeArg;
+    return listType;
+}
 
 bool typeEq(Type* t1, Type* t2) {
     return t1 == t2;

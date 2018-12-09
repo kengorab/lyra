@@ -14,7 +14,8 @@
     C(PRIMITIVE_TYPE_DOUBLE) \
     C(PRIMITIVE_TYPE_BOOL) \
     C(PRIMITIVE_TYPE_STRING) \
-    C(PRIMITIVE_TYPE_NIL)
+    C(PRIMITIVE_TYPE_NIL) \
+    C(PRIMITIVE_TYPE_ANY)
 
 typedef enum {
     PRIMITIVE_TYPE_TYPES
@@ -26,17 +27,24 @@ typedef enum {
 // Ignore warning; initialized statically
 const char* primitiveTypes[];
 
-typedef struct {
+typedef struct Type Type;
+
+struct Type {
     PrimitiveType type;
     const char* name;
-} Type;
+    int numTypeArgs;
+    Type** typeArgs;
+};
 
 Type* typeString();
 Type* typeInt();
 Type* typeDouble();
 Type* typeBool();
 Type* typeNil();
+Type* typeAny();
 Type* typeUnit();
+
+Type* typeList(Type* typeArg);
 
 bool typeEq(Type* t1, Type* t2);
 

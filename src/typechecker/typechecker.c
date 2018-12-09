@@ -290,10 +290,21 @@ static TypecheckError* visitTypeDeclStmtNode(Typechecker* tc, Node* node) {
 
 static TypecheckError* visitArrayLiteralNode(Typechecker* tc, Node* node) {
     ArrayLiteralNode* arrayLiteralNode = node->as.arrayLiteralNode;
-    printf("%s\n", "visitArrayLiteralNode");
+    Type* t = NULL;
     for (int i = 0; i < arrayLiteralNode->size; ++i) {
-        visit(tc, arrayLiteralNode->elements[i]);
+        Node* item = arrayLiteralNode->elements[i];
+        TypecheckError* err = visit(tc, item);
+        if (err != NULL) {
+            return err;
+        }
+
+        if (t == NULL) {
+            t = item->type;
+        } else if (!typeEq(t, item->type) && !typeEq(t, typeAny())) {
+            t = typeAny(); // TODO: This should probably resolve to List[Type1 | Type2 | Type3] or something like that
+        }
     }
+    node->type = typeList(t);
     return NULL;
 }
 

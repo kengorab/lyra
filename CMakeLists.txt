@@ -91,6 +91,8 @@ add_executable(
         test/parser/unary_binary_tests.h
         test/parser/val_decl_tests.c
         test/parser/val_decl_tests.h
+        test/typechecker/array_tests.c
+        test/typechecker/array_tests.h
         test/typechecker/binary_tests.c
         test/typechecker/binary_tests.h
         test/typechecker/block_tests.c

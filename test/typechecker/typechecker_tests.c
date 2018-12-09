@@ -10,6 +10,7 @@
 #include "ifelse_tests.h"
 #include "block_tests.h"
 #include "valdecl_tests.h"
+#include "array_tests.h"
 
 void runTypecheckerTests(Tester* tester) {
     tester->startSuite("Typechecker");
@@ -31,4 +32,7 @@ void runTypecheckerTests(Tester* tester) {
 
     tester->startSubsuite("Typechecker", "Val-Decl");
     runValDeclTypecheckerTests(tester);
+
+    tester->startSubsuite("Typechecker", "Array");
+    runArrayTypecheckerTests(tester);
 }
