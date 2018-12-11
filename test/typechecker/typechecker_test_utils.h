@@ -35,6 +35,15 @@
     ASSERT_EQ_STR(typeStr, _type->typeArgs[0]->name, "The list type argument's type name should be " typeStr); \
 })
 
+#define GET_TYPE_FROM_SCOPE(tc, name) ({ \
+    map_t scope; \
+    stack_peek(tc->scopes, &scope); \
+    \
+    Type* _type; \
+    hashmap_get(scope, name, (void**) &_type); \
+    _type; \
+})
+
 #define ASSERT_TOKEN_POSITION(token, lineNum, colNum) ({ \
     ASSERT_EQ(lineNum, token->line, "The error token should be on line " #lineNum); \
     ASSERT_EQ(colNum, token->col, "The error token should be on col " #colNum); \

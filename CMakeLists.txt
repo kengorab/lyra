@@ -97,6 +97,8 @@ add_executable(
         test/typechecker/binary_tests.h
         test/typechecker/block_tests.c
         test/typechecker/block_tests.h
+        test/typechecker/funcdecl_tests.c
+        test/typechecker/funcdecl_tests.h
         test/typechecker/ifelse_tests.c
         test/typechecker/ifelse_tests.h
         test/typechecker/literal_tests.c

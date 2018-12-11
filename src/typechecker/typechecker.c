@@ -180,7 +180,7 @@ static TypecheckError* visitIfElseNode(Typechecker* tc, Node* node) {
     IfElseNode* ifElseNode = node->as.ifElseNode;
     visit(tc, ifElseNode->conditionExpr);
     if (!NODE_IS_BOOL(ifElseNode->conditionExpr)) {
-        Token* token = NODE_GET_TOKEN_HACK(ifElseNode);
+        Token* token = NODE_GET_TOKEN_HACK(ifElseNode->conditionExpr);
         return newTypeMismatchError(token, ifElseNode->conditionExpr->type, 1, typeBool());
     }
 
@@ -271,8 +271,43 @@ static TypecheckError* visitValDeclStmtNode(Typechecker* tc, Node* node) {
 
 static TypecheckError* visitFuncDeclStmtNode(Typechecker* tc, Node* node) {
     FuncDeclStmt* funcDeclStmt = node->as.funcDeclStmt;
-    printf("%s\n", "visitFuncDeclStmtNode");
-    visit(tc, funcDeclStmt->body);
+    node->type = typeUnit();
+
+    beginScope(tc);
+
+    Type** paramTypes = calloc((size_t) funcDeclStmt->numParams, sizeof(Type*));
+    TypecheckError* err;
+    for (int i = 0; i < funcDeclStmt->numParams; i++) {
+        paramTypes[i] = resolveType(funcDeclStmt->paramTypeAnnotations[i]);
+        IdentifierNode* param = funcDeclStmt->params[i]->as.identifierNode;
+        err = define(tc, param->token, param->name, paramTypes[i]);
+        if (err != NULL) {
+            return err;
+        }
+    }
+
+    err = visit(tc, funcDeclStmt->body);
+    endScope(tc);
+    if (err != NULL) {
+        return err;
+    }
+
+    Type* bodyType = funcDeclStmt->body->type;
+    if (funcDeclStmt->returnTypeAnnotation == NULL) {
+        Type* funcType = typeFunction(bodyType, funcDeclStmt->numParams, paramTypes);
+        free(paramTypes);
+        err = define(tc, funcDeclStmt->token, funcDeclStmt->name->name, funcType);
+        if (err != NULL) {
+            return err;
+        }
+    } else {
+        Type* returnType = resolveType(funcDeclStmt->returnTypeAnnotation);
+        if (!typeEq(bodyType, returnType)) {
+            Token* token = NODE_GET_TOKEN_HACK(funcDeclStmt->body);
+            return newTypeMismatchError(token, returnType, 1, bodyType);
+        }
+    }
+
     return NULL;
 }
 

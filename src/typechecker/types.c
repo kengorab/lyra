@@ -39,6 +39,17 @@ Type* typeList(Type* typeArg) {
     return listType;
 }
 
+Type* typeFunction(Type* returnType, int numArgs, Type** argTypes) {
+    Type* funcType = malloc(sizeof(Type));
+    funcType->type = PRIMITIVE_TYPE_NONPRIMITIVE;
+    funcType->name = "Function";
+    funcType->numTypeArgs = numArgs + 1;
+    funcType->typeArgs = calloc((size_t) numArgs + 1, sizeof(Type*));
+    funcType->typeArgs[0] = returnType;
+    memcpy(funcType->typeArgs + 1, argTypes, numArgs * sizeof(Type*));
+    return funcType;
+}
+
 bool typeEq(Type* t1, Type* t2) {
     return t1 == t2;
 }

@@ -61,7 +61,7 @@ const char* literalNodeTypes[];
 // ------------------------------------
 
 // HACK! This only works because the first field in all of the union structs of Node is Token*
-#define NODE_GET_TOKEN_HACK(node) (node->conditionExpr->as.literalNode->token)
+#define NODE_GET_TOKEN_HACK(node) (node->as.literalNode->token)
 
 typedef struct {
     Token* token; // See NODE_GET_TOKEN_HACK
@@ -269,11 +269,8 @@ Node* newInvocationNode(Token* token, Node* target, int numArgs, Node** argument
 
 Node* newValDeclStmtNode(Token* token, Node* identNode, TypeExpr* typeAnnot, Node* assignment, bool isMutable);
 
-Node*
-newFuncDeclStmtNode(Token* token, Node* nameNode, int numParams, Node** params, TypeExpr** paramTypeAnnots, Node* body,
-                    TypeExpr* optRetTypeAnnot);
+Node* newFuncDeclStmtNode(Token* token, Node* nameNode, int numParams, Node** params, TypeExpr** paramTypeAnnots, Node* body, TypeExpr* optRetTypeAnnot);
 
-Node*
-newTypeDeclStmtNode(Token* token, IdentifierNode* name, TypeExpr* typeExpr, int numArgs, IdentifierNode** typeArgs);
+Node* newTypeDeclStmtNode(Token* token, IdentifierNode* name, TypeExpr* typeExpr, int numArgs, IdentifierNode** typeArgs);
 
 #endif //CLYRA_AST_H

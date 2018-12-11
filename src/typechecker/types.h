@@ -45,6 +45,7 @@ Type* typeAny();
 Type* typeUnit();
 
 Type* typeList(Type* typeArg);
+Type* typeFunction(Type* returnType, int numArgs, Type** argTypes);
 
 bool typeEq(Type* t1, Type* t2);
 
