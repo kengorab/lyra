@@ -7,13 +7,27 @@
 
 const char* primitiveTypes[] = {PRIMITIVE_TYPE_TYPES};
 
-static Type _typeString = {.type = PRIMITIVE_TYPE_STRING, .name = "String", .numTypeArgs = 0, .typeArgs = NULL};
-static Type _typeInt = {.type = PRIMITIVE_TYPE_INT, .name = "Int", .numTypeArgs = 0, .typeArgs = NULL};
-static Type _typeDouble = {.type = PRIMITIVE_TYPE_DOUBLE, .name = "Double", .numTypeArgs = 0, .typeArgs = NULL};
-static Type _typeBool = {.type = PRIMITIVE_TYPE_BOOL, .name = "Bool", .numTypeArgs = 0, .typeArgs = NULL};
-static Type _typeNil = {.type = PRIMITIVE_TYPE_NIL, .name = "Nil", .numTypeArgs = 0, .typeArgs = NULL};
-static Type _typeAny = {.type = PRIMITIVE_TYPE_ANY, .name = "Any", .numTypeArgs = 0, .typeArgs = NULL};
-static Type _typeUnit = {.type = PRIMITIVE_TYPE_UNIT, .name = "Unit", .numTypeArgs = 0, .typeArgs = NULL};
+static Type _typeString = {
+    .type = PRIMITIVE_TYPE_STRING, .name = "String", .numTypeArgs = 0, .typeArgs = NULL, .typeArgNames = NULL
+};
+static Type _typeInt = {
+    .type = PRIMITIVE_TYPE_INT, .name = "Int", .numTypeArgs = 0, .typeArgs = NULL, .typeArgNames = NULL
+};
+static Type _typeDouble = {
+    .type = PRIMITIVE_TYPE_DOUBLE, .name = "Double", .numTypeArgs = 0, .typeArgs = NULL, .typeArgNames = NULL
+};
+static Type _typeBool = {
+    .type = PRIMITIVE_TYPE_BOOL, .name = "Bool", .numTypeArgs = 0, .typeArgs = NULL, .typeArgNames = NULL
+};
+static Type _typeNil = {
+    .type = PRIMITIVE_TYPE_NIL, .name = "Nil", .numTypeArgs = 0, .typeArgs = NULL, .typeArgNames = NULL
+};
+static Type _typeAny = {
+    .type = PRIMITIVE_TYPE_ANY, .name = "Any", .numTypeArgs = 0, .typeArgs = NULL, .typeArgNames = NULL
+};
+static Type _typeUnit = {
+    .type = PRIMITIVE_TYPE_UNIT, .name = "Unit", .numTypeArgs = 0, .typeArgs = NULL, .typeArgNames = NULL
+};
 
 Type* typeString() { return &_typeString; }
 
@@ -34,19 +48,28 @@ Type* typeList(Type* typeArg) {
     listType->type = PRIMITIVE_TYPE_NONPRIMITIVE;
     listType->name = "List";
     listType->numTypeArgs = 1;
-    listType->typeArgs = malloc(sizeof(Type*) * 1);
+
+    listType->typeArgs = calloc(1, sizeof(Type*));
     listType->typeArgs[0] = typeArg;
+
+    listType->typeArgNames = calloc(1, sizeof(char*));
+    listType->typeArgNames[0] = "T";
     return listType;
 }
 
-Type* typeFunction(Type* returnType, int numArgs, Type** argTypes) {
+Type* typeFunction(Type* returnType, int numArgs, Type** argTypes, const char** paramNames) {
     Type* funcType = malloc(sizeof(Type));
     funcType->type = PRIMITIVE_TYPE_NONPRIMITIVE;
     funcType->name = "Function";
     funcType->numTypeArgs = numArgs + 1;
+
     funcType->typeArgs = calloc((size_t) numArgs + 1, sizeof(Type*));
     funcType->typeArgs[0] = returnType;
     memcpy(funcType->typeArgs + 1, argTypes, numArgs * sizeof(Type*));
+
+    funcType->typeArgNames = calloc((size_t) numArgs + 1, sizeof(char*));
+    funcType->typeArgNames[0] = "_ret";
+    memcpy(funcType->typeArgNames + 1, paramNames, numArgs * sizeof(char*));
     return funcType;
 }
 

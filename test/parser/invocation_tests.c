@@ -54,7 +54,7 @@ TEST(testInvocationExpression_nestedExpr, {
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
 
     Node* n = nodes->values[0];
-    ASSERT_EQ_STR("NODE_TYPE_INVOCATION", astNodeTypes[n->type], "The node should have type NODE_TYPE_INVOCATION");
+    ASSERT_EQ_STR("NODE_TYPE_INVOCATION", astNodeTypes[n->nodeType], "The node should have type NODE_TYPE_INVOCATION");
     InvocationNode* invocation = n->as.invocationNode;
 
     ASSERT_TRUE(invocation->numArgs == 1, "There should be 1 argument to this invocation");
@@ -62,7 +62,7 @@ TEST(testInvocationExpression_nestedExpr, {
     if (!res.pass) return res;
 
     Node* arg = invocation->arguments[0];
-    ASSERT_EQ_STR("NODE_TYPE_BINARY", astNodeTypes[arg->type], "The first arg should have type NODE_TYPE_BINARY");
+    ASSERT_EQ_STR("NODE_TYPE_BINARY", astNodeTypes[arg->nodeType], "The first arg should have type NODE_TYPE_BINARY");
     BinaryNode* binary = arg->as.binaryNode;
 
     res = assertLiteralNode(testName, binary->lExpr, LITERAL_NODE_INT, 1);

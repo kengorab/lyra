@@ -220,11 +220,48 @@ static TypecheckError* visitBlockNode(Typechecker* tc, Node* node) {
 
 static TypecheckError* visitInvocationNode(Typechecker* tc, Node* node) {
     InvocationNode* invocationNode = node->as.invocationNode;
-    printf("%s\n", "visitInvocationNode");
     visit(tc, invocationNode->target);
-    for (int i = 0; i < invocationNode->numArgs; ++i) {
-        visit(tc, invocationNode->arguments[i]);
+    Type* targetType = invocationNode->target->type;
+    if (!NODE_IS_FUNCTION(invocationNode->target)) {
+        const char* typeName = targetType->name;
+        char msg[32 + strlen(typeName)];
+        snprintf(msg, sizeof(msg), "Cannot invoke type %s as function", typeName);
+        return newCustomError(invocationNode->token, msg);
     }
+
+    int numExpectedParams = targetType->numTypeArgs - 1; // Subtract 1 to account for return type arg
+    if (invocationNode->numArgs != numExpectedParams) {
+        char msg[29];
+        snprintf(msg, sizeof(msg), "Expected %d parameters, got %d", numExpectedParams, invocationNode->numArgs);
+        return newCustomError(invocationNode->token, msg);
+    }
+
+    for (int i = 0; i < invocationNode->numArgs; ++i) {
+        TypecheckError* err = visit(tc, invocationNode->arguments[i]);
+        if (err != NULL) {
+            return err;
+        }
+
+        const char* paramName = invocationNode->argNames[i];
+        if (strlen(paramName) != 0) {
+            const char* expectedArgName = targetType->typeArgNames[i + 1]; // Offset by 1 to account for _ret
+            if (strcmp(expectedArgName, paramName) != 0) {
+                char msg[52 + strlen(expectedArgName) + strlen(paramName)];
+                snprintf(msg, sizeof(msg), "Incorrect name for named parameter: expected %s, got %s", expectedArgName,
+                         paramName);
+                return newCustomError(NODE_GET_TOKEN_HACK(invocationNode->arguments[i]), msg);
+            }
+        }
+
+        Type* paramType = invocationNode->arguments[i]->type;
+        if (!typeEq(paramType, targetType->typeArgs[i + 1])) {
+            return newTypeMismatchError(NODE_GET_TOKEN_HACK(invocationNode->arguments[i]), paramType, 1,
+                                        targetType->typeArgs[i + 1]);
+        }
+    }
+
+    node->type = targetType->typeArgs[0];
+
     return NULL;
 }
 
@@ -294,8 +331,14 @@ static TypecheckError* visitFuncDeclStmtNode(Typechecker* tc, Node* node) {
 
     Type* bodyType = funcDeclStmt->body->type;
     if (funcDeclStmt->returnTypeAnnotation == NULL) {
-        Type* funcType = typeFunction(bodyType, funcDeclStmt->numParams, paramTypes);
+        const char** paramNames = calloc((size_t) funcDeclStmt->numParams, sizeof(char*));
+        for (int i = 0; i < funcDeclStmt->numParams; ++i) {
+            paramNames[i] = funcDeclStmt->params[i]->as.identifierNode->name;
+        }
+
+        Type* funcType = typeFunction(bodyType, funcDeclStmt->numParams, paramTypes, paramNames);
         free(paramTypes);
+        free(paramNames);
         err = define(tc, funcDeclStmt->token, funcDeclStmt->name->name, funcType);
         if (err != NULL) {
             return err;

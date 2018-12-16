@@ -12,6 +12,7 @@
 #include "valdecl_tests.h"
 #include "array_tests.h"
 #include "funcdecl_tests.h"
+#include "invocation_tests.h"
 
 void runTypecheckerTests(Tester* tester) {
     tester->startSuite("Typechecker");
@@ -39,4 +40,7 @@ void runTypecheckerTests(Tester* tester) {
 
     tester->startSubsuite("Typechecker", "Func-Decl");
     runFuncDeclTypecheckerTests(tester);
+
+    tester->startSubsuite("Typechecker", "Invocation");
+    runInvocationTypecheckerTests(tester);
 }

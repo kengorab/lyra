@@ -34,6 +34,13 @@ struct Type {
     const char* name;
     int numTypeArgs;
     Type** typeArgs;
+
+    // Alright, this is a _little_ not great, but this will (for now) serve the purpose of
+    // both keeping track of the types of parameter names in functions. This is as if the type
+    // of `func abc(param1: Int): String` were Function[String, Int], an instance of tye type
+    // Function[_ret, param1]. Again, not fantastic, but there shouldn't be any overhead with it
+    // and it'll work for now.
+    const char** typeArgNames;
 };
 
 Type* typeString();
@@ -45,7 +52,7 @@ Type* typeAny();
 Type* typeUnit();
 
 Type* typeList(Type* typeArg);
-Type* typeFunction(Type* returnType, int numArgs, Type** argTypes);
+Type* typeFunction(Type* returnType, int numArgs, Type** argTypes, const char** paramNames);
 
 bool typeEq(Type* t1, Type* t2);
 
@@ -60,5 +67,7 @@ Type* resolveType(TypeExpr* typeExpr);
 #define NODE_IS_BOOL(n) (n->type->type == PRIMITIVE_TYPE_BOOL)
 #define NODE_IS_STRING(n) (n->type->type == PRIMITIVE_TYPE_STRING)
 #define NODE_IS_NIL(n) (n->type->type == PRIMITIVE_TYPE_NIL)
+#define NODE_IS_FUNCTION(n) \
+  (n->type->type == PRIMITIVE_TYPE_NONPRIMITIVE && strcmp("Function", n->type->name) == 0)
 
 #endif //CLYRA_TYPES_H

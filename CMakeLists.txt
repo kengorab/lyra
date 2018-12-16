@@ -101,6 +101,8 @@ add_executable(
         test/typechecker/funcdecl_tests.h
         test/typechecker/ifelse_tests.c
         test/typechecker/ifelse_tests.h
+        test/typechecker/invocation_tests.c
+        test/typechecker/invocation_tests.h
         test/typechecker/literal_tests.c
         test/typechecker/literal_tests.h
         test/typechecker/typechecker_tests.c
