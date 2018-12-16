@@ -46,6 +46,31 @@ TEST(testInvocationExpression_2ArgsUnnamed, {
     ASSERT_EQ_STR("", invocation->argNames[1], "The second arg name should be empty");
 })
 
+TEST(testInvocationExpression_nestedExpr, {
+    Parser p = parseString("a(1 + 2)");
+
+    List* errorList = newList();
+    List* nodes = parse(&p, &errorList);
+    ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
+
+    Node* n = nodes->values[0];
+    ASSERT_EQ_STR("NODE_TYPE_INVOCATION", astNodeTypes[n->type], "The node should have type NODE_TYPE_INVOCATION");
+    InvocationNode* invocation = n->as.invocationNode;
+
+    ASSERT_TRUE(invocation->numArgs == 1, "There should be 1 argument to this invocation");
+    TestResult res = assertIdentNode(testName, invocation->target, "a");
+    if (!res.pass) return res;
+
+    Node* arg = invocation->arguments[0];
+    ASSERT_EQ_STR("NODE_TYPE_BINARY", astNodeTypes[arg->type], "The first arg should have type NODE_TYPE_BINARY");
+    BinaryNode* binary = arg->as.binaryNode;
+
+    res = assertLiteralNode(testName, binary->lExpr, LITERAL_NODE_INT, 1);
+    if (!res.pass) return res;
+
+    return assertLiteralNode(testName, binary->rExpr, LITERAL_NODE_INT, 2);
+})
+
 TEST(testInvocationExpression_nestedInvocations, {
     Parser p = parseString("a(b(\"b\"), \"a\")");
 
@@ -137,6 +162,7 @@ TEST(testInvocationExpression_namedAndUnnamed, {
 void runInvocationTests(Tester* tester) {
     tester->run(testInvocationExpression_noArgs);
     tester->run(testInvocationExpression_2ArgsUnnamed);
+    tester->run(testInvocationExpression_nestedExpr);
     tester->run(testInvocationExpression_nestedInvocations);
     tester->run(testInvocationExpression_errorNoComma);
 
