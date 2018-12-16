@@ -308,7 +308,7 @@ static Node* parsePrecedence(Parser* parser, Precedence precedence, ParseError**
 
     Node* left = rule->prefixFn(parser, &prefixToken, outErr);
 
-    while (precedence <= GET_RULE((*parser->current)->type)->precedence) {
+    while (precedence < GET_RULE((*parser->current)->type)->precedence) {
         Token* infixToken = *parser->current;
         advance(parser); // See comment above for prefix token
         rule = GET_RULE(infixToken->type);
@@ -394,7 +394,7 @@ static Node* parseInvocation(Parser* parser, Token** lParenToken, Node** targetE
         }
         listAdd(argNames, (void**) &argName);
 
-        Node* elem = parsePrecedence(parser, PREC_CALL, outErr);
+        Node* elem = parsePrecedence(parser, PREC_NONE, outErr);
         listAdd(args, (void**) &elem);
         if (PEEK(parser)->type == TOKEN_COMMA)
             advance(parser); // Consume the ","
