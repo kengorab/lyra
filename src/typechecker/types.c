@@ -57,6 +57,20 @@ Type* typeList(Type* typeArg) {
     return listType;
 }
 
+Type* typeObj(const char* name, int numFields, Type** fieldTypes, const char** fieldNames) {
+    Type* funcType = malloc(sizeof(Type));
+    funcType->type = PRIMITIVE_TYPE_NONPRIMITIVE;
+    funcType->name = name == NULL ? "Obj" : name;
+    funcType->numTypeArgs = numFields;
+
+    funcType->typeArgs = calloc((size_t) numFields, sizeof(Type*));
+    memcpy(funcType->typeArgs, fieldTypes, numFields * sizeof(Type*));
+
+    funcType->typeArgNames = calloc((size_t) numFields, sizeof(char*));
+    memcpy(funcType->typeArgNames, fieldNames, numFields * sizeof(char*));
+    return funcType;
+}
+
 Type* typeFunction(Type* returnType, int numArgs, Type** argTypes, const char** paramNames) {
     Type* funcType = malloc(sizeof(Type));
     funcType->type = PRIMITIVE_TYPE_NONPRIMITIVE;

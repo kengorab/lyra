@@ -105,6 +105,8 @@ add_executable(
         test/typechecker/invocation_tests.h
         test/typechecker/literal_tests.c
         test/typechecker/literal_tests.h
+        test/typechecker/objectliteral_tests.c
+        test/typechecker/objectliteral_tests.h
         test/typechecker/typechecker_tests.c
         test/typechecker/typechecker_tests.h
         test/typechecker/unary_tests.c

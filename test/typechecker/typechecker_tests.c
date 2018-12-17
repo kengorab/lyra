@@ -13,6 +13,7 @@
 #include "array_tests.h"
 #include "funcdecl_tests.h"
 #include "invocation_tests.h"
+#include "objectliteral_tests.h"
 
 void runTypecheckerTests(Tester* tester) {
     tester->startSuite("Typechecker");
@@ -43,4 +44,7 @@ void runTypecheckerTests(Tester* tester) {
 
     tester->startSubsuite("Typechecker", "Invocation");
     runInvocationTypecheckerTests(tester);
+
+    tester->startSubsuite("Typechecker", "Objects");
+    runObjectLiteralTypecheckerTests(tester);
 }

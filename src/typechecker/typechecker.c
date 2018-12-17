@@ -388,10 +388,22 @@ static TypecheckError* visitArrayLiteralNode(Typechecker* tc, Node* node) {
 
 static TypecheckError* visitObjectLiteralNode(Typechecker* tc, Node* node) {
     ObjectLiteralNode* objectLiteralNode = node->as.objectLiteralNode;
-    printf("%s\n", "visitObjectLiteralNode");
+
+    Type** fieldTypes = calloc((size_t) objectLiteralNode->size, sizeof(Type*));
+    const char** fieldNames = calloc((size_t) objectLiteralNode->size, sizeof(char*));
     for (int i = 0; i < objectLiteralNode->size; ++i) {
-        visit(tc, objectLiteralNode->entries[i]->value);
+        TypecheckError* err = visit(tc, objectLiteralNode->entries[i]->value);
+        if (err != NULL) {
+            return err;
+        }
+        fieldTypes[i] = objectLiteralNode->entries[i]->value->type;
+        fieldNames[i] = objectLiteralNode->entries[i]->ident->as.identifierNode->name;
     }
+
+    node->type = typeObj(NULL, objectLiteralNode->size, fieldTypes, fieldNames);
+    free(fieldTypes);
+    free(fieldNames);
+
     return NULL;
 }
 

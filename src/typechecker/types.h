@@ -52,6 +52,7 @@ Type* typeAny();
 Type* typeUnit();
 
 Type* typeList(Type* typeArg);
+Type* typeObj(const char* name, int numFields, Type** fieldTypes, const char** fieldNames);
 Type* typeFunction(Type* returnType, int numArgs, Type** argTypes, const char** paramNames);
 
 bool typeEq(Type* t1, Type* t2);
