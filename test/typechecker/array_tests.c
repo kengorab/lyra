@@ -13,7 +13,7 @@ TEST(testTypecheckArrayNode_notAllSameType, {
 })
 
 TEST(testTypecheckArrayNode_errWithinArray, {
-    Typechecker* tc = PARSE_SINGLE_EXPR_GET_TC("[1, true + false, 3]", 1);
+    Typechecker* tc = PARSE_AND_GET_TC("[1, true + false, 3]", 1);
     TypecheckError* err = (TypecheckError*) tc->errors->values[0];
     ASSERT_EQ(TYPE_ERROR_MISMATCH, err->kind, "The error should be a Type Mismatch error");
     ASSERT_TOKEN_POSITION(err->mismatch.token, 1, 10);

@@ -2,7 +2,7 @@
 #define CLYRA_TYPES_H
 
 #include <stdbool.h>
-//#include "parser/ast.h"
+#include "typedefs.h"
 
 #undef C
 #define C(ENUM_VAL) ENUM_VAL,
@@ -27,7 +27,7 @@ typedef enum {
 // Ignore warning; initialized statically
 const char* primitiveTypes[];
 
-typedef struct Type Type;
+typedef struct Type Type; // Pre-defined in typedefs.h, ignore warning
 
 struct Type {
     PrimitiveType type;
@@ -41,7 +41,16 @@ struct Type {
     // Function[_ret, param1]. Again, not fantastic, but there shouldn't be any overhead with it
     // and it'll work for now.
     const char** typeArgNames;
+
+    Type* parent;
 };
+
+void initTypesMap(TypesMap* map);
+
+Type* newType(const char* name);
+Type* newTypeWithParent(const char* name, Type* parentType);
+Type* newTypeWithArgs(const char* name, int numTypeArgs, Type** typeArgs, const char** typeArgNames);
+Type* newTypeWithParentAndArgs(const char* name, Type* parentType, int numTypeArgs, Type** typeArgs, const char** typeArgNames);
 
 Type* typeString();
 Type* typeInt();
@@ -55,11 +64,11 @@ Type* typeList(Type* typeArg);
 Type* typeObj(const char* name, int numFields, Type** fieldTypes, const char** fieldNames);
 Type* typeFunction(Type* returnType, int numArgs, Type** argTypes, const char** paramNames);
 
-bool typeEq(Type* t1, Type* t2);
+bool typeEq(Type* targetType, Type* currentType);
 
 typedef struct TypeExpr TypeExpr; // Generates warning in ast.h for redefinition
 
-Type* resolveType(TypeExpr* typeExpr);
+Type* resolveType(TypeExpr* typeExpr, TypesMap* types);
 
 #define NODE_IS_PRIMITIVE(n) (n->type->type != PRIMITIVE_TYPE_NONPRIMITIVE)
 #define NODE_IS_INT(n) (n->type->type == PRIMITIVE_TYPE_INT)

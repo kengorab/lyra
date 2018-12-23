@@ -4,7 +4,7 @@
 #include "test_utils.h"
 
 TEST(testTypecheckInvocationNode_errorTargetNotInvokeable, {
-    Typechecker* tc = PARSE_SINGLE_EXPR_GET_TC("(12 + 34)(1)", 1);
+    Typechecker* tc = PARSE_AND_GET_TC("(12 + 34)(1)", 1);
     TypecheckError* err = (TypecheckError*) tc->errors->values[0];
     ASSERT_EQ(TYPE_ERROR_CUSTOM, err->kind, "The error should be a Custom error");
     ASSERT_TOKEN_POSITION(err->custom.token, 1, 10);
@@ -13,7 +13,7 @@ TEST(testTypecheckInvocationNode_errorTargetNotInvokeable, {
 })
 
 TEST(testTypecheckInvocationNode_errorInParam, {
-    Typechecker* tc = PARSE_SINGLE_EXPR_GET_TC(
+    Typechecker* tc = PARSE_AND_GET_TC(
         "{\n"
         "  func abc(a: Int) = a\n"
         "  abc(1 + true)\n"
@@ -30,7 +30,7 @@ TEST(testTypecheckInvocationNode_errorInParam, {
 })
 
 TEST(testTypecheckInvocationNode_errorIncorrectArity, {
-    Typechecker* tc = PARSE_SINGLE_EXPR_GET_TC(
+    Typechecker* tc = PARSE_AND_GET_TC(
         "{\n"
         "  func abc(a: Int, b: Int) = a + b\n"
         "  abc(1)\n"
@@ -44,7 +44,7 @@ TEST(testTypecheckInvocationNode_errorIncorrectArity, {
 })
 
 TEST(testTypecheckInvocationNode_errorParamTypeMismatch, {
-    Typechecker* tc = PARSE_SINGLE_EXPR_GET_TC(
+    Typechecker* tc = PARSE_AND_GET_TC(
         "{\n"
         "  func abc(a: Int, b: Int) = a\n"
         "  abc(1, '2')\n"
@@ -60,7 +60,7 @@ TEST(testTypecheckInvocationNode_errorParamTypeMismatch, {
 })
 
 TEST(testTypecheckInvocationNode_errorNamedParamNameMismatch, {
-    Typechecker* tc = PARSE_SINGLE_EXPR_GET_TC(
+    Typechecker* tc = PARSE_AND_GET_TC(
         "{\n"
         "  func abc(paramOne: Int, paramTwo: Int) = paramOne + paramTwo\n"
         "  abc(1, paramOne: 3)\n"
@@ -75,7 +75,7 @@ TEST(testTypecheckInvocationNode_errorNamedParamNameMismatch, {
 })
 
 TEST(testTypecheckInvocationNode_typeIsFunctionReturnType, {
-    Typechecker* tc = PARSE_SINGLE_EXPR_GET_TC(
+    Typechecker* tc = PARSE_AND_GET_TC(
         "{\n"
         "  func abc(paramOne: Int, paramTwo: String) = paramOne + paramTwo\n"
         "  abc(1, paramTwo: '3')\n"

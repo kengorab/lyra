@@ -11,7 +11,7 @@
     (Node*) nodes->values[0]; \
 })
 
-#define PARSE_SINGLE_EXPR_GET_TC(expr, numExpectedErrs) ({ \
+#define PARSE_AND_GET_TC(expr, numExpectedErrs) ({ \
     Parser p = parseString(expr); \
     List* errorList = newList(); \
     List* nodes = parse(&p, &errorList); \

@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <parser/ast.h>
 
 #include "parser/ast.h"
 #include "typechecker.h"
@@ -20,7 +19,7 @@ static TypecheckError* newCustomError(Token* token, const char* message);
 
 static TypecheckError* visit(Typechecker* tc, Node* node);
 
-static TypecheckError* visitTypeExpr(Typechecker* tc, TypeExpr* typeExpr);
+static TypecheckError* visitTypeExpr(Typechecker* tc, TypeExpr* typeExpr, Type** outType);
 
 static TypecheckError* visitLiteralNode(Typechecker* tc, Node* node) {
     LiteralNode* literalNode = node->as.literalNode;
@@ -277,7 +276,7 @@ static TypecheckError* visitValDeclStmtNode(Typechecker* tc, Node* node) {
                 return newCustomError(valDeclStmt->token, _msg);
             }
 
-            Type* type = resolveType(valDeclStmt->typeAnnotation);
+            Type* type = resolveType(valDeclStmt->typeAnnotation, tc->typesMap);
             TypecheckError* err = define(tc, valDeclStmt->token, name, type);
             if (err != NULL) return err;
         } else {
@@ -292,7 +291,7 @@ static TypecheckError* visitValDeclStmtNode(Typechecker* tc, Node* node) {
             TypecheckError* err = define(tc, valDeclStmt->token, name, valDeclStmt->assignment->type);
             if (err != NULL) return err;
         } else {
-            Type* type = resolveType(valDeclStmt->typeAnnotation);
+            Type* type = resolveType(valDeclStmt->typeAnnotation, tc->typesMap);
             TypecheckError* err = define(tc, valDeclStmt->token, name, type);
             if (err != NULL) return err;
 
@@ -315,7 +314,7 @@ static TypecheckError* visitFuncDeclStmtNode(Typechecker* tc, Node* node) {
     Type** paramTypes = calloc((size_t) funcDeclStmt->numParams, sizeof(Type*));
     TypecheckError* err;
     for (int i = 0; i < funcDeclStmt->numParams; i++) {
-        paramTypes[i] = resolveType(funcDeclStmt->paramTypeAnnotations[i]);
+        paramTypes[i] = resolveType(funcDeclStmt->paramTypeAnnotations[i], tc->typesMap);
         IdentifierNode* param = funcDeclStmt->params[i]->as.identifierNode;
         err = define(tc, param->token, param->name, paramTypes[i]);
         if (err != NULL) {
@@ -344,7 +343,7 @@ static TypecheckError* visitFuncDeclStmtNode(Typechecker* tc, Node* node) {
             return err;
         }
     } else {
-        Type* returnType = resolveType(funcDeclStmt->returnTypeAnnotation);
+        Type* returnType = resolveType(funcDeclStmt->returnTypeAnnotation, tc->typesMap);
         if (!typeEq(bodyType, returnType)) {
             Token* token = NODE_GET_TOKEN_HACK(funcDeclStmt->body);
             return newTypeMismatchError(token, returnType, 1, bodyType);
@@ -354,15 +353,37 @@ static TypecheckError* visitFuncDeclStmtNode(Typechecker* tc, Node* node) {
     return NULL;
 }
 
-static TypecheckError* visitTypeExpr(Typechecker* tc, TypeExpr* typeExpr) {
-    printf("%s\n", "visitTypeExpr");
+static TypecheckError* visitTypeExpr(Typechecker* tc, TypeExpr* typeExpr, Type** outType) {
+    switch (typeExpr->type) {
+        case TYPE_EXPR_BASIC_TYPE: {
+            *outType = resolveType(typeExpr, tc->typesMap);
+            break;
+        }
+        default:
+            printf("Unknown type: %s; exiting\n", tokenGetValue(typeExpr->token));
+            exit(1);
+    }
+
     return NULL;
 }
 
 static TypecheckError* visitTypeDeclStmtNode(Typechecker* tc, Node* node) {
     TypeDeclStmt* typeDeclStmt = node->as.typeDeclStmt;
-    printf("%s\n", "visitTypeDeclStmtNode");
-    visitTypeExpr(tc, typeDeclStmt->typeExpr);
+
+    if (tc->scopes->size != 1) {
+        return newCustomError(typeDeclStmt->token, "Types cannot be declared outside of the top-level scope");
+    }
+
+    Type* type;
+    TypecheckError* err = visitTypeExpr(tc, typeDeclStmt->typeExpr, &type);
+    if (err != NULL) {
+        return err;
+    }
+
+    const char* name = typeDeclStmt->name->name;
+//    type = newTypeWithParent(name, type); // TODO: This might become necessary later?
+    add_TypesMap(tc->typesMap, name, type);
+
     return NULL;
 }
 
@@ -461,6 +482,7 @@ Typechecker* newTypechecker(List* nodes) {
     tc->errors = newList(); // List<TypecheckError>
     tc->nodes = nodes; // List<Node>
     tc->scopes = stack_new(); // Stack<Map<String, Type>>
+    tc->typesMap = newTypesMap(); // Map<String, Type>
 
     initTypechecker(tc);
 
@@ -469,6 +491,8 @@ Typechecker* newTypechecker(List* nodes) {
 
 void initTypechecker(Typechecker* tc) {
     beginScope(tc); // Begin global scope (scope at depth 0 is global)
+
+    initTypesMap(tc->typesMap);
 }
 
 void beginScope(Typechecker* tc) {

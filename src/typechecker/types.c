@@ -87,30 +87,115 @@ Type* typeFunction(Type* returnType, int numArgs, Type** argTypes, const char** 
     return funcType;
 }
 
-bool typeEq(Type* t1, Type* t2) {
-    return t1 == t2;
+void initTypesMap(TypesMap* map) {
+    add_TypesMap(map, "Int", &_typeInt);
+    add_TypesMap(map, "String", &_typeString);
+    add_TypesMap(map, "Double", &_typeDouble);
+    add_TypesMap(map, "Bool", &_typeBool);
+    add_TypesMap(map, "Any", &_typeAny);
+    add_TypesMap(map, "Unit", &_typeUnit);
+
+    add_TypesMap(map, "List", typeList(&_typeAny));
 }
 
-Type* resolveType(TypeExpr* typeExpr) {
+Type* newTypeWithParent(const char* name, Type* parentType) {
+    Type* type = malloc(sizeof(Type));
+
+    type->type = PRIMITIVE_TYPE_NONPRIMITIVE;
+    type->name = name;
+    type->numTypeArgs = 0;
+    type->typeArgs = NULL;
+    type->typeArgNames = NULL;
+    type->parent = parentType;
+
+    return type;
+}
+
+Type* newType(const char* name) {
+    return newTypeWithParent(name, NULL);
+}
+
+Type* newTypeWithParentAndArgs(const char* name, Type* parentType, int numTypeArgs, Type** typeArgs,
+                               const char** typeArgNames) {
+    Type* t = newType(name);
+    t->numTypeArgs = numTypeArgs;
+    t->typeArgs = typeArgs;
+    t->typeArgNames = typeArgNames;
+    t->parent = parentType;
+    return t;
+}
+
+Type* newTypeWithArgs(const char* name, int numTypeArgs, Type** typeArgs, const char** typeArgNames) {
+    return newTypeWithParentAndArgs(name, NULL, numTypeArgs, typeArgs, typeArgNames);
+}
+
+bool typeEq(Type* targetType, Type* currentType) {
+    if (targetType->type == PRIMITIVE_TYPE_NONPRIMITIVE && currentType->type == PRIMITIVE_TYPE_NONPRIMITIVE) {
+        if (strcmp(targetType->name, currentType->name) != 0) {
+            return false;
+        }
+        if (targetType->numTypeArgs != currentType->numTypeArgs) {
+            return false;
+        }
+        for (int i = 0; i < targetType->numTypeArgs; ++i) {
+            if (!typeEq(targetType->typeArgs[i], currentType->typeArgs[i])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    if (targetType->type != PRIMITIVE_TYPE_NONPRIMITIVE && currentType->type != PRIMITIVE_TYPE_NONPRIMITIVE) {
+        return targetType == currentType;
+    }
+
+    // TODO: do this test in the both-non-primitive branch too!
+
+    Type* parent = currentType->parent;
+    while (parent != NULL) {
+        if (typeEq(targetType, parent)) {
+            return true;
+        }
+        parent = parent->parent;
+    }
+    return false;
+}
+
+Type* resolveType(TypeExpr* typeExpr, TypesMap* typesMap) {
     switch (typeExpr->type) {
         case TYPE_EXPR_BASIC_TYPE: {
             const char* name = typeExpr->as.basicType.name->name;
-            if (strcmp("String", name) == 0) {
-                return typeString();
-            } else if (strcmp("Int", name) == 0) {
-                return typeInt();
-            } else if (strcmp("Double", name) == 0) {
-                return typeDouble();
-            } else if (strcmp("Bool", name) == 0) {
-                return typeBool();
-            } else if (strcmp("Unit", name) == 0) {
-                return typeUnit();
-            } else {
-                Type* type = malloc(sizeof(Type*));
-                type->type = PRIMITIVE_TYPE_NONPRIMITIVE;
-                type->name = name;
-                return type;
+
+            Type* type;
+            if (get_TypesMap(typesMap, name, &type) != MAP_OK) {
+                return NULL; // Unknown type, throw error up at call site
             }
+
+            for (int i = 0; i < typeExpr->numArgs; ++i) {
+                Type* arg = resolveType(typeExpr->typeArgs[i], typesMap);
+                if (arg == NULL) return NULL;
+
+                type->typeArgs[i] = arg;
+            }
+
+            return type;
+
+//            if (strcmp("String", name) == 0) {
+//                return typeString();
+//            } else if (strcmp("Int", name) == 0) {
+//                return typeInt();
+//            } else if (strcmp("Double", name) == 0) {
+//                return typeDouble();
+//            } else if (strcmp("Bool", name) == 0) {
+//                return typeBool();
+//            } else if (strcmp("Unit", name) == 0) {
+//                return typeUnit();
+//            }
+//
+//            Type* type = malloc(sizeof(Type*));
+//            type->type = PRIMITIVE_TYPE_NONPRIMITIVE;
+//            type->name = name;
+//            return type;
         }
         default: {
             printf("Unknown type: %s; exiting\n", tokenGetValue(typeExpr->token));

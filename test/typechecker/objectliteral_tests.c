@@ -46,7 +46,7 @@ TEST(testTypecheckObjectLiteralNode_nestedObjsAndArrays, {
 })
 
 TEST(testTypecheckObjectLiteralNode_errorWithinValue, {
-    Typechecker* tc = PARSE_SINGLE_EXPR_GET_TC("{ a: true + false }", 1);
+    Typechecker* tc = PARSE_AND_GET_TC("{ a: true + false }", 1);
     TypecheckError* err = (TypecheckError*) tc->errors->values[0];
     ASSERT_EQ(TYPE_ERROR_MISMATCH, err->kind, "The error should be a Type Mismatch error");
     ASSERT_TOKEN_POSITION(err->mismatch.token, 1, 11);

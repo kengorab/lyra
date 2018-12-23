@@ -3,7 +3,7 @@
 #include "test_utils.h"
 
 TEST(testTypecheckValDeclNode_typeIsUnitAndRegistersBindingInScope, {
-    Typechecker* tc = PARSE_SINGLE_EXPR_GET_TC("val a = 123", 0);
+    Typechecker* tc = PARSE_AND_GET_TC("val a = 123", 0);
 
     Node* node = tc->nodes->values[0];
     ASSERT_TYPE_EQ(node->type, PRIMITIVE_TYPE_UNIT, "Unit");
@@ -17,7 +17,7 @@ TEST(testTypecheckValDeclNode_typeIsUnitAndRegistersBindingInScope, {
 })
 
 TEST(testTypecheckValDeclNode_usingBindingInExpr, {
-    Typechecker* tc = PARSE_SINGLE_EXPR_GET_TC(
+    Typechecker* tc = PARSE_AND_GET_TC(
         "val a = 12.3"
         "a + 4",
         0
@@ -27,8 +27,8 @@ TEST(testTypecheckValDeclNode_usingBindingInExpr, {
     ASSERT_TYPE_EQ(node->type, PRIMITIVE_TYPE_DOUBLE, "Double");
 })
 
-TEST(testTypecheckValDeclNode_typeAnnotationMatchingType, {
-    Typechecker* tc = PARSE_SINGLE_EXPR_GET_TC("val a: Int = 123", 0);
+TEST(testTypecheckValDeclNode_typeAnnotationMatchingSimpleType, {
+    Typechecker* tc = PARSE_AND_GET_TC("val a: Int = 123", 0);
 
     map_t scope;
     stack_peek(tc->scopes, &scope);
@@ -38,8 +38,19 @@ TEST(testTypecheckValDeclNode_typeAnnotationMatchingType, {
     ASSERT_TYPE_EQ(type, PRIMITIVE_TYPE_INT, "Int");
 })
 
+TEST(testTypecheckValDeclNode_typeAnnotationMatchingTypeWithTypeArgs, {
+    Typechecker* tc = PARSE_AND_GET_TC("val a: List[Int] = [123]", 0);
+
+    map_t scope;
+    stack_peek(tc->scopes, &scope);
+
+    Type* type;
+    hashmap_get(scope, "a", (void**) &type);
+    ASSERT_TYPE_LIST_OF(type, PRIMITIVE_TYPE_INT, "Int");
+})
+
 TEST(testTypecheckValDeclNode_errorTypeAnnotationNotMatchingType_bindingSavedWithAnnotatedType, {
-    Typechecker* tc = PARSE_SINGLE_EXPR_GET_TC("val a: String = 123", 1);
+    Typechecker* tc = PARSE_AND_GET_TC("val a: String = 123", 1);
 
     TypecheckError* err = (TypecheckError*) tc->errors->values[0];
     ASSERT_EQ(TYPE_ERROR_MISMATCH, err->kind, "The error should be a Type Mismatch error");
@@ -57,7 +68,7 @@ TEST(testTypecheckValDeclNode_errorTypeAnnotationNotMatchingType_bindingSavedWit
 })
 
 TEST(testTypecheckValDeclNode_errorNoAssignment, {
-    Typechecker* tc = PARSE_SINGLE_EXPR_GET_TC("val a: String", 1);
+    Typechecker* tc = PARSE_AND_GET_TC("val a: String", 1);
 
     TypecheckError* err = (TypecheckError*) tc->errors->values[0];
     ASSERT_EQ(TYPE_ERROR_CUSTOM, err->kind, "The error should be a Custom error");
@@ -67,7 +78,7 @@ TEST(testTypecheckValDeclNode_errorNoAssignment, {
 })
 
 TEST(testTypecheckValDeclNode_errorRedeclaringVariable, {
-    Typechecker* tc = PARSE_SINGLE_EXPR_GET_TC(
+    Typechecker* tc = PARSE_AND_GET_TC(
         "{\n"
         "  val a = 1\n"
         "  val a = 'abc'\n"
@@ -83,7 +94,7 @@ TEST(testTypecheckValDeclNode_errorRedeclaringVariable, {
 })
 
 TEST(testTypecheckVarDeclNode_typeIsUnitAndRegistersBindingInScope, {
-    Typechecker* tc = PARSE_SINGLE_EXPR_GET_TC("var a = 123", 0);
+    Typechecker* tc = PARSE_AND_GET_TC("var a = 123", 0);
 
     Node* node = tc->nodes->values[0];
     ASSERT_TYPE_EQ(node->type, PRIMITIVE_TYPE_UNIT, "Unit");
@@ -97,7 +108,7 @@ TEST(testTypecheckVarDeclNode_typeIsUnitAndRegistersBindingInScope, {
 })
 
 TEST(testTypecheckVarDeclNode_typeAnnotationButNoAssignment, {
-    Typechecker* tc = PARSE_SINGLE_EXPR_GET_TC("var a: Double", 0);
+    Typechecker* tc = PARSE_AND_GET_TC("var a: Double", 0);
 
     map_t scope;
     stack_peek(tc->scopes, &scope);
@@ -108,7 +119,7 @@ TEST(testTypecheckVarDeclNode_typeAnnotationButNoAssignment, {
 })
 
 TEST(testTypecheckVarDeclNode_errorMissingRequiredTypeAnnotation, {
-    Typechecker* tc = PARSE_SINGLE_EXPR_GET_TC("var a", 1);
+    Typechecker* tc = PARSE_AND_GET_TC("var a", 1);
 
     TypecheckError* err = (TypecheckError*) tc->errors->values[0];
     ASSERT_EQ(TYPE_ERROR_CUSTOM, err->kind, "The error should be a Custom error");
@@ -118,14 +129,15 @@ TEST(testTypecheckVarDeclNode_errorMissingRequiredTypeAnnotation, {
 })
 
 void runValDeclTypecheckerTests(Tester* tester) {
-    tester->run(testTypecheckValDeclNode_typeIsUnitAndRegistersBindingInScope);
-    tester->run(testTypecheckValDeclNode_usingBindingInExpr);
-    tester->run(testTypecheckValDeclNode_typeAnnotationMatchingType);
-    tester->run(testTypecheckValDeclNode_errorTypeAnnotationNotMatchingType_bindingSavedWithAnnotatedType);
-    tester->run(testTypecheckValDeclNode_errorNoAssignment);
-    tester->run(testTypecheckValDeclNode_errorRedeclaringVariable);
+//    tester->run(testTypecheckValDeclNode_typeIsUnitAndRegistersBindingInScope);
+//    tester->run(testTypecheckValDeclNode_usingBindingInExpr);
+    tester->run(testTypecheckValDeclNode_typeAnnotationMatchingSimpleType);
+    tester->run(testTypecheckValDeclNode_typeAnnotationMatchingTypeWithTypeArgs);
+//    tester->run(testTypecheckValDeclNode_errorTypeAnnotationNotMatchingType_bindingSavedWithAnnotatedType);
+//    tester->run(testTypecheckValDeclNode_errorNoAssignment);
+//    tester->run(testTypecheckValDeclNode_errorRedeclaringVariable);
 
-    tester->run(testTypecheckVarDeclNode_typeIsUnitAndRegistersBindingInScope);
-    tester->run(testTypecheckVarDeclNode_typeAnnotationButNoAssignment);
-    tester->run(testTypecheckVarDeclNode_errorMissingRequiredTypeAnnotation);
+//    tester->run(testTypecheckVarDeclNode_typeIsUnitAndRegistersBindingInScope);
+//    tester->run(testTypecheckVarDeclNode_typeAnnotationButNoAssignment);
+//    tester->run(testTypecheckVarDeclNode_errorMissingRequiredTypeAnnotation);
 }

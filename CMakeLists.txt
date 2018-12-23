@@ -16,6 +16,7 @@ add_executable(
         src/common/hashmap.h
         src/common/list.c
         src/common/list.h
+        src/common/maps.h
         src/common/stack.c
         src/common/stack.h
         src/common/strings.c
@@ -34,6 +35,8 @@ add_executable(
         src/main.c
         src/typechecker/typechecker.c
         src/typechecker/typechecker.h
+        src/typechecker/typedefs.h
+        src/typechecker/typedefs.c
         src/typechecker/types.c
         src/typechecker/types.h
 )
@@ -47,6 +50,7 @@ add_executable(
         src/common/hashmap.h
         src/common/list.c
         src/common/list.h
+        src/common/maps.h
         src/common/stack.c
         src/common/stack.h
         src/common/strings.c
@@ -61,6 +65,8 @@ add_executable(
         src/parser/parser_error.h
         src/typechecker/typechecker.c
         src/typechecker/typechecker.h
+        src/typechecker/typedefs.h
+        src/typechecker/typedefs.c
         src/typechecker/types.c
         src/typechecker/types.h
         test/common/list_test.c
@@ -109,6 +115,8 @@ add_executable(
         test/typechecker/objectliteral_tests.h
         test/typechecker/typechecker_tests.c
         test/typechecker/typechecker_tests.h
+        test/typechecker/typedecl_tests.c
+        test/typechecker/typedecl_tests.h
         test/typechecker/unary_tests.c
         test/typechecker/unary_tests.h
         test/typechecker/valdecl_tests.c

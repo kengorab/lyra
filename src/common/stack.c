@@ -4,7 +4,7 @@
 
 lyra_stack_t* stack_new() {
     lyra_stack_t* s = malloc(sizeof(lyra_stack_t));
-    s->items = malloc(sizeof(void*) & STACK_MAX_SIZE);
+    s->items = malloc(sizeof(void*) * STACK_MAX_SIZE); // TODO: calloc
     s->top = -1;
     s->size = 0;
 
