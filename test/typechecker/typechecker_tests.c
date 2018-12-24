@@ -15,9 +15,13 @@
 #include "invocation_tests.h"
 #include "objectliteral_tests.h"
 #include "typedecl_tests.h"
+#include "types_tests.h"
 
 void runTypecheckerTests(Tester* tester) {
     tester->startSuite("Typechecker");
+
+    tester->startSubsuite("Typechecker", "Types");
+    runTypesTests(tester);
 
     tester->startSubsuite("Typechecker", "Literals");
     runLiteralTypecheckerTests(tester);

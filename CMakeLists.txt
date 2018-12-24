@@ -126,6 +126,6 @@ add_executable(
         test/test.h
         test/test_utils.c
         test/test_utils.h
-)
+        test/typechecker/types_tests.c test/typechecker/types_tests.h)
 
 add_test(clyra_tests clyra_tests)

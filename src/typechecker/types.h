@@ -47,6 +47,8 @@ struct Type {
 
 void initTypesMap(TypesMap* map);
 
+Type* typeClone(Type* orig);
+
 Type* newType(const char* name);
 Type* newTypeWithParent(const char* name, Type* parentType);
 Type* newTypeWithArgs(const char* name, int numTypeArgs, Type** typeArgs, const char** typeArgNames);

@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 
 #include "parser/ast.h"
 #include "types.h"
@@ -98,6 +99,26 @@ void initTypesMap(TypesMap* map) {
     add_TypesMap(map, "List", typeList(&_typeAny));
 }
 
+/**
+ * When realizing an instance of a type which requires type arguments, ensure we get a "fresh" instance of that Type*,
+ * otherwise we run the risk of mutating the base type stored in the TypesMap.
+ */
+Type* typeClone(Type* orig) {
+    if (orig->type != PRIMITIVE_TYPE_NONPRIMITIVE) {
+        return orig;
+    }
+
+    // We should not be needlessly duplicating a Type* if we don't need to; see above comment
+    assert(orig->numTypeArgs != 0);
+
+    Type** typeArgs = calloc((size_t) orig->numTypeArgs, sizeof(Type*));
+    for (int i = 0; i < orig->numTypeArgs; ++i) {
+        typeArgs[i] = typeClone(orig->typeArgs[i]);
+    }
+
+    return newTypeWithParentAndArgs(orig->name, orig->parent, orig->numTypeArgs, typeArgs, orig->typeArgNames);
+}
+
 Type* newTypeWithParent(const char* name, Type* parentType) {
     Type* type = malloc(sizeof(Type));
 
@@ -130,6 +151,18 @@ Type* newTypeWithArgs(const char* name, int numTypeArgs, Type** typeArgs, const 
 }
 
 bool typeEq(Type* targetType, Type* currentType) {
+    if (targetType->type == PRIMITIVE_TYPE_ANY) {
+        return true;
+    }
+
+    Type* parent = currentType->parent;
+    while (parent != NULL) {
+        if (typeEq(targetType, parent)) {
+            return true;
+        }
+        parent = parent->parent;
+    }
+
     if (targetType->type == PRIMITIVE_TYPE_NONPRIMITIVE && currentType->type == PRIMITIVE_TYPE_NONPRIMITIVE) {
         if (strcmp(targetType->name, currentType->name) != 0) {
             return false;
@@ -149,15 +182,6 @@ bool typeEq(Type* targetType, Type* currentType) {
         return targetType == currentType;
     }
 
-    // TODO: do this test in the both-non-primitive branch too!
-
-    Type* parent = currentType->parent;
-    while (parent != NULL) {
-        if (typeEq(targetType, parent)) {
-            return true;
-        }
-        parent = parent->parent;
-    }
     return false;
 }
 
@@ -171,6 +195,10 @@ Type* resolveType(TypeExpr* typeExpr, TypesMap* typesMap) {
                 return NULL; // Unknown type, throw error up at call site
             }
 
+            if (type->type == PRIMITIVE_TYPE_NONPRIMITIVE) {
+                type = typeClone(type);
+            }
+
             for (int i = 0; i < typeExpr->numArgs; ++i) {
                 Type* arg = resolveType(typeExpr->typeArgs[i], typesMap);
                 if (arg == NULL) return NULL;
@@ -179,23 +207,6 @@ Type* resolveType(TypeExpr* typeExpr, TypesMap* typesMap) {
             }
 
             return type;
-
-//            if (strcmp("String", name) == 0) {
-//                return typeString();
-//            } else if (strcmp("Int", name) == 0) {
-//                return typeInt();
-//            } else if (strcmp("Double", name) == 0) {
-//                return typeDouble();
-//            } else if (strcmp("Bool", name) == 0) {
-//                return typeBool();
-//            } else if (strcmp("Unit", name) == 0) {
-//                return typeUnit();
-//            }
-//
-//            Type* type = malloc(sizeof(Type*));
-//            type->type = PRIMITIVE_TYPE_NONPRIMITIVE;
-//            type->name = name;
-//            return type;
         }
         default: {
             printf("Unknown type: %s; exiting\n", tokenGetValue(typeExpr->token));
