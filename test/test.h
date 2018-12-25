@@ -2,6 +2,7 @@
 #define CLYRA_TEST_H
 
 #include <stdbool.h>
+#include <string.h>
 
 typedef struct {
     const char* testName;

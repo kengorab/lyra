@@ -33,7 +33,7 @@ Parser parseString(char* sourceStr) {
 }
 
 TestResult assertIdentNode(const char* testName, Node* n, const char* name) {
-    ASSERT_EQ_STR("NODE_TYPE_IDENT", astNodeTypes[n->type], "The node should have type NODE_TYPE_IDENT");
+    ASSERT_EQ_STR("NODE_TYPE_IDENT", astNodeTypes[n->nodeType], "The node should have type NODE_TYPE_IDENT");
 
     IdentifierNode* ident = n->as.identifierNode;
     char* identName = substring(ident->token->start, (size_t) ident->token->length);
@@ -45,7 +45,7 @@ TestResult assertLiteralNode(const char* testName, Node* n, LiteralNodeType litT
     va_list args;
     va_start(args, litType);
 
-    ASSERT_EQ_STR("NODE_TYPE_LITERAL", astNodeTypes[n->type], "The node should have type NODE_TYPE_LITERAL");
+    ASSERT_EQ_STR("NODE_TYPE_LITERAL", astNodeTypes[n->nodeType], "The node should have type NODE_TYPE_LITERAL");
     LiteralNode* literalNode = n->as.literalNode;
 
     char* msg = malloc(100);

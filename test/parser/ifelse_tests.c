@@ -13,7 +13,7 @@ TEST(testParseIfElseStatement_noElse, {
     List* nodes = parse(&p, &errorList);
 
     Node* n = nodes->values[0];
-    ASSERT_EQ_STR("NODE_TYPE_IF_ELSE", astNodeTypes[n->type],
+    ASSERT_EQ_STR("NODE_TYPE_IF_ELSE", astNodeTypes[n->nodeType],
                   "The node should have type NODE_TYPE_IF_ELSE");
 
     IfElseNode* ifElseNode = n->as.ifElseNode;
@@ -31,14 +31,14 @@ TEST(testParseIfElseStatement_blockExpr_noElse, {
     List* nodes = parse(&p, &errorList);
 
     Node* n = nodes->values[0];
-    ASSERT_EQ_STR("NODE_TYPE_IF_ELSE", astNodeTypes[n->type],
+    ASSERT_EQ_STR("NODE_TYPE_IF_ELSE", astNodeTypes[n->nodeType],
                   "The node should have type NODE_TYPE_IF_ELSE");
 
     IfElseNode* ifElseNode = n->as.ifElseNode;
     TestResult res = assertLiteralNode(testName, ifElseNode->conditionExpr, LITERAL_NODE_BOOL, true);
     if (!res.pass) return res;
 
-    ASSERT_EQ_STR("NODE_TYPE_BLOCK", astNodeTypes[ifElseNode->thenExpr->type],
+    ASSERT_EQ_STR("NODE_TYPE_BLOCK", astNodeTypes[ifElseNode->thenExpr->nodeType],
                   "The node should have type NODE_TYPE_BLOCK");
     ASSERT_EQ(1, ifElseNode->thenExpr->as.blockNode->numExprs,
               "The then-expr block should have 1 expression-statement");
@@ -52,7 +52,7 @@ TEST(testParseIfElseStatement_withElse, {
     List* nodes = parse(&p, &errorList);
 
     Node* n = nodes->values[0];
-    ASSERT_EQ_STR("NODE_TYPE_IF_ELSE", astNodeTypes[n->type],
+    ASSERT_EQ_STR("NODE_TYPE_IF_ELSE", astNodeTypes[n->nodeType],
                   "The node should have type NODE_TYPE_IF_ELSE");
 
     IfElseNode* ifElseNode = n->as.ifElseNode;
@@ -70,14 +70,14 @@ TEST(testParseIfElseStatement_nestedIfElseStmt, {
     List* nodes = parse(&p, &errorList);
 
     Node* n = nodes->values[0];
-    ASSERT_EQ_STR("NODE_TYPE_IF_ELSE", astNodeTypes[n->type],
+    ASSERT_EQ_STR("NODE_TYPE_IF_ELSE", astNodeTypes[n->nodeType],
                   "The node should have type NODE_TYPE_IF_ELSE");
 
     IfElseNode* ifElseNode = n->as.ifElseNode;
     TestResult res = assertLiteralNode(testName, ifElseNode->conditionExpr, LITERAL_NODE_BOOL, true);
     if (!res.pass) return res;
 
-    ASSERT_EQ_STR("NODE_TYPE_IF_ELSE", astNodeTypes[ifElseNode->thenExpr->type],
+    ASSERT_EQ_STR("NODE_TYPE_IF_ELSE", astNodeTypes[ifElseNode->thenExpr->nodeType],
                   "The node should have type NODE_TYPE_IF_ELSE");
     IfElseNode* nestedIfElseNode = n->as.ifElseNode->thenExpr->as.ifElseNode;
     res = assertLiteralNode(testName, nestedIfElseNode->conditionExpr, LITERAL_NODE_BOOL, false);

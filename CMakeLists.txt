@@ -10,8 +10,17 @@ include_directories(test)
 
 add_executable(
         clyra
+        src/common/depth_map.c
+        src/common/depth_map.h
+        src/common/hashmap.c
+        src/common/hashmap.h
         src/common/list.c
         src/common/list.h
+        src/common/maps.h
+        src/common/stack.c
+        src/common/stack.h
+        src/common/strings.c
+        src/common/strings.h
         src/debugging/mem_checks.h
         src/debugging/printing_visitor.c
         src/debugging/printing_visitor.h
@@ -24,15 +33,28 @@ add_executable(
         src/parser/parser_error.c
         src/parser/parser_error.h
         src/main.c
-        src/common/strings.c
-        src/common/strings.h
-        src/typechecker/typechecker.c src/typechecker/typechecker.h)
+        src/typechecker/typechecker.c
+        src/typechecker/typechecker.h
+        src/typechecker/typedefs.h
+        src/typechecker/typedefs.c
+        src/typechecker/types.c
+        src/typechecker/types.h
+)
 
 enable_testing()
 add_executable(
         clyra_tests
+        src/common/depth_map.c
+        src/common/depth_map.h
+        src/common/hashmap.c
+        src/common/hashmap.h
         src/common/list.c
         src/common/list.h
+        src/common/maps.h
+        src/common/stack.c
+        src/common/stack.h
+        src/common/strings.c
+        src/common/strings.h
         src/lexer/lexer.c
         src/lexer/lexer.h
         src/parser/ast.h
@@ -41,6 +63,12 @@ add_executable(
         src/parser/parser.h
         src/parser/parser_error.c
         src/parser/parser_error.h
+        src/typechecker/typechecker.c
+        src/typechecker/typechecker.h
+        src/typechecker/typedefs.h
+        src/typechecker/typedefs.c
+        src/typechecker/types.c
+        src/typechecker/types.h
         test/common/list_test.c
         test/common/list_test.h
         test/lexer/lexer_test.c
@@ -61,19 +89,43 @@ add_executable(
         test/parser/parser_test.h
         test/parser/type_decl_tests.c
         test/parser/type_decl_tests.h
-        test/main.c
-        test/test.h
         test/parser/literal_tests.c
         test/parser/literal_tests.h
         test/parser/object_tests.c
         test/parser/object_tests.h
         test/parser/unary_binary_tests.c
         test/parser/unary_binary_tests.h
-        test/test_utils.c
-        test/test_utils.h
         test/parser/val_decl_tests.c
         test/parser/val_decl_tests.h
-        src/common/strings.c
-        src/common/strings.h
-)
+        test/typechecker/array_tests.c
+        test/typechecker/array_tests.h
+        test/typechecker/binary_tests.c
+        test/typechecker/binary_tests.h
+        test/typechecker/block_tests.c
+        test/typechecker/block_tests.h
+        test/typechecker/funcdecl_tests.c
+        test/typechecker/funcdecl_tests.h
+        test/typechecker/ifelse_tests.c
+        test/typechecker/ifelse_tests.h
+        test/typechecker/invocation_tests.c
+        test/typechecker/invocation_tests.h
+        test/typechecker/literal_tests.c
+        test/typechecker/literal_tests.h
+        test/typechecker/objectliteral_tests.c
+        test/typechecker/objectliteral_tests.h
+        test/typechecker/typechecker_tests.c
+        test/typechecker/typechecker_tests.h
+        test/typechecker/typedecl_tests.c
+        test/typechecker/typedecl_tests.h
+        test/typechecker/unary_tests.c
+        test/typechecker/unary_tests.h
+        test/typechecker/valdecl_tests.c
+        test/typechecker/valdecl_tests.h
+        test/typechecker/typechecker_test_utils.h
+        test/main.c
+        test/test.h
+        test/test_utils.c
+        test/test_utils.h
+        test/typechecker/types_tests.c test/typechecker/types_tests.h)
+
 add_test(clyra_tests clyra_tests)

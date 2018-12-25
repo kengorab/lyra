@@ -12,7 +12,7 @@ TEST(testNewIntLiteralNode, {
     Token* t = makeToken("12", TOKEN_NUMBER);
     Node* n = newLiteralNode(t);
 
-    ASSERT_EQ_STR("NODE_TYPE_LITERAL", astNodeTypes[n->type], "The node should have type NODE_TYPE_LITERAL");
+    ASSERT_EQ_STR("NODE_TYPE_LITERAL", astNodeTypes[n->nodeType], "The node should have type NODE_TYPE_LITERAL");
     LiteralNode* literalNode = n->as.literalNode;
     ASSERT_EQ_STR("LITERAL_NODE_INT", literalNodeTypes[literalNode->type],
                   "The literal node should be of type LITERAL_NODE_INT");
@@ -25,7 +25,7 @@ TEST(testNewIntLiteralNode_tokenContentsContainsDotOutsideScopeOfToken, {
 
     Node* n = newLiteralNode(t);
 
-    ASSERT_EQ_STR("NODE_TYPE_LITERAL", astNodeTypes[n->type], "The node should have type NODE_TYPE_LITERAL");
+    ASSERT_EQ_STR("NODE_TYPE_LITERAL", astNodeTypes[n->nodeType], "The node should have type NODE_TYPE_LITERAL");
     LiteralNode* literalNode = n->as.literalNode;
     ASSERT_EQ_STR("LITERAL_NODE_INT", literalNodeTypes[literalNode->type],
                   "The literal node should be of type LITERAL_NODE_INT");
@@ -36,7 +36,7 @@ TEST(testNewDoubleLiteralNode, {
     Token* t = makeToken("1.23", TOKEN_NUMBER);
     Node* n = newLiteralNode(t);
 
-    ASSERT_EQ_STR("NODE_TYPE_LITERAL", astNodeTypes[n->type], "The node should have type NODE_TYPE_LITERAL");
+    ASSERT_EQ_STR("NODE_TYPE_LITERAL", astNodeTypes[n->nodeType], "The node should have type NODE_TYPE_LITERAL");
     LiteralNode* literalNode = n->as.literalNode;
     ASSERT_EQ_STR("LITERAL_NODE_DOUBLE", literalNodeTypes[literalNode->type],
                   "The literal node should be of type LITERAL_NODE_DOUBLE");
@@ -47,7 +47,7 @@ TEST(testNewBoolLiteralNode_true, {
     Token* t = makeToken("true", TOKEN_TRUE);
     Node* n = newLiteralNode(t);
 
-    ASSERT_EQ_STR("NODE_TYPE_LITERAL", astNodeTypes[n->type], "The node should have type NODE_TYPE_LITERAL");
+    ASSERT_EQ_STR("NODE_TYPE_LITERAL", astNodeTypes[n->nodeType], "The node should have type NODE_TYPE_LITERAL");
     LiteralNode* literalNode = n->as.literalNode;
     ASSERT_EQ_STR("LITERAL_NODE_BOOL", literalNodeTypes[literalNode->type],
                   "The literal node should be of type LITERAL_NODE_BOOL");
@@ -58,7 +58,7 @@ TEST(testNewBoolLiteralNode_false, {
     Token* t = makeToken("false", TOKEN_FALSE);
     Node* n = newLiteralNode(t);
 
-    ASSERT_EQ_STR("NODE_TYPE_LITERAL", astNodeTypes[n->type], "The node should have type NODE_TYPE_LITERAL");
+    ASSERT_EQ_STR("NODE_TYPE_LITERAL", astNodeTypes[n->nodeType], "The node should have type NODE_TYPE_LITERAL");
     LiteralNode* literalNode = n->as.literalNode;
     ASSERT_EQ_STR("LITERAL_NODE_BOOL", literalNodeTypes[literalNode->type],
                   "The literal node should be of type LITERAL_NODE_BOOL");
@@ -69,7 +69,7 @@ TEST(testNewStringLiteralNode, {
     Token* t = makeToken("\"some string\"", TOKEN_STRING);
     Node* n = newLiteralNode(t);
 
-    ASSERT_EQ_STR("NODE_TYPE_LITERAL", astNodeTypes[n->type], "The node should have type NODE_TYPE_LITERAL");
+    ASSERT_EQ_STR("NODE_TYPE_LITERAL", astNodeTypes[n->nodeType], "The node should have type NODE_TYPE_LITERAL");
     LiteralNode* literalNode = n->as.literalNode;
     ASSERT_EQ_STR("LITERAL_NODE_STRING", literalNodeTypes[literalNode->type],
                   "The literal node should be of type LITERAL_NODE_STRING");
@@ -82,7 +82,7 @@ TEST(testNewStringLiteralNode_tokenContentsExtendsPastClosingQuote_strlengthIsCo
     t->start = "\"some string\"\nval b = 1";
     Node* n = newLiteralNode(t);
 
-    ASSERT_EQ_STR("NODE_TYPE_LITERAL", astNodeTypes[n->type], "The node should have type NODE_TYPE_LITERAL");
+    ASSERT_EQ_STR("NODE_TYPE_LITERAL", astNodeTypes[n->nodeType], "The node should have type NODE_TYPE_LITERAL");
     LiteralNode* literalNode = n->as.literalNode;
     ASSERT_EQ_STR("LITERAL_NODE_STRING", literalNodeTypes[literalNode->type],
                   "The literal node should be of type LITERAL_NODE_STRING");

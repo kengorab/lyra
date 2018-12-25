@@ -16,7 +16,7 @@ const char* typeExprTypes[] = {TYPE_EXPR_TYPES};
 
 Node* newLiteralNode(Token* token) {
     Node* n = malloc(sizeof(Node));
-    n->type = NODE_TYPE_LITERAL;
+    n->nodeType = NODE_TYPE_LITERAL;
 
     LiteralNode* literalNode = malloc(sizeof(LiteralNode));
     literalNode->token = token;
@@ -64,7 +64,7 @@ Node* newLiteralNode(Token* token) {
 
 Node* newIdentifierNode(Token* token) {
     Node* n = malloc(sizeof(Node));
-    n->type = NODE_TYPE_IDENT;
+    n->nodeType = NODE_TYPE_IDENT;
 
     IdentifierNode* ident = malloc(sizeof(IdentifierNode));
     ident->token = token;
@@ -76,7 +76,7 @@ Node* newIdentifierNode(Token* token) {
 
 Node* newUnaryNode(Token* token, Node* expr) {
     Node* n = malloc(sizeof(Node));
-    n->type = NODE_TYPE_UNARY;
+    n->nodeType = NODE_TYPE_UNARY;
 
     UnaryNode* unary = malloc(sizeof(UnaryNode));
     unary->token = token;
@@ -88,7 +88,7 @@ Node* newUnaryNode(Token* token, Node* expr) {
 
 Node* newBinaryNode(Token* token, Node* lExpr, Node* rExpr) {
     Node* n = malloc(sizeof(Node));
-    n->type = NODE_TYPE_BINARY;
+    n->nodeType = NODE_TYPE_BINARY;
 
     BinaryNode* binary = malloc(sizeof(BinaryNode));
     binary->token = token;
@@ -101,7 +101,7 @@ Node* newBinaryNode(Token* token, Node* lExpr, Node* rExpr) {
 
 Node* newArrayLiteralNode(Token* token, Node** elements, int size) {
     Node* n = malloc(sizeof(Node));
-    n->type = NODE_TYPE_ARRAY_LITERAL;
+    n->nodeType = NODE_TYPE_ARRAY_LITERAL;
 
     ArrayLiteralNode* array = malloc(sizeof(ArrayLiteralNode));
     array->token = token;
@@ -121,7 +121,7 @@ ObjectLiteralEntry* newObjectLiteralEntry(Node* key, Node* value) {
 
 Node* newObjectLiteralNode(Token* token, ObjectLiteralEntry** entries, Node** keys, int size) {
     Node* n = malloc(sizeof(Node));
-    n->type = NODE_TYPE_OBJECT_LITERAL;
+    n->nodeType = NODE_TYPE_OBJECT_LITERAL;
 
     ObjectLiteralNode* object = malloc(sizeof(ObjectLiteralNode));
     object->token = token;
@@ -135,7 +135,7 @@ Node* newObjectLiteralNode(Token* token, ObjectLiteralEntry** entries, Node** ke
 
 Node* newGroupingNode(Token* token, Node* expr) {
     Node* n = malloc(sizeof(Node));
-    n->type = NODE_TYPE_GROUPING;
+    n->nodeType = NODE_TYPE_GROUPING;
 
     GroupingNode* grouping = malloc(sizeof(GroupingNode));
     grouping->token = token;
@@ -147,7 +147,7 @@ Node* newGroupingNode(Token* token, Node* expr) {
 
 Node* newIfElseNode(Token* token, Node* condExpr, Node* thenExpr, Node* elseExpr) {
     Node* n = malloc(sizeof(Node));
-    n->type = NODE_TYPE_IF_ELSE;
+    n->nodeType = NODE_TYPE_IF_ELSE;
 
     IfElseNode* ifElse = malloc(sizeof(IfElseNode));
     ifElse->token = token;
@@ -161,7 +161,7 @@ Node* newIfElseNode(Token* token, Node* condExpr, Node* thenExpr, Node* elseExpr
 
 Node* newBlockNode(Token* token, Node** exprs, int numExprs) {
     Node* n = malloc(sizeof(Node));
-    n->type = NODE_TYPE_BLOCK;
+    n->nodeType = NODE_TYPE_BLOCK;
 
     BlockNode* block = malloc(sizeof(BlockNode));
     block->token = token;
@@ -174,7 +174,7 @@ Node* newBlockNode(Token* token, Node** exprs, int numExprs) {
 
 Node* newInvocationNode(Token* token, Node* target, int numArgs, Node** arguments, char** argNames) {
     Node* n = malloc(sizeof(Node));
-    n->type = NODE_TYPE_INVOCATION;
+    n->nodeType = NODE_TYPE_INVOCATION;
 
     InvocationNode* invocation = malloc(sizeof(InvocationNode));
     invocation->token = token;
@@ -225,6 +225,7 @@ TypeExpr* newStructTypeExpr(Token* token, int numFields, Node** keys, TypeExpr**
     return expr;
 }
 
+// TODO: Rename "enum types" to "union types"
 TypeExpr* newEnumTypeExpr(Token* token, int numOptions, TypeExpr** options) {
     TypeExpr* expr = malloc(sizeof(TypeExpr));
     expr->token = token;
@@ -242,7 +243,7 @@ TypeExpr* newEnumTypeExpr(Token* token, int numOptions, TypeExpr** options) {
 
 Node* newValDeclStmtNode(Token* token, Node* identNode, TypeExpr* typeAnnot, Node* assignment, bool isMutable) {
     Node* n = malloc(sizeof(Node));
-    n->type = NODE_TYPE_VAL_DECL_STATEMENT;
+    n->nodeType = NODE_TYPE_VAL_DECL_STATEMENT;
 
     ValDeclStmt* valDeclStmt = malloc(sizeof(ValDeclStmt));
     valDeclStmt->token = token;
@@ -257,7 +258,7 @@ Node* newValDeclStmtNode(Token* token, Node* identNode, TypeExpr* typeAnnot, Nod
 
 Node* newFuncDeclStmtNode(Token* token, Node* nameNode, int numParams, Node** params, TypeExpr** paramTypeAnnots, Node* body, TypeExpr* optRetTypeAnnot) {
     Node* n = malloc(sizeof(Node));
-    n->type = NODE_TYPE_FUNC_DECL_STATEMENT;
+    n->nodeType = NODE_TYPE_FUNC_DECL_STATEMENT;
 
     FuncDeclStmt* funcDeclStmt = malloc(sizeof(FuncDeclStmt));
     funcDeclStmt->token = token;
@@ -274,7 +275,7 @@ Node* newFuncDeclStmtNode(Token* token, Node* nameNode, int numParams, Node** pa
 
 Node* newTypeDeclStmtNode(Token* token, IdentifierNode* name, TypeExpr* typeExpr, int numArgs, IdentifierNode** typeArgs) {
     Node* n = malloc(sizeof(Node));
-    n->type = NODE_TYPE_TYPE_DECL_STATEMENT;
+    n->nodeType = NODE_TYPE_TYPE_DECL_STATEMENT;
 
     TypeDeclStmt* typeDeclStmt = malloc(sizeof(TypeDeclStmt));
     typeDeclStmt->token = token;

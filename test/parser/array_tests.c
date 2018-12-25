@@ -14,7 +14,7 @@ TEST(testArrayLiteralExpression, {
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
 
     Node* n = nodes->values[0];
-    ASSERT_EQ_STR("NODE_TYPE_ARRAY_LITERAL", astNodeTypes[n->type],
+    ASSERT_EQ_STR("NODE_TYPE_ARRAY_LITERAL", astNodeTypes[n->nodeType],
                   "The node should have type NODE_TYPE_ARRAY_LITERAL");
     ArrayLiteralNode* array = n->as.arrayLiteralNode;
 
@@ -31,7 +31,7 @@ TEST(testArrayLiteralExpression_trailingCommas, {
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
 
     Node* n = nodes->values[0];
-    ASSERT_EQ_STR("NODE_TYPE_ARRAY_LITERAL", astNodeTypes[n->type],
+    ASSERT_EQ_STR("NODE_TYPE_ARRAY_LITERAL", astNodeTypes[n->nodeType],
                   "The node should have type NODE_TYPE_ARRAY_LITERAL");
     ArrayLiteralNode* array = n->as.arrayLiteralNode;
 
@@ -48,7 +48,7 @@ TEST(testArrayLiteralExpression_emptyArray, {
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
 
     Node* n = nodes->values[0];
-    ASSERT_EQ_STR("NODE_TYPE_ARRAY_LITERAL", astNodeTypes[n->type],
+    ASSERT_EQ_STR("NODE_TYPE_ARRAY_LITERAL", astNodeTypes[n->nodeType],
                   "The node should have type NODE_TYPE_ARRAY_LITERAL");
     ArrayLiteralNode* array = n->as.arrayLiteralNode;
     ASSERT_EQ(0, array->size, "There should be no elements in the array");

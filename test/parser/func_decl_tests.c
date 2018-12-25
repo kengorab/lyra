@@ -15,7 +15,7 @@ TEST(testParseFuncDeclStatement_noParams, {
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
 
     Node* n = nodes->values[0];
-    ASSERT_EQ_STR("NODE_TYPE_FUNC_DECL_STATEMENT", astNodeTypes[n->type],
+    ASSERT_EQ_STR("NODE_TYPE_FUNC_DECL_STATEMENT", astNodeTypes[n->nodeType],
                   "The node should have type NODE_TYPE_FUNC_DECL_STATEMENT");
 
     FuncDeclStmt* funcDeclStmt = n->as.funcDeclStmt;
@@ -33,7 +33,7 @@ TEST(testParseFuncDeclStatement_returnTypeAnnotation, {
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
 
     Node* n = nodes->values[0];
-    ASSERT_EQ_STR("NODE_TYPE_FUNC_DECL_STATEMENT", astNodeTypes[n->type],
+    ASSERT_EQ_STR("NODE_TYPE_FUNC_DECL_STATEMENT", astNodeTypes[n->nodeType],
                   "The node should have type NODE_TYPE_FUNC_DECL_STATEMENT");
 
     FuncDeclStmt* funcDeclStmt = n->as.funcDeclStmt;
@@ -53,7 +53,7 @@ TEST(testParseFuncDeclStatement_with1Param, {
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
 
     Node* n = nodes->values[0];
-    ASSERT_EQ_STR("NODE_TYPE_FUNC_DECL_STATEMENT", astNodeTypes[n->type],
+    ASSERT_EQ_STR("NODE_TYPE_FUNC_DECL_STATEMENT", astNodeTypes[n->nodeType],
                   "The node should have type NODE_TYPE_FUNC_DECL_STATEMENT");
 
     FuncDeclStmt* funcDeclStmt = n->as.funcDeclStmt;
@@ -75,7 +75,7 @@ TEST(testParseFuncDeclStatement_with2Params_trailingComma, {
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
 
     Node* n = nodes->values[0];
-    ASSERT_EQ_STR("NODE_TYPE_FUNC_DECL_STATEMENT", astNodeTypes[n->type],
+    ASSERT_EQ_STR("NODE_TYPE_FUNC_DECL_STATEMENT", astNodeTypes[n->nodeType],
                   "The node should have type NODE_TYPE_FUNC_DECL_STATEMENT");
 
     FuncDeclStmt* funcDeclStmt = n->as.funcDeclStmt;
@@ -101,14 +101,14 @@ TEST(testParseFuncDeclStatement_blockAsBody, {
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
 
     Node* n = nodes->values[0];
-    ASSERT_EQ_STR("NODE_TYPE_FUNC_DECL_STATEMENT", astNodeTypes[n->type],
+    ASSERT_EQ_STR("NODE_TYPE_FUNC_DECL_STATEMENT", astNodeTypes[n->nodeType],
                   "The node should have type NODE_TYPE_FUNC_DECL_STATEMENT");
 
     FuncDeclStmt* funcDeclStmt = n->as.funcDeclStmt;
     ASSERT_EQ_STR("myFunc", funcDeclStmt->name->name, "The ident should be abc");
     ASSERT_TRUE(funcDeclStmt->numParams == 0, "There should be no params for the function");
 
-    ASSERT_EQ_STR("NODE_TYPE_BLOCK", astNodeTypes[funcDeclStmt->body->type],
+    ASSERT_EQ_STR("NODE_TYPE_BLOCK", astNodeTypes[funcDeclStmt->body->nodeType],
                   "The node should have type NODE_TYPE_BLOCK");
     ASSERT_TRUE(funcDeclStmt->body->as.blockNode->numExprs == 1, "There should be 1 expression in the function's body");
 

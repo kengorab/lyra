@@ -2,13 +2,14 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+#include "common/list.h"
 #include "lexer/lexer.h"
 #include "parser/parser.h"
 #include "debugging/printing_visitor.h"
-#include "common/list.h"
+#include "typechecker/typechecker.h"
 
 int main(int argc, char** argv) {
-    char* source = "func add(a: Int, b: Int): Int = a + b";
+    char* source = "val a = (1 + 3) <= 5 == true";
     if (argc == 2) {
         source = argv[1];
     }
@@ -37,5 +38,10 @@ int main(int argc, char** argv) {
     }
 
     printing_visit(nodes);
+
+    Typechecker* tc = newTypechecker(nodes);
+    int numTypecheckErrors = typecheck(tc);
+    // TODO: Handle errors
+
     return 0;
 }

@@ -14,7 +14,7 @@ TEST(testObjectLiteralExpression, {
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
 
     Node* n = nodes->values[0];
-    ASSERT_EQ_STR("NODE_TYPE_OBJECT_LITERAL", astNodeTypes[n->type],
+    ASSERT_EQ_STR("NODE_TYPE_OBJECT_LITERAL", astNodeTypes[n->nodeType],
                   "The node should have type NODE_TYPE_OBJECT_LITERAL");
     ObjectLiteralNode* obj = n->as.objectLiteralNode;
 
@@ -38,7 +38,7 @@ TEST(testObjectLiteralExpression_trailingCommas, {
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
 
     Node* n = nodes->values[0];
-    ASSERT_EQ_STR("NODE_TYPE_OBJECT_LITERAL", astNodeTypes[n->type],
+    ASSERT_EQ_STR("NODE_TYPE_OBJECT_LITERAL", astNodeTypes[n->nodeType],
                   "The node should have type NODE_TYPE_OBJECT_LITERAL");
     ObjectLiteralNode* obj = n->as.objectLiteralNode;
 
@@ -64,7 +64,7 @@ TEST(testObjectLiteralExpression_emptyObject, {
     ASSERT_EQ(1, nodes->count, "There should be 1 element in the list");
 
     Node* n = nodes->values[0];
-    ASSERT_EQ_STR("NODE_TYPE_OBJECT_LITERAL", astNodeTypes[n->type],
+    ASSERT_EQ_STR("NODE_TYPE_OBJECT_LITERAL", astNodeTypes[n->nodeType],
                   "The node should have type NODE_TYPE_OBJECT_LITERAL");
     ObjectLiteralNode* obj = n->as.objectLiteralNode;
 
