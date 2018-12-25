@@ -34,7 +34,7 @@ TEST(testTypecheckBlockNode_valDeclWithinBlocks, {
 })
 
 TEST(testTypecheckBlockNode_handlesErrorWithinBlock, {
-    Typechecker* tc = PARSE_SINGLE_EXPR_GET_TC(
+    Typechecker* tc = PARSE_AND_GET_TC(
         "{\n"
         "  val a = 123\n"
         "  b\n"

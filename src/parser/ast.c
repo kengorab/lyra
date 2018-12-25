@@ -225,6 +225,7 @@ TypeExpr* newStructTypeExpr(Token* token, int numFields, Node** keys, TypeExpr**
     return expr;
 }
 
+// TODO: Rename "enum types" to "union types"
 TypeExpr* newEnumTypeExpr(Token* token, int numOptions, TypeExpr** options) {
     TypeExpr* expr = malloc(sizeof(TypeExpr));
     expr->token = token;

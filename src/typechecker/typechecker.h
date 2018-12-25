@@ -7,12 +7,15 @@
 #include "common/list.h"
 #include "common/depth_map.h"
 #include "common/stack.h"
+#include "common/maps.h"
+#include "typechecker/typedefs.h"
 
 typedef struct {
     List* nodes;
     List* errors;
     NodeDepthMap* depthMap;
     lyra_stack_t* scopes;
+    TypesMap* typesMap;
 } Typechecker;
 
 Typechecker* newTypechecker(List* nodes);

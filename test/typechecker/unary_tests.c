@@ -13,7 +13,7 @@ TEST(testTypecheckUnaryNode_minusDouble, {
 })
 
 TEST(testTypecheckUnaryNode_errorMinusBoolean, {
-    Typechecker* tc = PARSE_SINGLE_EXPR_GET_TC("-true", 1);
+    Typechecker* tc = PARSE_AND_GET_TC("-true", 1);
     TypecheckError* err = (TypecheckError*) tc->errors->values[0];
     ASSERT_EQ(TYPE_ERROR_MISMATCH, err->kind, "The error should be a Type Mismatch error");
     ASSERT_TOKEN_POSITION(err->mismatch.token, 1, 1);
@@ -24,7 +24,7 @@ TEST(testTypecheckUnaryNode_errorMinusBoolean, {
 })
 
 TEST(testTypecheckUnaryNode_errorMinusString, {
-    Typechecker* tc = PARSE_SINGLE_EXPR_GET_TC("-'some string'", 1);
+    Typechecker* tc = PARSE_AND_GET_TC("-'some string'", 1);
     TypecheckError* err = (TypecheckError*) tc->errors->values[0];
     ASSERT_EQ(TYPE_ERROR_MISMATCH, err->kind, "The error should be a Type Mismatch error");
     ASSERT_TOKEN_POSITION(err->mismatch.token, 1, 1);
@@ -43,7 +43,7 @@ TEST(testTypecheckUnaryNode_bangBoolean, {
 })
 
 TEST(testTypecheckUnaryNode_errorBangInt, {
-    Typechecker* tc = PARSE_SINGLE_EXPR_GET_TC("!3", 1);
+    Typechecker* tc = PARSE_AND_GET_TC("!3", 1);
     TypecheckError* err = (TypecheckError*) tc->errors->values[0];
     ASSERT_EQ(TYPE_ERROR_MISMATCH, err->kind, "The error should be a Type Mismatch error");
     ASSERT_TOKEN_POSITION(err->mismatch.token, 1, 1);
@@ -53,7 +53,7 @@ TEST(testTypecheckUnaryNode_errorBangInt, {
 })
 
 TEST(testTypecheckUnaryNode_errorBangString, {
-    Typechecker* tc = PARSE_SINGLE_EXPR_GET_TC("!'some string'", 1);
+    Typechecker* tc = PARSE_AND_GET_TC("!'some string'", 1);
     TypecheckError* err = (TypecheckError*) tc->errors->values[0];
     ASSERT_EQ(TYPE_ERROR_MISMATCH, err->kind, "The error should be a Type Mismatch error");
     ASSERT_TOKEN_POSITION(err->mismatch.token, 1, 1);

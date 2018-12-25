@@ -3,7 +3,7 @@
 #include "test_utils.h"
 
 TEST(testTypecheckFuncDeclNode_noParams, {
-    Typechecker* tc = PARSE_SINGLE_EXPR_GET_TC("func returnOne() = 1", 0);
+    Typechecker* tc = PARSE_AND_GET_TC("func returnOne() = 1", 0);
     Node* expr = (Node*) tc->nodes->values[0];
     ASSERT_TYPE_EQ(expr->type, PRIMITIVE_TYPE_UNIT, "Unit");
 
@@ -16,7 +16,7 @@ TEST(testTypecheckFuncDeclNode_noParams, {
 })
 
 TEST(testTypecheckFuncDeclNode_oneParam, {
-    Typechecker* tc = PARSE_SINGLE_EXPR_GET_TC("func returnOne(a: String) = 1", 0);
+    Typechecker* tc = PARSE_AND_GET_TC("func returnOne(a: String) = 1", 0);
     Node* expr = (Node*) tc->nodes->values[0];
     ASSERT_TYPE_EQ(expr->type, PRIMITIVE_TYPE_UNIT, "Unit");
 
@@ -30,7 +30,7 @@ TEST(testTypecheckFuncDeclNode_oneParam, {
 })
 
 TEST(testTypecheckFuncDeclNode_multiParams, {
-    Typechecker* tc = PARSE_SINGLE_EXPR_GET_TC("func returnOne(a: String, b: Bool) = if (b) a else 'nope'", 0);
+    Typechecker* tc = PARSE_AND_GET_TC("func returnOne(a: String, b: Bool) = if (b) a else 'nope'", 0);
     Node* expr = (Node*) tc->nodes->values[0];
     ASSERT_TYPE_EQ(expr->type, PRIMITIVE_TYPE_UNIT, "Unit");
 
@@ -45,7 +45,7 @@ TEST(testTypecheckFuncDeclNode_multiParams, {
 })
 
 TEST(testTypecheckFuncDeclNode_errorDuplicateParameter, {
-    Typechecker* tc = PARSE_SINGLE_EXPR_GET_TC("func returnOne(a: Int, a: Bool) = 1", 1);
+    Typechecker* tc = PARSE_AND_GET_TC("func returnOne(a: Int, a: Bool) = 1", 1);
     TypecheckError* err = (TypecheckError*) tc->errors->values[0];
     ASSERT_EQ(TYPE_ERROR_CUSTOM, err->kind, "The error should be a Custom error");
     ASSERT_TOKEN_POSITION(err->mismatch.token, 1, 24);
@@ -54,7 +54,7 @@ TEST(testTypecheckFuncDeclNode_errorDuplicateParameter, {
 })
 
 TEST(testTypecheckFuncDeclNode_errorReturnTypeAnnotationMismatch, {
-    Typechecker* tc = PARSE_SINGLE_EXPR_GET_TC("func returnOne(a: Int, b: Int): Bool = a + b", 1);
+    Typechecker* tc = PARSE_AND_GET_TC("func returnOne(a: Int, b: Int): Bool = a + b", 1);
     TypecheckError* err = (TypecheckError*) tc->errors->values[0];
     ASSERT_EQ(TYPE_ERROR_MISMATCH, err->kind, "The error should be a Type Mismatch error");
     ASSERT_TOKEN_POSITION(err->mismatch.token, 1, 42);
@@ -64,7 +64,7 @@ TEST(testTypecheckFuncDeclNode_errorReturnTypeAnnotationMismatch, {
 })
 
 TEST(testTypecheckFuncDeclNode_errorWithinBody, {
-    Typechecker* tc = PARSE_SINGLE_EXPR_GET_TC("func returnOne(a: Int, b: Bool) = a + b", 1);
+    Typechecker* tc = PARSE_AND_GET_TC("func returnOne(a: Int, b: Bool) = a + b", 1);
     TypecheckError* err = (TypecheckError*) tc->errors->values[0];
     ASSERT_EQ(TYPE_ERROR_MISMATCH, err->kind, "The error should be a Type Mismatch error");
     ASSERT_TOKEN_POSITION(err->mismatch.token, 1, 37);
