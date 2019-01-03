@@ -1,0 +1,130 @@
+{
+  "types": {
+    "Int": { "type": "PRIMITIVE_TYPE_INT", "name": "Int", "parent": "Any" },
+    "Unit": { "type": "PRIMITIVE_TYPE_UNIT", "name": "Unit", "parent": "Any" },
+    "Double": { "type": "PRIMITIVE_TYPE_DOUBLE", "name": "Double", "parent": "Any" },
+    "String": { "type": "PRIMITIVE_TYPE_STRING", "name": "String", "parent": "Any" },
+    "List": { "type": "PRIMITIVE_TYPE_NONPRIMITIVE", "name": "List[T]", "parent": "Any" },
+    "Bool": { "type": "PRIMITIVE_TYPE_BOOL", "name": "Bool", "parent": "Any" },
+    "X": { "type": "PRIMITIVE_TYPE_INT", "name": "Int", "parent": "Any" },
+    "Any": { "type": "PRIMITIVE_TYPE_ANY", "name": "Any", "parent": "Any" }
+  },
+  "ast": {
+    "nodes": [
+      {
+        "kind": "NODE_TYPE_TYPE_DECL_STATEMENT",
+        "position": [1, 1],
+        "type": "Unit",
+        "name": "X",
+        "typeArgs": [],
+        "typeExpr": { "typeExprKind": "TYPE_EXPR_BASIC_TYPE", "name": "Int", "typeArgs": [] }
+      },
+      {
+        "kind": "NODE_TYPE_FUNC_DECL_STATEMENT",
+        "position": [3, 1],
+        "type": "Unit",
+        "name": "abc",
+        "parameters": [
+          { "kind": "NODE_TYPE_IDENT", "position": [3, 10], "type": "Int", "name": "a" },
+          { "kind": "NODE_TYPE_IDENT", "position": [3, 16], "type": "Int", "name": "b" }
+        ],
+        "annotatedParameterTypes": [
+          { "typeExprKind": "TYPE_EXPR_BASIC_TYPE", "name": "X", "typeArgs": [] },
+          { "typeExprKind": "TYPE_EXPR_BASIC_TYPE", "name": "X", "typeArgs": [] }
+        ],
+        "body": {
+          "kind": "NODE_TYPE_BINARY",
+          "position": [3, 26],
+          "type": "Int",
+          "operator": { "value": "+", "position": [3, 26] },
+          "left": { "kind": "NODE_TYPE_IDENT", "position": [3, 24], "type": "Int", "name": "a" },
+          "right": { "kind": "NODE_TYPE_IDENT", "position": [3, 28], "type": "Int", "name": "b" }
+        },
+        "annotatedReturnType": null
+      },
+      {
+        "kind": "NODE_TYPE_VAL_DECL_STATEMENT",
+        "position": [5, 1],
+        "type": "Unit",
+        "isMutable": false,
+        "name": "a",
+        "annotatedType": null,
+        "assignment": {
+          "kind": "NODE_TYPE_INVOCATION",
+          "position": [5, 12],
+          "type": "Int",
+          "target": { "kind": "NODE_TYPE_IDENT", "position": [5, 9], "type": "Function[Int, Int, Int]", "name": "abc" },
+          "arguments": [
+            {
+              "kind": "NODE_TYPE_LITERAL",
+              "position": [5, 13],
+              "type": "Int",
+              "literalKind": "LITERAL_NODE_INT",
+              "value": 1
+            },
+            {
+              "kind": "NODE_TYPE_LITERAL",
+              "position": [5, 16],
+              "type": "Int",
+              "literalKind": "LITERAL_NODE_INT",
+              "value": 2
+            }
+          ]
+        }
+      },
+      {
+        "kind": "NODE_TYPE_VAL_DECL_STATEMENT",
+        "position": [6, 1],
+        "type": "Unit",
+        "isMutable": false,
+        "name": "b",
+        "annotatedType": null,
+        "assignment": {
+          "kind": "NODE_TYPE_ARRAY_LITERAL",
+          "position": [6, 9],
+          "type": "List[Int]",
+          "elements": [
+            { "kind": "NODE_TYPE_IDENT", "position": [6, 10], "type": "Int", "name": "a" },
+            {
+              "kind": "NODE_TYPE_LITERAL",
+              "position": [6, 13],
+              "type": "Int",
+              "literalKind": "LITERAL_NODE_INT",
+              "value": 4
+            },
+            {
+              "kind": "NODE_TYPE_LITERAL",
+              "position": [6, 16],
+              "type": "Int",
+              "literalKind": "LITERAL_NODE_INT",
+              "value": 3
+            }
+          ]
+        }
+      },
+      {
+        "kind": "NODE_TYPE_VAL_DECL_STATEMENT",
+        "position": [7, 1],
+        "type": "Unit",
+        "isMutable": false,
+        "name": "c",
+        "annotatedType": null,
+        "assignment": {
+          "kind": "NODE_TYPE_OBJECT_LITERAL",
+          "position": [7, 9],
+          "type": "Obj[Int, List[Int]]",
+          "entries": [
+            {
+              "key": { "kind": "NODE_TYPE_IDENT", "position": [7, 11], "type": "Int", "name": "a" },
+              "value": { "kind": "NODE_TYPE_IDENT", "position": [7, 14], "type": "Int", "name": "a" }
+            },
+            {
+              "key": { "kind": "NODE_TYPE_IDENT", "position": [7, 17], "type": "List[Int]", "name": "b" },
+              "value": { "kind": "NODE_TYPE_IDENT", "position": [7, 20], "type": "List[Int]", "name": "b" }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

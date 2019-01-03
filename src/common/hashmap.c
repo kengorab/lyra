@@ -395,3 +395,29 @@ int hashmap_length(map_t in){
     if(m != NULL) return m->size;
     else return 0;
 }
+
+char** hashmap_keys(map_t in, int* numKeys) {
+    /* Cast the hashmap */
+    hashmap_map* m = (hashmap_map*) in;
+
+    /* On empty hashmap, return immediately */
+    if (hashmap_length(m) <= 0) {
+        *numKeys = 0;
+        return NULL;
+    }
+
+    char** keys = calloc((size_t) hashmap_length(in), sizeof(char*));
+    int keyIdx = 0;
+
+    /* Linear probing */
+    for(int i = 0; i< m->table_size; i++) {
+        if(m->data[i].in_use != 0) {
+            char* key = m->data[i].key;
+            keys[keyIdx] = key;
+            keyIdx++;
+        }
+    }
+
+    *numKeys = hashmap_length(in);
+    return keys;
+}

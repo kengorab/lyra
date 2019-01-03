@@ -79,4 +79,9 @@ extern void hashmap_free(map_t in);
  */
 extern int hashmap_length(map_t in);
 
+/*
+ * Gets the keys of the hashmap
+ */
+char** hashmap_keys(map_t in, int* numKeys);
+
 #endif //CLYRA_HASHMAP_H
