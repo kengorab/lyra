@@ -315,7 +315,9 @@ static TypecheckError* visitFuncDeclStmtNode(Typechecker* tc, Node* node) {
     TypecheckError* err;
     for (int i = 0; i < funcDeclStmt->numParams; i++) {
         paramTypes[i] = resolveType(funcDeclStmt->paramTypeAnnotations[i], tc->typesMap);
-        IdentifierNode* param = funcDeclStmt->params[i]->as.identifierNode;
+        Node* paramNode = funcDeclStmt->params[i];
+        paramNode->type = paramTypes[i];
+        IdentifierNode* param = paramNode->as.identifierNode;
         err = define(tc, param->token, param->name, paramTypes[i]);
         if (err != NULL) {
             return err;
@@ -323,7 +325,7 @@ static TypecheckError* visitFuncDeclStmtNode(Typechecker* tc, Node* node) {
     }
 
     err = visit(tc, funcDeclStmt->body);
-    endScope(tc);
+    endScope(tc); // TODO?: Assign scope onto FuncDeclNode to use later on?
     if (err != NULL) {
         return err;
     }
@@ -359,8 +361,7 @@ static TypecheckError* visitTypeExpr(Typechecker* tc, TypeExpr* typeExpr, Type**
             *outType = resolveType(typeExpr, tc->typesMap);
             break;
         }
-        default:
-            printf("Unknown type: %s; exiting\n", tokenGetValue(typeExpr->token));
+        default:printf("Unknown type: %s; exiting\n", tokenGetValue(typeExpr->token));
             exit(1);
     }
 
@@ -369,6 +370,7 @@ static TypecheckError* visitTypeExpr(Typechecker* tc, TypeExpr* typeExpr, Type**
 
 static TypecheckError* visitTypeDeclStmtNode(Typechecker* tc, Node* node) {
     TypeDeclStmt* typeDeclStmt = node->as.typeDeclStmt;
+    node->type = typeUnit();
 
     if (tc->scopes->size != 1) {
         return newCustomError(typeDeclStmt->token, "Types cannot be declared outside of the top-level scope");
@@ -419,6 +421,8 @@ static TypecheckError* visitObjectLiteralNode(Typechecker* tc, Node* node) {
         }
         fieldTypes[i] = objectLiteralNode->entries[i]->value->type;
         fieldNames[i] = objectLiteralNode->entries[i]->ident->as.identifierNode->name;
+
+        objectLiteralNode->entries[i]->ident->type = fieldTypes[i];
     }
 
     node->type = typeObj(NULL, objectLiteralNode->size, fieldTypes, fieldNames);

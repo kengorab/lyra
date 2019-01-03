@@ -24,6 +24,8 @@ add_executable(
         src/debugging/mem_checks.h
         src/debugging/printing_visitor.c
         src/debugging/printing_visitor.h
+        src/debugging/to_json_visitor.c
+        src/debugging/to_json_visitor.h
         src/lexer/lexer.c
         src/lexer/lexer.h
         src/parser/ast.h
