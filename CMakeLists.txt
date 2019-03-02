@@ -41,6 +41,17 @@ add_executable(
         src/typechecker/typedefs.c
         src/typechecker/types.c
         src/typechecker/types.h
+        src/vm/chunk.c
+        src/vm/chunk.h
+        src/vm/common.h
+        src/vm/debug.c
+        src/vm/debug.h
+        src/vm/value.c
+        src/vm/value.h
+        src/vm/lines.c
+        src/vm/lines.h
+        src/vm/vm.c
+        src/vm/vm.h
 )
 
 enable_testing()
@@ -71,6 +82,18 @@ add_executable(
         src/typechecker/typedefs.c
         src/typechecker/types.c
         src/typechecker/types.h
+        src/vm/chunk.c
+        src/vm/chunk.h
+        src/vm/common.h
+        src/vm/debug.c
+        src/vm/debug.h
+        src/vm/lines.c
+        src/vm/lines.h
+        src/vm/value.c
+        src/vm/value.h
+        src/vm/vm.c
+        src/vm/vm.h
+
         test/common/list_test.c
         test/common/list_test.h
         test/lexer/lexer_test.c
@@ -128,6 +151,8 @@ add_executable(
         test/test.h
         test/test_utils.c
         test/test_utils.h
-        test/typechecker/types_tests.c test/typechecker/types_tests.h)
+        test/typechecker/types_tests.c
+        test/typechecker/types_tests.h
+)
 
 add_test(clyra_tests clyra_tests)
