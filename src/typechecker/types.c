@@ -6,8 +6,6 @@
 #include "parser/ast.h"
 #include "types.h"
 
-const char* primitiveTypes[] = {PRIMITIVE_TYPE_TYPES};
-
 static Type _typeString = {
     .type = PRIMITIVE_TYPE_STRING, .name = "String", .numTypeArgs = 0, .typeArgs = NULL, .typeArgNames = NULL
 };

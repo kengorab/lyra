@@ -3,29 +3,22 @@
 
 #include <stdbool.h>
 #include "typedefs.h"
+#include "common/enums.h"
 
-#undef C
-#define C(ENUM_VAL) ENUM_VAL,
-#define PRIMITIVE_TYPE_TYPES \
-    C(PRIMITIVE_TYPE_UNSET) \
-    C(PRIMITIVE_TYPE_NONPRIMITIVE) \
-    C(PRIMITIVE_TYPE_UNIT) \
-    C(PRIMITIVE_TYPE_INT) \
-    C(PRIMITIVE_TYPE_DOUBLE) \
-    C(PRIMITIVE_TYPE_BOOL) \
-    C(PRIMITIVE_TYPE_STRING) \
-    C(PRIMITIVE_TYPE_NIL) \
-    C(PRIMITIVE_TYPE_ANY)
+MAKE_ENUM(
+    PrimitiveType,
+    primitiveTypes,
 
-typedef enum {
-    PRIMITIVE_TYPE_TYPES
-} PrimitiveType;
-
-#undef C
-#define C(ENUM_VAL) #ENUM_VAL,
-
-// Ignore warning; initialized statically
-const char* primitiveTypes[];
+    PRIMITIVE_TYPE_UNSET,
+    PRIMITIVE_TYPE_NONPRIMITIVE,
+    PRIMITIVE_TYPE_UNIT,
+    PRIMITIVE_TYPE_INT,
+    PRIMITIVE_TYPE_DOUBLE,
+    PRIMITIVE_TYPE_BOOL,
+    PRIMITIVE_TYPE_STRING,
+    PRIMITIVE_TYPE_NIL,
+    PRIMITIVE_TYPE_ANY
+)
 
 typedef struct Type Type; // Pre-defined in typedefs.h, ignore warning
 
@@ -50,20 +43,32 @@ void initTypesMap(TypesMap* map);
 Type* typeClone(Type* orig);
 
 Type* newType(const char* name);
+
 Type* newTypeWithParent(const char* name, Type* parentType);
+
 Type* newTypeWithArgs(const char* name, int numTypeArgs, Type** typeArgs, const char** typeArgNames);
-Type* newTypeWithParentAndArgs(const char* name, Type* parentType, int numTypeArgs, Type** typeArgs, const char** typeArgNames);
+
+Type* newTypeWithParentAndArgs(const char* name, Type* parentType, int numTypeArgs, Type** typeArgs,
+                               const char** typeArgNames);
 
 Type* typeString();
+
 Type* typeInt();
+
 Type* typeDouble();
+
 Type* typeBool();
+
 Type* typeNil();
+
 Type* typeAny();
+
 Type* typeUnit();
 
 Type* typeList(Type* typeArg);
+
 Type* typeObj(const char* name, int numFields, Type** fieldTypes, const char** fieldNames);
+
 Type* typeFunction(Type* returnType, int numArgs, Type** argTypes, const char** paramNames);
 
 bool typeEq(Type* targetType, Type* currentType);
