@@ -2,6 +2,7 @@
 #define CLYRA_TYPES_H
 
 #include <stdbool.h>
+
 #include "typedefs.h"
 #include "common/enums.h"
 
@@ -48,8 +49,7 @@ Type* newTypeWithParent(const char* name, Type* parentType);
 
 Type* newTypeWithArgs(const char* name, int numTypeArgs, Type** typeArgs, const char** typeArgNames);
 
-Type* newTypeWithParentAndArgs(const char* name, Type* parentType, int numTypeArgs, Type** typeArgs,
-                               const char** typeArgNames);
+Type* newTypeWithParentAndArgs(const char* name, Type* parentType, int numTypeArgs, Type** typeArgs, const char** typeArgNames);
 
 Type* typeString();
 
