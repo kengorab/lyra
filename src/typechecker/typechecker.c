@@ -533,8 +533,6 @@ static TypecheckError* define(Typechecker* tc, Token* token, const char* name, T
     return NULL;
 }
 
-const char* typeErrorTypes[] = {TYPE_ERROR_TYPES};
-
 static TypecheckError* newCustomError(Token* token, const char* message) {
     TypecheckError* err = malloc(sizeof(TypecheckError));
     err->kind = TYPE_ERROR_CUSTOM;

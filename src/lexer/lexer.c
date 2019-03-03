@@ -21,8 +21,6 @@ static char advance(Lexer* lexer) {
 #define IS_DIGIT(ch) ('0' <= ch && ch <= '9')
 #define IS_ALPHA(ch) ('a' <= ch && ch <= 'z' || 'A' <= ch && ch <= 'Z')
 
-const char* tokenTypes[] = {TOKEN_TYPES};
-
 const char* tokenGetValue(Token* token) {
     return substring(token->start, (size_t) token->length);
 }

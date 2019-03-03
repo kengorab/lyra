@@ -4,6 +4,7 @@
 #include <stdarg.h>
 
 #include "parser/ast.h"
+#include "common/enums.h"
 #include "common/list.h"
 #include "common/depth_map.h"
 #include "common/stack.h"
@@ -20,23 +21,13 @@ typedef struct {
 
 Typechecker* newTypechecker(List* nodes);
 
-#ifdef C
-#undef C
-#endif
-#define C(ENUM_VAL) ENUM_VAL,
-#define TYPE_ERROR_TYPES \
-    C(TYPE_ERROR_MISMATCH) \
-    C(TYPE_ERROR_CUSTOM)
+MAKE_ENUM(
+    TypeErrorType,
+    typeErrorTypes,
 
-typedef enum {
-    TYPE_ERROR_TYPES
-} TypeErrorType;
-
-#undef C
-#define C(ENUM_VAL) #ENUM_VAL,
-
-// Ignore warning; initialized statically
-const char* typeErrorTypes[];
+    TYPE_ERROR_MISMATCH,
+    TYPE_ERROR_CUSTOM
+)
 
 typedef struct {
     TypeErrorType kind;
