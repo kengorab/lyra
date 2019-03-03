@@ -4,12 +4,6 @@
 #include "parser/ast.h"
 #include "ast.h"
 
-const char* astNodeTypes[] = {AST_NODE_TYPES};
-
-const char* literalNodeTypes[] = {LITERAL_NODE_TYPES};
-
-const char* typeExprTypes[] = {TYPE_EXPR_TYPES};
-
 // ------------------------------------
 //             Expressions
 // ------------------------------------

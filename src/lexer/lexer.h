@@ -1,61 +1,53 @@
 #ifndef CLYRA_LEXER_H
 #define CLYRA_LEXER_H
 
-#ifdef C
-#undef C
-#endif
-#define C(ENUM_VAL) ENUM_VAL,
-#define TOKEN_TYPES \
-    C(TOKEN_NUMBER) \
-    C(TOKEN_PLUS) \
-    C(TOKEN_MINUS) \
-    C(TOKEN_STAR) \
-    C(TOKEN_SLASH) \
-    C(TOKEN_LT) \
-    C(TOKEN_LTE) \
-    C(TOKEN_GT) \
-    C(TOKEN_GTE) \
-    C(TOKEN_EQ) \
-    C(TOKEN_EQ_EQ) \
-    C(TOKEN_BANG) \
-    C(TOKEN_BANG_EQ) \
-    C(TOKEN_AND) \
-    C(TOKEN_OR) \
-    C(TOKEN_LBRACK) \
-    C(TOKEN_RBRACK) \
-    C(TOKEN_LBRACE) \
-    C(TOKEN_RBRACE) \
-    C(TOKEN_LPAREN) \
-    C(TOKEN_RPAREN) \
-    C(TOKEN_DOT) \
-    C(TOKEN_COMMA) \
-    C(TOKEN_COLON) \
-    C(TOKEN_COLON_COLON) \
-    C(TOKEN_ARROW) \
-    C(TOKEN_PIPE) \
-    C(TOKEN_STRING) \
-    C(TOKEN_IDENT) \
-    C(TOKEN_VAL) \
-    C(TOKEN_VAR) \
-    C(TOKEN_TYPE) \
-    C(TOKEN_FUNC) \
-    C(TOKEN_IF) \
-    C(TOKEN_ELSE) \
-    C(TOKEN_TRUE) \
-    C(TOKEN_FALSE) \
-    C(TOKEN_NIL) \
-    C(TOKEN_ERROR) \
-    C(TOKEN_EOF)
+#include "common/enums.h"
 
-typedef enum {
-    TOKEN_TYPES
-} TokenType;
+MAKE_ENUM(
+    TokenType,
+    tokenTypes,
 
-#undef C
-#define C(ENUM_VAL) #ENUM_VAL,
-
-// Ignore warning; initialized statically
-const char* tokenTypes[];
+    TOKEN_NUMBER,
+    TOKEN_PLUS,
+    TOKEN_MINUS,
+    TOKEN_STAR,
+    TOKEN_SLASH,
+    TOKEN_LT,
+    TOKEN_LTE,
+    TOKEN_GT,
+    TOKEN_GTE,
+    TOKEN_EQ,
+    TOKEN_EQ_EQ,
+    TOKEN_BANG,
+    TOKEN_BANG_EQ,
+    TOKEN_AND,
+    TOKEN_OR,
+    TOKEN_LBRACK,
+    TOKEN_RBRACK,
+    TOKEN_LBRACE,
+    TOKEN_RBRACE,
+    TOKEN_LPAREN,
+    TOKEN_RPAREN,
+    TOKEN_DOT,
+    TOKEN_COMMA,
+    TOKEN_COLON,
+    TOKEN_COLON_COLON,
+    TOKEN_ARROW,
+    TOKEN_PIPE,
+    TOKEN_STRING,
+    TOKEN_IDENT,
+    TOKEN_VAL,
+    TOKEN_VAR,
+    TOKEN_TYPE,
+    TOKEN_FUNC,
+    TOKEN_IF,
+    TOKEN_ELSE,
+    TOKEN_TRUE,
+    TOKEN_FALSE,
+    TOKEN_NIL,
+    TOKEN_ERROR,
+    TOKEN_EOF
+)
 
 typedef struct {
     TokenType type;

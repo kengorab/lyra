@@ -5,56 +5,39 @@
 
 #include "typechecker/types.h"
 #include "lexer/lexer.h"
+#include "common/enums.h"
 
-#ifdef C
-#undef C
-#endif
-#define C(ENUM_VAL) ENUM_VAL,
-#define AST_NODE_TYPES \
-    C(NODE_TYPE_LITERAL) \
-    C(NODE_TYPE_ARRAY_LITERAL) \
-    C(NODE_TYPE_OBJECT_LITERAL) \
-    C(NODE_TYPE_IDENT) \
-    C(NODE_TYPE_UNARY) \
-    C(NODE_TYPE_BINARY) \
-    C(NODE_TYPE_GROUPING) \
-    C(NODE_TYPE_IF_ELSE) \
-    C(NODE_TYPE_BLOCK) \
-    C(NODE_TYPE_INVOCATION) \
-    C(NODE_TYPE_VAL_DECL_STATEMENT) \
-    C(NODE_TYPE_FUNC_DECL_STATEMENT) \
-    C(NODE_TYPE_TYPE_DECL_STATEMENT)
+MAKE_ENUM(
+    AstNodeType,
+    astNodeTypes,
 
-typedef enum {
-    AST_NODE_TYPES
-} AstNodeType;
-
-#undef C
-#define C(ENUM_VAL) #ENUM_VAL,
-
-// Ignore warning; initialized statically
-const char* astNodeTypes[];
+    NODE_TYPE_LITERAL,
+    NODE_TYPE_ARRAY_LITERAL,
+    NODE_TYPE_OBJECT_LITERAL,
+    NODE_TYPE_IDENT,
+    NODE_TYPE_UNARY,
+    NODE_TYPE_BINARY,
+    NODE_TYPE_GROUPING,
+    NODE_TYPE_IF_ELSE,
+    NODE_TYPE_BLOCK,
+    NODE_TYPE_INVOCATION,
+    NODE_TYPE_VAL_DECL_STATEMENT,
+    NODE_TYPE_FUNC_DECL_STATEMENT,
+    NODE_TYPE_TYPE_DECL_STATEMENT
+)
 
 typedef struct Node Node;
 
-#undef C
-#define C(ENUM_VAL) ENUM_VAL,
-#define LITERAL_NODE_TYPES \
-    C(LITERAL_NODE_INT) \
-    C(LITERAL_NODE_DOUBLE) \
-    C(LITERAL_NODE_STRING) \
-    C(LITERAL_NODE_BOOL) \
-    C(LITERAL_NODE_NIL)
+MAKE_ENUM(
+    LiteralNodeType,
+    literalNodeTypes,
 
-typedef enum {
-    LITERAL_NODE_TYPES
-} LiteralNodeType;
-
-#undef C
-#define C(ENUM_VAL) #ENUM_VAL,
-
-// Ignore warning; initialized statically
-const char* literalNodeTypes[];
+    LITERAL_NODE_INT,
+    LITERAL_NODE_DOUBLE,
+    LITERAL_NODE_STRING,
+    LITERAL_NODE_BOOL,
+    LITERAL_NODE_NIL
+)
 
 // ------------------------------------
 //             Expressions
@@ -174,23 +157,15 @@ typedef struct {
 //             Type Node
 // ------------------------------------
 
-#undef C
-#define C(ENUM_VAL) ENUM_VAL,
-#define TYPE_EXPR_TYPES \
-    C(TYPE_EXPR_BASIC_TYPE) \
-    C(TYPE_EXPR_TUPLE_TYPE) \
-    C(TYPE_EXPR_STRUCT_TYPE) \
-    C(TYPE_EXPR_ENUM_TYPE)
+MAKE_ENUM(
+    TypeExprType,
+    typeExprTypes,
 
-typedef enum {
-    TYPE_EXPR_TYPES
-} TypeExprType;
-
-#undef C
-#define C(ENUM_VAL) #ENUM_VAL,
-
-// Ignore warning; initialized statically
-const char* typeExprTypes[];
+    TYPE_EXPR_BASIC_TYPE,
+    TYPE_EXPR_TUPLE_TYPE,
+    TYPE_EXPR_STRUCT_TYPE,
+    TYPE_EXPR_ENUM_TYPE
+)
 
 struct TypeExpr {
     Token* token;

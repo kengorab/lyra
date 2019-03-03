@@ -10,6 +10,7 @@ include_directories(test)
 
 add_executable(
         clyra
+        src/common/enums.h
         src/common/depth_map.c
         src/common/depth_map.h
         src/common/hashmap.c
@@ -57,6 +58,7 @@ add_executable(
 enable_testing()
 add_executable(
         clyra_tests
+        src/common/enums.h
         src/common/depth_map.c
         src/common/depth_map.h
         src/common/hashmap.c
@@ -147,12 +149,12 @@ add_executable(
         test/typechecker/valdecl_tests.c
         test/typechecker/valdecl_tests.h
         test/typechecker/typechecker_test_utils.h
+        test/typechecker/types_tests.c
+        test/typechecker/types_tests.h
         test/main.c
         test/test.h
         test/test_utils.c
         test/test_utils.h
-        test/typechecker/types_tests.c
-        test/typechecker/types_tests.h
 )
 
 add_test(clyra_tests clyra_tests)
