@@ -440,7 +440,7 @@ static TypecheckError* visitGroupingNodeNode(Typechecker* tc, Node* node) {
 }
 
 // Must keep order with AST_NODE_TYPES enum
-TypecheckRule rules[] = {
+static TypecheckRule rules[] = {
     {NODE_TYPE_LITERAL,             visitLiteralNode},
     {NODE_TYPE_ARRAY_LITERAL,       visitArrayLiteralNode},
     {NODE_TYPE_OBJECT_LITERAL,      visitObjectLiteralNode},

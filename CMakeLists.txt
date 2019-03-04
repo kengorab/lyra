@@ -45,6 +45,8 @@ add_executable(
         src/vm/chunk.c
         src/vm/chunk.h
         src/vm/common.h
+        src/vm/compiler.c
+        src/vm/compiler.h
         src/vm/debug.c
         src/vm/debug.h
         src/vm/value.c
@@ -87,6 +89,8 @@ add_executable(
         src/vm/chunk.c
         src/vm/chunk.h
         src/vm/common.h
+        src/vm/compiler.c
+        src/vm/compiler.h
         src/vm/debug.c
         src/vm/debug.h
         src/vm/lines.c
@@ -98,6 +102,10 @@ add_executable(
 
         test/common/list_test.c
         test/common/list_test.h
+        test/compiler/compiler_tests.c
+        test/compiler/compiler_tests.h
+        test/compiler/literal_tests.c
+        test/compiler/literal_tests.h
         test/lexer/lexer_test.c
         test/lexer/lexer_test.h
         test/parser/ast_test.c
@@ -155,6 +163,6 @@ add_executable(
         test/test.h
         test/test_utils.c
         test/test_utils.h
-)
+        test/compiler/compiler_test_utils.c test/compiler/compiler_test_utils.h test/compiler/unary_tests.c test/compiler/unary_tests.h test/compiler/binary_tests.c test/compiler/binary_tests.h)
 
 add_test(clyra_tests clyra_tests)

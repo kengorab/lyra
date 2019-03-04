@@ -1,10 +1,11 @@
 #include <stdio.h>
-#include <typechecker/typechecker_tests.h>
 
 #include "common/list_test.h"
 #include "lexer/lexer_test.h"
 #include "parser/ast_test.h"
 #include "parser/parser_test.h"
+#include "typechecker/typechecker_tests.h"
+#include "compiler/compiler_tests.h"
 
 #define ANSI_RED  "\x1b[31m"
 #define ANSI_GREEN  "\x1b[32m"
@@ -48,6 +49,7 @@ int main() {
     runLexerTests(&t);
     runParserTests(&t);
     runTypecheckerTests(&t);
+    runCompilerTests(&t);
 
     printf(
         "Ran %d tests; %s%d successful%s, %s%d failure%s%s\n",
